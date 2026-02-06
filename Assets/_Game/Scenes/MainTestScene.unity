@@ -260,6 +260,7 @@ GameObject:
   - component: {fileID: 190765077}
   - component: {fileID: 190765078}
   - component: {fileID: 190765079}
+  - component: {fileID: 190765080}
   m_Layer: 0
   m_Name: InventoryManager
   m_TagString: Untagged
@@ -296,7 +297,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.InventoryManager
   itemDatabase: {fileID: 11400000, guid: b6bc9f2876cdf4129b27b641365d7331, type: 2}
   items: []
-  debugItemId: bandages
+  debugSelectedItem: {fileID: 11400000, guid: 2fd80d194305b484fb50aadc8d78e6f3, type: 2}
 --- !u!114 &190765079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -314,6 +315,22 @@ MonoBehaviour:
   failCount: 0
   isRunning: 0
   autoRunOnStart: 0
+--- !u!114 &190765080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 190765076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21dce13103a2043d2bc425a7a664d91c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.AIItemCreator
+  inventoryManager: {fileID: 190765078}
+  customItemName: Test Item
+  customItemType: 3
+  customDescription: A.N.G.E.L. generated this item
 --- !u!1 &659944815
 GameObject:
   m_ObjectHideFlags: 0
