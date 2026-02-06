@@ -7,20 +7,20 @@ using Sirenix.OdinInspector;
 namespace TheBunkerGames.Tests
 {
     /// <summary>
-    /// Tests for DailyChoiceController: dilemma presentation, choice making,
+    /// Tests for DailyChoiceManager: dilemma presentation, choice making,
     /// stat effects, edge cases.
     /// </summary>
     public class DailyChoiceTester : BaseTester
     {
         public override string TesterName => "DailyChoice";
 
-        private DailyChoiceController dc;
+        private DailyChoiceManager dc;
         private FamilyManager fm;
 
         protected override void Setup()
         {
-            dc = DailyChoiceController.Instance;
-            AssertNotNull(dc, "DailyChoiceController.Instance");
+            dc = DailyChoiceManager.Instance;
+            AssertNotNull(dc, "DailyChoiceManager.Instance");
 
             fm = FamilyManager.Instance;
             AssertNotNull(fm, "FamilyManager.Instance");
@@ -127,13 +127,13 @@ namespace TheBunkerGames.Tests
         {
             DilemmaData received = null;
             System.Action<DilemmaData> handler = d => received = d;
-            DailyChoiceController.OnDilemmaPresented += handler;
+            DailyChoiceManager.OnDilemmaPresented += handler;
 
             dc.PresentDilemma(CreateTestDilemma());
             AssertNotNull(received, "Event should fire");
             AssertEqual("Test Dilemma", received.Title, "Event dilemma title");
 
-            DailyChoiceController.OnDilemmaPresented -= handler;
+            DailyChoiceManager.OnDilemmaPresented -= handler;
         }
 
         // -------------------------------------------------------------------------
@@ -151,7 +151,7 @@ namespace TheBunkerGames.Tests
                 chosenOption = o;
                 outcome = out_;
             };
-            DailyChoiceController.OnChoiceMade += handler;
+            DailyChoiceManager.OnChoiceMade += handler;
 
             dc.MakeChoice(0);
             AssertNotNull(chosenOption, "Chosen option");
@@ -159,7 +159,7 @@ namespace TheBunkerGames.Tests
             AssertNotNull(outcome, "Outcome");
             AssertEqual(ChoiceOutcome.Positive, outcome.OutcomeType, "Outcome type");
 
-            DailyChoiceController.OnChoiceMade -= handler;
+            DailyChoiceManager.OnChoiceMade -= handler;
         }
 
         [TestMethod("MakeChoice applies stat effects to all family members (no target)")]
@@ -245,13 +245,13 @@ namespace TheBunkerGames.Tests
 
             bool fired = false;
             System.Action handler = () => fired = true;
-            DailyChoiceController.OnChoicePhaseComplete += handler;
+            DailyChoiceManager.OnChoicePhaseComplete += handler;
 
             dc.CompleteChoicePhase();
             AssertNull(dc.CurrentDilemma, "Dilemma should be null after complete");
             AssertTrue(fired, "OnChoicePhaseComplete should fire");
 
-            DailyChoiceController.OnChoicePhaseComplete -= handler;
+            DailyChoiceManager.OnChoicePhaseComplete -= handler;
         }
     }
 }

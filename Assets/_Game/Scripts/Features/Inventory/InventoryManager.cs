@@ -187,6 +187,26 @@ namespace TheBunkerGames
             }
             return new string[] { "can_of_beans", "bandages", "broken_radio" }; // Fallback
         }
+
+        [Title("Auto Setup")]
+        [Button("Auto Setup Dependencies", ButtonSizes.Large)]
+        [GUIColor(0.4f, 1f, 0.4f)]
+        private void AutoSetupDependencies()
+        {
+            #if UNITY_EDITOR
+            // Ensure Tester exists
+            var testerType = System.Type.GetType("TheBunkerGames.Tests.InventoryManagerTester");
+            if (testerType != null && GetComponent(testerType) == null)
+            {
+                gameObject.AddComponent(testerType);
+                Debug.Log("[InventoryManager] Added InventoryManagerTester.");
+            }
+            else if (testerType == null)
+            {
+                Debug.LogWarning("[InventoryManager] Could not find InventoryManagerTester type. Ensure it is in TheBunkerGames.Tests namespace.");
+            }
+            #endif
+        }
         #endif
     }
 }

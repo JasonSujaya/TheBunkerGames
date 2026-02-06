@@ -8,19 +8,19 @@ using Sirenix.OdinInspector;
 namespace TheBunkerGames.Tests
 {
     /// <summary>
-    /// Tests for AngelInteractionController: mood changes, processing degradation,
+    /// Tests for AngelInteractionManager: mood changes, processing degradation,
     /// interaction limits, mock responses, resource granting, events.
     /// </summary>
     public class AngelInteractionTester : BaseTester
     {
         public override string TesterName => "AngelInteraction";
 
-        private AngelInteractionController angel;
+        private AngelInteractionManager angel;
 
         protected override void Setup()
         {
-            angel = AngelInteractionController.Instance;
-            AssertNotNull(angel, "AngelInteractionController.Instance");
+            angel = AngelInteractionManager.Instance;
+            AssertNotNull(angel, "AngelInteractionManager.Instance");
         }
 
         // -------------------------------------------------------------------------
@@ -71,13 +71,13 @@ namespace TheBunkerGames.Tests
 
             AngelMood? received = null;
             Action<AngelMood> handler = m => received = m;
-            AngelInteractionController.OnMoodChanged += handler;
+            AngelInteractionManager.OnMoodChanged += handler;
 
             angel.SetMood(AngelMood.Mocking);
             AssertNotNull(received, "OnMoodChanged should fire");
             AssertEqual(AngelMood.Mocking, received.Value, "Received mood");
 
-            AngelInteractionController.OnMoodChanged -= handler;
+            AngelInteractionManager.OnMoodChanged -= handler;
         }
 
         [TestMethod("SetMood does not fire event for same mood")]
@@ -87,12 +87,12 @@ namespace TheBunkerGames.Tests
 
             bool fired = false;
             Action<AngelMood> handler = m => fired = true;
-            AngelInteractionController.OnMoodChanged += handler;
+            AngelInteractionManager.OnMoodChanged += handler;
 
             angel.SetMood(AngelMood.Neutral);
             AssertFalse(fired, "Should not fire for same mood");
 
-            AngelInteractionController.OnMoodChanged -= handler;
+            AngelInteractionManager.OnMoodChanged -= handler;
         }
 
         // -------------------------------------------------------------------------
@@ -157,7 +157,7 @@ namespace TheBunkerGames.Tests
         {
             AngelResponseData received = null;
             Action<AngelResponseData> handler = r => received = r;
-            AngelInteractionController.OnAngelResponse += handler;
+            AngelInteractionManager.OnAngelResponse += handler;
 
             var response = new AngelResponseData
             {
@@ -169,7 +169,7 @@ namespace TheBunkerGames.Tests
             AssertNotNull(received, "OnAngelResponse should fire");
             AssertEqual("Test response", received.Message, "Response message");
 
-            AngelInteractionController.OnAngelResponse -= handler;
+            AngelInteractionManager.OnAngelResponse -= handler;
         }
 
         [TestMethod("ProcessAngelResponse adds granted items to inventory")]
@@ -205,12 +205,12 @@ namespace TheBunkerGames.Tests
         {
             bool fired = false;
             Action handler = () => fired = true;
-            AngelInteractionController.OnInteractionComplete += handler;
+            AngelInteractionManager.OnInteractionComplete += handler;
 
             angel.CompleteInteraction();
             AssertTrue(fired, "OnInteractionComplete should fire");
 
-            AngelInteractionController.OnInteractionComplete -= handler;
+            AngelInteractionManager.OnInteractionComplete -= handler;
         }
 
         // -------------------------------------------------------------------------

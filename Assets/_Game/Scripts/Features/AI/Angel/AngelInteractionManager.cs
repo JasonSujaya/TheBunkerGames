@@ -12,12 +12,17 @@ namespace TheBunkerGames
     /// Players argue with A.N.G.E.L. for resources. Her mood and "Processing" level
     /// determine cooperation. Sends context to Neocortex and processes AI responses.
     /// </summary>
-    public class AngelInteractionController : MonoBehaviour
+    /// <summary>
+    /// Controls the A.N.G.E.L. Interaction phase (Phase 2 of the Core Loop).
+    /// Players argue with A.N.G.E.L. for resources. Her mood and "Processing" level
+    /// determine cooperation. Sends context to Neocortex and processes AI responses.
+    /// </summary>
+    public class AngelInteractionManager : MonoBehaviour
     {
         // -------------------------------------------------------------------------
         // Singleton
         // -------------------------------------------------------------------------
-        public static AngelInteractionController Instance { get; private set; }
+        public static AngelInteractionManager Instance { get; private set; }
 
         // -------------------------------------------------------------------------
         // Events
@@ -206,7 +211,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         private string BuildAngelContext(string playerMessage)
         {
-            var report = StatusReviewController.Instance?.LatestReport;
+            var report = StatusReviewManager.Instance?.LatestReport;
             string context = $"[ANGEL_CONTEXT] Day: {report?.Day ?? 0}, Mood: {currentMood}, Processing: {processingLevel:F0}%\n";
             context += $"[PLAYER_REQUEST] {playerMessage}";
             return context;
@@ -268,6 +273,26 @@ namespace TheBunkerGames
         private void Debug_CompletePhase()
         {
             if (Application.isPlaying) CompleteInteraction();
+        }
+
+        [Title("Auto Setup")]
+        [Button("Auto Setup Dependencies", ButtonSizes.Large)]
+        [GUIColor(0.4f, 1f, 0.4f)]
+        private void AutoSetupDependencies()
+        {
+            #if UNITY_EDITOR
+            // Ensure Tester exists
+            var testerType = System.Type.GetType("TheBunkerGames.Tests.AngelInteractionTester");
+            if (testerType != null && GetComponent(testerType) == null)
+            {
+                gameObject.AddComponent(testerType);
+                Debug.Log("[AngelInteractionManager] Added AngelInteractionTester.");
+            }
+            else if (testerType == null)
+            {
+                Debug.LogWarning("[AngelInteractionManager] Could not find AngelInteractionTester type. Ensure it is in TheBunkerGames.Tests namespace.");
+            }
+            #endif
         }
         #endif
     }

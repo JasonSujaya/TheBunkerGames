@@ -68,20 +68,20 @@ namespace TheBunkerGames
         private void OnEnable()
         {
             // Wire up phase completion events to auto-advance
-            StatusReviewController.OnStatusReviewComplete += AdvanceToAngelInteraction;
-            AngelInteractionController.OnInteractionComplete += AdvanceToCityExploration;
-            CityExplorationController.OnExplorationPhaseComplete += AdvanceToDailyChoice;
-            DailyChoiceController.OnChoicePhaseComplete += AdvanceToNightCycle;
-            NightCycleController.OnNightCycleComplete += AdvanceToNextDay;
+            StatusReviewManager.OnStatusReviewComplete += AdvanceToAngelInteraction;
+            AngelInteractionManager.OnInteractionComplete += AdvanceToCityExploration;
+            CityExplorationManager.OnExplorationPhaseComplete += AdvanceToDailyChoice;
+            DailyChoiceManager.OnChoicePhaseComplete += AdvanceToNightCycle;
+            NightCycleManager.OnNightCycleComplete += AdvanceToNextDay;
         }
 
         private void OnDisable()
         {
-            StatusReviewController.OnStatusReviewComplete -= AdvanceToAngelInteraction;
-            AngelInteractionController.OnInteractionComplete -= AdvanceToCityExploration;
-            CityExplorationController.OnExplorationPhaseComplete -= AdvanceToDailyChoice;
-            DailyChoiceController.OnChoicePhaseComplete -= AdvanceToNightCycle;
-            NightCycleController.OnNightCycleComplete -= AdvanceToNextDay;
+            StatusReviewManager.OnStatusReviewComplete -= AdvanceToAngelInteraction;
+            AngelInteractionManager.OnInteractionComplete -= AdvanceToCityExploration;
+            CityExplorationManager.OnExplorationPhaseComplete -= AdvanceToDailyChoice;
+            DailyChoiceManager.OnChoicePhaseComplete -= AdvanceToNightCycle;
+            NightCycleManager.OnNightCycleComplete -= AdvanceToNextDay;
         }
 
         // -------------------------------------------------------------------------

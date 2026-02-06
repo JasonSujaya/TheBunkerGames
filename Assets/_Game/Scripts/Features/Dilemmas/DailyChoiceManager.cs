@@ -12,12 +12,17 @@ namespace TheBunkerGames
     /// Every day demands a sacrifice — moral dilemmas presented by A.N.G.E.L.
     /// Supports Twitch voting via Audience Mode.
     /// </summary>
-    public class DailyChoiceController : MonoBehaviour
+    /// <summary>
+    /// Controls the Daily Choice phase (Phase 4 of the Core Loop).
+    /// Every day demands a sacrifice — moral dilemmas presented by A.N.G.E.L.
+    /// Supports Twitch voting via Audience Mode.
+    /// </summary>
+    public class DailyChoiceManager : MonoBehaviour
     {
         // -------------------------------------------------------------------------
         // Singleton
         // -------------------------------------------------------------------------
-        public static DailyChoiceController Instance { get; private set; }
+        public static DailyChoiceManager Instance { get; private set; }
 
         // -------------------------------------------------------------------------
         // Events
@@ -229,6 +234,26 @@ namespace TheBunkerGames
         private void Debug_CompletePhase()
         {
             if (Application.isPlaying) CompleteChoicePhase();
+        }
+
+        [Title("Auto Setup")]
+        [Button("Auto Setup Dependencies", ButtonSizes.Large)]
+        [GUIColor(0.4f, 1f, 0.4f)]
+        private void AutoSetupDependencies()
+        {
+            #if UNITY_EDITOR
+            // Ensure Tester exists
+            var testerType = System.Type.GetType("TheBunkerGames.Tests.DailyChoiceTester");
+            if (testerType != null && GetComponent(testerType) == null)
+            {
+                gameObject.AddComponent(testerType);
+                Debug.Log("[DailyChoiceManager] Added DailyChoiceTester.");
+            }
+            else if (testerType == null)
+            {
+                Debug.LogWarning("[DailyChoiceManager] Could not find DailyChoiceTester type. Ensure it is in TheBunkerGames.Tests namespace.");
+            }
+            #endif
         }
         #endif
     }

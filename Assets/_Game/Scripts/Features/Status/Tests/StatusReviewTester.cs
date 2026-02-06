@@ -8,20 +8,20 @@ using Sirenix.OdinInspector;
 namespace TheBunkerGames.Tests
 {
     /// <summary>
-    /// Tests for StatusReviewController: report generation, warnings,
+    /// Tests for StatusReviewManager: report generation, warnings,
     /// critical conditions, event firing.
     /// </summary>
     public class StatusReviewTester : BaseTester
     {
         public override string TesterName => "StatusReview";
 
-        private StatusReviewController sr;
+        private StatusReviewManager sr;
         private FamilyManager fm;
 
         protected override void Setup()
         {
-            sr = StatusReviewController.Instance;
-            AssertNotNull(sr, "StatusReviewController.Instance");
+            sr = StatusReviewManager.Instance;
+            AssertNotNull(sr, "StatusReviewManager.Instance");
 
             fm = FamilyManager.Instance;
             AssertNotNull(fm, "FamilyManager.Instance");
@@ -53,12 +53,12 @@ namespace TheBunkerGames.Tests
 
             StatusReportData received = null;
             Action<StatusReportData> handler = r => received = r;
-            StatusReviewController.OnStatusReportGenerated += handler;
+            StatusReviewManager.OnStatusReportGenerated += handler;
 
             sr.GenerateStatusReport();
             AssertNotNull(received, "Event should fire");
 
-            StatusReviewController.OnStatusReportGenerated -= handler;
+            StatusReviewManager.OnStatusReportGenerated -= handler;
         }
 
         [TestMethod("Report has correct alive and total counts")]
@@ -177,12 +177,12 @@ namespace TheBunkerGames.Tests
                 warningChar = c;
                 warningMsg = m;
             };
-            StatusReviewController.OnCriticalWarning += handler;
+            StatusReviewManager.OnCriticalWarning += handler;
 
             sr.GenerateStatusReport();
             AssertNotNull(warningChar, "OnCriticalWarning should fire");
 
-            StatusReviewController.OnCriticalWarning -= handler;
+            StatusReviewManager.OnCriticalWarning -= handler;
         }
 
         [TestMethod("Multiple warnings for character with multiple conditions")]
@@ -241,12 +241,12 @@ namespace TheBunkerGames.Tests
         {
             bool fired = false;
             Action handler = () => fired = true;
-            StatusReviewController.OnStatusReviewComplete += handler;
+            StatusReviewManager.OnStatusReviewComplete += handler;
 
             sr.CompleteStatusReview();
             AssertTrue(fired, "OnStatusReviewComplete should fire");
 
-            StatusReviewController.OnStatusReviewComplete -= handler;
+            StatusReviewManager.OnStatusReviewComplete -= handler;
         }
     }
 }

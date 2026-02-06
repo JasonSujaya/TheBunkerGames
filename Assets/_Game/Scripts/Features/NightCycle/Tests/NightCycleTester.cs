@@ -7,20 +7,20 @@ using Sirenix.OdinInspector;
 namespace TheBunkerGames.Tests
 {
     /// <summary>
-    /// Tests for NightCycleController: stat decay, death checks, dream log,
+    /// Tests for NightCycleManager: stat decay, death checks, dream log,
     /// angel degradation, night report generation.
     /// </summary>
     public class NightCycleTester : BaseTester
     {
         public override string TesterName => "NightCycle";
 
-        private NightCycleController nc;
+        private NightCycleManager nc;
         private FamilyManager fm;
 
         protected override void Setup()
         {
-            nc = NightCycleController.Instance;
-            AssertNotNull(nc, "NightCycleController.Instance");
+            nc = NightCycleManager.Instance;
+            AssertNotNull(nc, "NightCycleManager.Instance");
 
             fm = FamilyManager.Instance;
             AssertNotNull(fm, "FamilyManager.Instance");
@@ -52,12 +52,12 @@ namespace TheBunkerGames.Tests
 
             NightReportData received = null;
             Action<NightReportData> handler = r => received = r;
-            NightCycleController.OnNightReportGenerated += handler;
+            NightCycleManager.OnNightReportGenerated += handler;
 
             nc.ProcessNightCycle();
             AssertNotNull(received, "OnNightReportGenerated should fire");
 
-            NightCycleController.OnNightReportGenerated -= handler;
+            NightCycleManager.OnNightReportGenerated -= handler;
         }
 
         [TestMethod("ProcessNightCycle fires OnDreamLogGenerated")]
@@ -67,13 +67,13 @@ namespace TheBunkerGames.Tests
 
             string dreamLog = null;
             Action<string> handler = d => dreamLog = d;
-            NightCycleController.OnDreamLogGenerated += handler;
+            NightCycleManager.OnDreamLogGenerated += handler;
 
             nc.ProcessNightCycle();
             AssertNotNull(dreamLog, "OnDreamLogGenerated should fire");
             AssertTrue(!string.IsNullOrEmpty(dreamLog), "Dream log should not be empty");
 
-            NightCycleController.OnDreamLogGenerated -= handler;
+            NightCycleManager.OnDreamLogGenerated -= handler;
         }
 
         // -------------------------------------------------------------------------
@@ -263,12 +263,12 @@ namespace TheBunkerGames.Tests
         {
             bool fired = false;
             Action handler = () => fired = true;
-            NightCycleController.OnNightCycleComplete += handler;
+            NightCycleManager.OnNightCycleComplete += handler;
 
             nc.CompleteNightCycle();
             AssertTrue(fired, "OnNightCycleComplete should fire");
 
-            NightCycleController.OnNightCycleComplete -= handler;
+            NightCycleManager.OnNightCycleComplete -= handler;
         }
 
         // -------------------------------------------------------------------------

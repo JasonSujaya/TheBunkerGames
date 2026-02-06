@@ -13,12 +13,12 @@ namespace TheBunkerGames
     /// and generates a "Dream/Nightmare" log — a hallucinated narrative
     /// of the family's mental state plus a visual illustration.
     /// </summary>
-    public class NightCycleController : MonoBehaviour
+    public class NightCycleManager : MonoBehaviour
     {
         // -------------------------------------------------------------------------
         // Singleton
         // -------------------------------------------------------------------------
-        public static NightCycleController Instance { get; private set; }
+        public static NightCycleManager Instance { get; private set; }
 
         // -------------------------------------------------------------------------
         // Events
@@ -183,11 +183,17 @@ namespace TheBunkerGames
 
         private void DegradeAngel()
         {
-            var angel = AngelInteractionController.Instance;
-            if (angel == null) return;
+            // 5. Degrade Angel's processing power based on the day's events
+            var angel = AngelInteractionManager.Instance;
+            if (angel != null)
+            {
+                float degradation = 5f; // Base degradation
+                if (LatestReport.IsNightmare) degradation += 10f;
+                // Characters dying causes massive logic failure
+                if (LatestReport.DeathsThisNight.Count > 0) degradation += 15f * LatestReport.DeathsThisNight.Count;
 
-            // A.N.G.E.L. degrades slightly each night
-            angel.DegradeProcessing(2f);
+                angel.DegradeProcessing(degradation);
+            }
         }
 
         private void GenerateDreamLog()
@@ -245,6 +251,26 @@ namespace TheBunkerGames
         private void Debug_CompleteNight()
         {
             if (Application.isPlaying) CompleteNightCycle();
+        }
+
+        [Title("Auto Setup")]
+        [Button("Auto Setup Dependencies", ButtonSizes.Large)]
+        [GUIColor(0.4f, 1f, 0.4f)]
+        private void AutoSetupDependencies()
+        {
+            #if UNITY_EDITOR
+            // Ensure Tester exists
+            var testerType = System.Type.GetType("TheBunkerGames.Tests.NightCycleTester");
+            if (testerType != null && GetComponent(testerType) == null)
+            {
+                gameObject.AddComponent(testerType);
+                Debug.Log("[NightCycleManager] Added NightCycleTester.");
+            }
+            else if (testerType == null)
+            {
+                Debug.LogWarning("[NightCycleManager] Could not find NightCycleTester type. Ensure it is in TheBunkerGames.Tests namespace.");
+            }
+            #endif
         }
         #endif
     }

@@ -12,12 +12,17 @@ namespace TheBunkerGames
     /// Monitors family health: Hunger, Thirst, Sanity, Physical Health.
     /// Generates warnings and alerts for critical conditions.
     /// </summary>
-    public class StatusReviewController : MonoBehaviour
+    /// <summary>
+    /// Controls the Status Review phase (Phase 1 of the Core Loop).
+    /// Monitors family health: Hunger, Thirst, Sanity, Physical Health.
+    /// Generates warnings and alerts for critical conditions.
+    /// </summary>
+    public class StatusReviewManager : MonoBehaviour
     {
         // -------------------------------------------------------------------------
         // Singleton
         // -------------------------------------------------------------------------
-        public static StatusReviewController Instance { get; private set; }
+        public static StatusReviewManager Instance { get; private set; }
 
         // -------------------------------------------------------------------------
         // Events
@@ -153,6 +158,26 @@ namespace TheBunkerGames
         private void Debug_CompletePhase()
         {
             if (Application.isPlaying) CompleteStatusReview();
+        }
+
+        [Title("Auto Setup")]
+        [Button("Auto Setup Dependencies", ButtonSizes.Large)]
+        [GUIColor(0.4f, 1f, 0.4f)]
+        private void AutoSetupDependencies()
+        {
+            #if UNITY_EDITOR
+            // Ensure Tester exists
+            var testerType = System.Type.GetType("TheBunkerGames.Tests.StatusReviewTester");
+            if (testerType != null && GetComponent(testerType) == null)
+            {
+                gameObject.AddComponent(testerType);
+                Debug.Log("[StatusReviewManager] Added StatusReviewTester.");
+            }
+            else if (testerType == null)
+            {
+                Debug.LogWarning("[StatusReviewManager] Could not find StatusReviewTester type. Ensure it is in TheBunkerGames.Tests namespace.");
+            }
+            #endif
         }
         #endif
     }

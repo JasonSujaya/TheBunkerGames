@@ -27,15 +27,15 @@ namespace TheBunkerGames
             CheckSystem("InventoryManager", InventoryManager.Instance);
             CheckSystem("QuestManager", FindObjectOfType<QuestManager>()); // Assuming it might not be a singleton yet
             
-            Debug.Log("--- Checking Controllers ---");
-            CheckSystem("DailyChoiceController", FindObjectOfType<DailyChoiceController>());
-            CheckSystem("StatusReviewController", FindObjectOfType<StatusReviewController>());
-            CheckSystem("NightCycleController", FindObjectOfType<NightCycleController>());
-            CheckSystem("CityExplorationController", FindObjectOfType<CityExplorationController>());
+            Debug.Log("--- Checking Managers ---");
+            CheckSystem("DailyChoiceManager", FindObjectOfType<DailyChoiceManager>());
+            CheckSystem("StatusReviewManager", FindObjectOfType<StatusReviewManager>());
+            CheckSystem("NightCycleManager", FindObjectOfType<NightCycleManager>());
+            CheckSystem("CityExplorationManager", FindObjectOfType<CityExplorationManager>());
             
             Debug.Log("--- Checking AI ---");
             CheckSystem("NeocortexIntegrator", FindObjectOfType<NeocortexIntegrator>());
-            CheckSystem("AngelInteractionController", FindObjectOfType<AngelInteractionController>());
+            CheckSystem("AngelInteractionManager", FindObjectOfType<AngelInteractionManager>());
         }
 
         private void CheckSystem(string name, MonoBehaviour instance)

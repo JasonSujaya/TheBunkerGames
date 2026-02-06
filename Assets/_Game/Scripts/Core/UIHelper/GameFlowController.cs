@@ -42,19 +42,19 @@ namespace TheBunkerGames
             switch (current)
             {
                 case GameState.StatusReview:
-                    StatusReviewController.Instance?.CompleteStatusReview();
+                    StatusReviewManager.Instance?.CompleteStatusReview();
                     break;
                 case GameState.AngelInteraction:
-                    AngelInteractionController.Instance?.CompleteInteraction();
+                    AngelInteractionManager.Instance?.CompleteInteraction();
                     break;
                 case GameState.CityExploration:
-                    CityExplorationController.Instance?.CompleteExplorationPhase();
+                    CityExplorationManager.Instance?.CompleteExplorationPhase();
                     break;
                 case GameState.DailyChoice:
-                    DailyChoiceController.Instance?.CompleteChoicePhase();
+                    DailyChoiceManager.Instance?.CompleteChoicePhase();
                     break;
                 case GameState.NightCycle:
-                    NightCycleController.Instance?.CompleteNightCycle();
+                    NightCycleManager.Instance?.CompleteNightCycle();
                     break;
             }
         }

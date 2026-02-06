@@ -100,7 +100,7 @@ namespace TheBunkerGames
             }
 
             // A.N.G.E.L.
-            var angel = AngelInteractionController.Instance;
+            var angel = AngelInteractionManager.Instance;
             if (angel != null)
             {
                 saveData.AngelMood = angel.CurrentMood.ToString();

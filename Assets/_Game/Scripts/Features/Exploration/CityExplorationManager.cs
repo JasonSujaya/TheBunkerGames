@@ -12,12 +12,12 @@ namespace TheBunkerGames
     /// Players send family members into the wasteland to scavenge for tools and food.
     /// Risk/reward system with location-based outcomes.
     /// </summary>
-    public class CityExplorationController : MonoBehaviour
+    public class CityExplorationManager : MonoBehaviour
     {
         // -------------------------------------------------------------------------
         // Singleton
         // -------------------------------------------------------------------------
-        public static CityExplorationController Instance { get; private set; }
+        public static CityExplorationManager Instance { get; private set; }
 
         // -------------------------------------------------------------------------
         // Events
@@ -262,6 +262,26 @@ namespace TheBunkerGames
         private void Debug_CompletePhase()
         {
             if (Application.isPlaying) CompleteExplorationPhase();
+        }
+
+        [Title("Auto Setup")]
+        [Button("Auto Setup Dependencies", ButtonSizes.Large)]
+        [GUIColor(0.4f, 1f, 0.4f)]
+        private void AutoSetupDependencies()
+        {
+            #if UNITY_EDITOR
+            // Ensure Tester exists
+            var testerType = System.Type.GetType("TheBunkerGames.Tests.ExplorationTester");
+            if (testerType != null && GetComponent(testerType) == null)
+            {
+                gameObject.AddComponent(testerType);
+                Debug.Log("[CityExplorationManager] Added ExplorationTester.");
+            }
+            else if (testerType == null)
+            {
+                Debug.LogWarning("[CityExplorationManager] Could not find ExplorationTester type. Ensure it is in TheBunkerGames.Tests namespace.");
+            }
+            #endif
         }
         #endif
     }

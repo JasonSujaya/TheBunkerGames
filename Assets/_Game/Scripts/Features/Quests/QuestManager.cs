@@ -169,6 +169,26 @@ namespace TheBunkerGames
                 Debug.Log($"  - [{quest.State}] {quest.Id}: {quest.Description}");
             }
         }
+
+        [Title("Auto Setup")]
+        [Button("Auto Setup Dependencies", ButtonSizes.Large)]
+        [GUIColor(0.4f, 1f, 0.4f)]
+        private void AutoSetupDependencies()
+        {
+            #if UNITY_EDITOR
+            // Ensure Tester exists
+            var testerType = System.Type.GetType("TheBunkerGames.Tests.QuestTester");
+            if (testerType != null && GetComponent(testerType) == null)
+            {
+                gameObject.AddComponent(testerType);
+                Debug.Log("[QuestManager] Added QuestTester.");
+            }
+            else if (testerType == null)
+            {
+                Debug.LogWarning("[QuestManager] Could not find QuestTester type. Ensure it is in TheBunkerGames.Tests namespace.");
+            }
+            #endif
+        }
         #endif
     }
 }

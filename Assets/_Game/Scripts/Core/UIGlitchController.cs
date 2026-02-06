@@ -89,7 +89,7 @@ namespace TheBunkerGames
             }
 
             // Sync with A.N.G.E.L.'s processing level
-            var angel = AngelInteractionController.Instance;
+            var angel = AngelInteractionManager.Instance;
             if (angel != null)
             {
                 // Normalize processing level (0-100) to (0-1)

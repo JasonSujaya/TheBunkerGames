@@ -7,20 +7,20 @@ using Sirenix.OdinInspector;
 namespace TheBunkerGames.Tests
 {
     /// <summary>
-    /// Tests for CityExplorationController: sending characters, resolving expeditions,
+    /// Tests for CityExplorationManager: sending characters, resolving expeditions,
     /// validation, risk factors, loot generation.
     /// </summary>
     public class ExplorationTester : BaseTester
     {
         public override string TesterName => "Exploration";
 
-        private CityExplorationController exploration;
+        private CityExplorationManager exploration;
         private FamilyManager fm;
 
         protected override void Setup()
         {
-            exploration = CityExplorationController.Instance;
-            AssertNotNull(exploration, "CityExplorationController.Instance");
+            exploration = CityExplorationManager.Instance;
+            AssertNotNull(exploration, "CityExplorationManager.Instance");
 
             fm = FamilyManager.Instance;
             AssertNotNull(fm, "FamilyManager.Instance");
@@ -139,7 +139,7 @@ namespace TheBunkerGames.Tests
                 eventChar = c;
                 eventLoc = l;
             };
-            CityExplorationController.OnCharacterSentOut += handler;
+            CityExplorationManager.OnCharacterSentOut += handler;
 
             exploration.SendCharacterToExplore(scout, location);
 
@@ -147,7 +147,7 @@ namespace TheBunkerGames.Tests
             AssertEqual("Scout", eventChar.Name, "Event character name");
             AssertNotNull(eventLoc, "Event location");
 
-            CityExplorationController.OnCharacterSentOut -= handler;
+            CityExplorationManager.OnCharacterSentOut -= handler;
         }
 
         // -------------------------------------------------------------------------
@@ -211,12 +211,12 @@ namespace TheBunkerGames.Tests
 
             int eventCount = 0;
             System.Action<ExplorationResult> handler = r => eventCount++;
-            CityExplorationController.OnExplorationComplete += handler;
+            CityExplorationManager.OnExplorationComplete += handler;
 
             exploration.ResolveExpeditions();
             AssertEqual(2, eventCount, "Should fire 2 events");
 
-            CityExplorationController.OnExplorationComplete -= handler;
+            CityExplorationManager.OnExplorationComplete -= handler;
         }
 
         // -------------------------------------------------------------------------
@@ -256,12 +256,12 @@ namespace TheBunkerGames.Tests
         {
             bool fired = false;
             System.Action handler = () => fired = true;
-            CityExplorationController.OnExplorationPhaseComplete += handler;
+            CityExplorationManager.OnExplorationPhaseComplete += handler;
 
             exploration.CompleteExplorationPhase();
             AssertTrue(fired, "OnExplorationPhaseComplete should fire");
 
-            CityExplorationController.OnExplorationPhaseComplete -= handler;
+            CityExplorationManager.OnExplorationPhaseComplete -= handler;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace TheBunkerGames
 {
     /// <summary>
     /// Manages the family members in the bunker.
-    /// Stat decay is now handled by NightCycleController.
+    /// Stat decay is now handled by NightCycleManager.
     /// </summary>
     public class FamilyManager : MonoBehaviour
     {
@@ -140,6 +140,26 @@ namespace TheBunkerGames
             {
                 Debug.Log($"[FamilyManager] {c.Name} - H:{c.Hunger:F0} T:{c.Thirst:F0} S:{c.Sanity:F0} HP:{c.Health:F0} | Alive:{c.IsAlive} Injured:{c.IsInjured}");
             }
+        }
+
+        [Title("Auto Setup")]
+        [Button("Auto Setup Dependencies", ButtonSizes.Large)]
+        [GUIColor(0.4f, 1f, 0.4f)]
+        private void AutoSetupDependencies()
+        {
+            #if UNITY_EDITOR
+            // Ensure Tester exists
+            var testerType = System.Type.GetType("TheBunkerGames.Tests.FamilyTester");
+            if (testerType != null && GetComponent(testerType) == null)
+            {
+                gameObject.AddComponent(testerType);
+                Debug.Log("[FamilyManager] Added FamilyTester.");
+            }
+            else if (testerType == null)
+            {
+                Debug.LogWarning("[FamilyManager] Could not find FamilyTester type. Ensure it is in TheBunkerGames.Tests namespace.");
+            }
+            #endif
         }
         #endif
     }
