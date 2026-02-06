@@ -15,6 +15,16 @@ namespace TheBunkerGames.Tests
 
         private InventoryManager inv;
 
+        protected override void EnsureDependencies()
+        {
+            if (InventoryManager.Instance == null)
+            {
+                Debug.LogWarning($"[{TesterName}] InventoryManager not found. Creating temporary instance for testing.");
+                var go = new GameObject("InventoryManager_AutoCreated");
+                go.AddComponent<InventoryManager>();
+            }
+        }
+
         protected override void Setup()
         {
             inv = InventoryManager.Instance;

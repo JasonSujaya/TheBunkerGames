@@ -15,6 +15,16 @@ namespace TheBunkerGames.Tests
 
         private GameManager gm;
 
+        protected override void EnsureDependencies()
+        {
+            if (GameManager.Instance == null)
+            {
+                Debug.LogWarning($"[{TesterName}] GameManager not found. Creating temporary instance for testing.");
+                var go = new GameObject("GameManager_AutoCreated");
+                go.AddComponent<GameManager>();
+            }
+        }
+
         protected override void Setup()
         {
             gm = GameManager.Instance;

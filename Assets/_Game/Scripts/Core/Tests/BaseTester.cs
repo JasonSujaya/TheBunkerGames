@@ -48,6 +48,12 @@ namespace TheBunkerGames.Tests
         [ReadOnly]
         #endif
         [SerializeField] protected bool isRunning;
+        
+        #if ODIN_INSPECTOR
+        [Title("Automation")]
+        [InfoBox("If true, tests will run automatically when the scene starts.")]
+        #endif
+        [SerializeField] protected bool autoRunOnStart = false;
 
         // -------------------------------------------------------------------------
         // Public Properties
@@ -58,6 +64,17 @@ namespace TheBunkerGames.Tests
         public int TotalTests => passCount + failCount;
         public bool AllPassed => failCount == 0 && passCount > 0;
         public bool IsRunning => isRunning;
+
+        // -------------------------------------------------------------------------
+        // Unity Lifecycle
+        // -------------------------------------------------------------------------
+        protected virtual void Start()
+        {
+            if (autoRunOnStart)
+            {
+                RunAllTests();
+            }
+        }
 
         // -------------------------------------------------------------------------
         // Abstract: Subclass Identity
@@ -89,6 +106,9 @@ namespace TheBunkerGames.Tests
             Debug.Log($"<color=#00CCFF>[{TesterName}] Running Tests...</color>");
             Debug.Log($"<color=#00CCFF>══════════════════════════════════════</color>");
 
+            Debug.Log($"<color=#00CCFF>══════════════════════════════════════</color>");
+
+            EnsureDependencies();
             Setup();
 
             // Discover and run all methods marked with [TestMethod]
@@ -149,6 +169,12 @@ namespace TheBunkerGames.Tests
         // -------------------------------------------------------------------------
         // Setup / TearDown Hooks (Override in subclasses)
         // -------------------------------------------------------------------------
+        /// <summary>
+        /// Called before Setup. Use this to ensure required objects (Managers, etc.) exist in the scene.
+        /// If dependencies are missing, this method should log errors or instantiate prefabs.
+        /// </summary>
+        protected virtual void EnsureDependencies() { }
+        
         protected virtual void Setup() { }
         protected virtual void TearDown() { }
 
