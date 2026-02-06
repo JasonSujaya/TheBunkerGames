@@ -11,7 +11,7 @@ namespace TheBunkerGames
     /// Drag onto any UIFeel component to share the same animation data across multiple UI elements.
     /// </summary>
     [CreateAssetMenu(fileName = "UIFeel_", menuName = "TheBunkerGames/UI Feel Effect")]
-    public class UIFeelEffectDataSO : ScriptableObject
+    public class UIFeelEffectData : ScriptableObject
     {
         // -------------------------------------------------------------------------
         // Effect Type
@@ -153,6 +153,8 @@ namespace TheBunkerGames
         OnPointerUp,
         OnPointerEnter,
         OnPointerExit,
-        OnClick
+        OnClick,
+        WhilePressed,
+        WhileHovered
     }
 }
