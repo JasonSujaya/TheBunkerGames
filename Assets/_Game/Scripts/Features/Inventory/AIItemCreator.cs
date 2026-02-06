@@ -116,37 +116,38 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Title("AI Item Creation")]
-        [InfoBox("Create items at runtime for AI-generated content")]
-        
-        [Button("Generate Random AI Item")]
+        [TitleGroup("AI Generation", "A.N.G.E.L. procedurally generates items")]
+        [HorizontalGroup("AI Generation/Buttons")]
+        [Button("Generate 1 Random Item")]
         private void Debug_CreateRandomAIItem()
         {
             GenerateRandomAIItem();
         }
 
-        [HorizontalGroup("Custom")]
-        [SerializeField] private string customItemName = "Test Item";
-        
-        [HorizontalGroup("Custom")]
-        [SerializeField] private ItemType customItemType = ItemType.Tools;
-
-        [TextArea(2, 4)]
-        [SerializeField] private string customDescription = "A.N.G.E.L. generated this item";
-
-        [Button("Create Custom AI Item")]
-        private void Debug_CreateCustomItem()
-        {
-            CreateAndAddToInventory(customItemName, customDescription, customItemType, 1);
-        }
-
-        [Button("Generate 5 AI Items")]
+        [HorizontalGroup("AI Generation/Buttons")]
+        [Button("Generate 5 Random Items")]
         private void Debug_Generate5Items()
         {
             for (int i = 0; i < 5; i++)
             {
                 GenerateRandomAIItem();
             }
+        }
+
+        [TitleGroup("Custom Factory", "Manually define and create new items")]
+        [HorizontalGroup("Custom Factory/Row1")]
+        [SerializeField] private string customItemName = "New Prototype";
+        
+        [HorizontalGroup("Custom Factory/Row1")]
+        [SerializeField] private ItemType customItemType = ItemType.Tools;
+
+        [TextArea(2, 4)]
+        [SerializeField] private string customDescription = "A manual entry for testing purposes.";
+
+        [Button("Create Custom Item Instance", ButtonSizes.Medium)]
+        private void Debug_CreateCustomItem()
+        {
+            CreateAndAddToInventory(customItemName, customDescription, customItemType, 1);
         }
         #endif
     }
