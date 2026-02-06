@@ -69,10 +69,7 @@ _LocalAssets.meta
 HotReloadData/
 HotReloadData.meta
 /Assets/_LocalAssets
-/.plastic
 /Packages/com.singularitygroup.hotreload
 /.plastic
-.plastic/plastic.changes
-.plastic/plastic.wktree
-.plastic/plastic.changes
 /Assets/Plugins
+
