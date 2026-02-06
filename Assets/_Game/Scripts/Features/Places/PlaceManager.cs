@@ -75,22 +75,22 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Public Methods
         // -------------------------------------------------------------------------
-        public void DiscoverPlace(PlaceDefinitionSO place)
+        public void AddPlace(PlaceDefinitionSO place)
         {
             if (place != null && !discoveredPlaces.Contains(place))
             {
                 discoveredPlaces.Add(place);
                 place.SetDiscovered(true);
-                Debug.Log($"[PlaceManager] Discovered new location: {place.PlaceName}");
+                Debug.Log($"[PlaceManager] Added new location: {place.PlaceName}");
             }
         }
 
-        public void DiscoverPlace(string placeId)
+        public void AddPlace(string placeId)
         {
             var place = placeDatabase?.GetPlace(placeId);
             if (place != null)
             {
-                DiscoverPlace(place);
+                AddPlace(place);
             }
         }
 
@@ -99,10 +99,10 @@ namespace TheBunkerGames
             return discoveredPlaces.Exists(p => p != null && p.PlaceId == placeId);
         }
 
-        public void ClearDiscoveredPlaces()
+        public void ClearAllPlaces()
         {
             discoveredPlaces.Clear();
-            Debug.Log("[PlaceManager] Cleared all discovered places.");
+            Debug.Log("[PlaceManager] Cleared all places.");
         }
 
         // -------------------------------------------------------------------------
@@ -113,12 +113,12 @@ namespace TheBunkerGames
         [ValueDropdown("GetAllPlaceProfileList")]
         [SerializeField] private PlaceDefinitionSO debugPlaceProfile;
 
-        [Button("Discover Place")]
-        private void Debug_DiscoverPlaceSO()
+        [Button("Add Place From SO")]
+        private void Debug_AddPlaceSO()
         {
             if (debugPlaceProfile != null)
             {
-                DiscoverPlace(debugPlaceProfile);
+                AddPlace(debugPlaceProfile);
             }
             else
             {
@@ -155,17 +155,17 @@ namespace TheBunkerGames
 
         [SerializeField] private string debugPlaceId = "OldPharmacy";
 
-        [Button("Discover By ID")]
-        private void Debug_DiscoverPlace()
+        [Button("Add By ID")]
+        private void Debug_AddPlace()
         {
             if (Application.isPlaying)
             {
-                DiscoverPlace(debugPlaceId);
+                AddPlace(debugPlaceId);
             }
         }
 
-        [Button("Discover Random Place")]
-        private void Debug_DiscoverRandom()
+        [Button("Add Random Place")]
+        private void Debug_AddRandom()
         {
             if (Application.isPlaying && placeDatabase != null && placeDatabase.AllPlaces.Count > 0)
             {
@@ -173,19 +173,19 @@ namespace TheBunkerGames
                 if (undiscovered.Count > 0)
                 {
                     var randomPlace = undiscovered[Random.Range(0, undiscovered.Count)];
-                    DiscoverPlace(randomPlace);
+                    AddPlace(randomPlace);
                 }
                 else
                 {
-                    Debug.Log("[PlaceManager] All places have been discovered!");
+                    Debug.Log("[PlaceManager] All places have been added/discovered!");
                 }
             }
         }
 
-        [Button("Clear Discovered Places")]
-        private void Debug_ClearDiscoveredPlaces()
+        [Button("Clear All Places")]
+        private void Debug_ClearAllPlaces()
         {
-            ClearDiscoveredPlaces();
+            ClearAllPlaces();
         }
 
         [Button("Log All Discovered Places")]
