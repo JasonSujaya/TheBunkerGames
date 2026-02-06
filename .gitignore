@@ -1,0 +1,67 @@
+# This .gitignore file was generated based on standard Unity practices and existing ignore.conf
+
+# Standard Unity Ignores
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+
+# MemoryCaptures can get large
+/[Mm]emoryCaptures/
+
+# Asset Store Tools
+**/[Aa]ssets/[Aa]sset[Ss]tore[Tt]ools/
+
+# PlasticSCM
+/[Aa]ssets/[Pp]lugins/[Pp]lastic[Ss][Cc][Mm]*
+
+# Visual Studio / MonoDevelop / Rider
+.vs/
+.vscode/
+.idea/
+.gradle/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity3D generated meta files
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# Build properties
+crashlytics-build.properties
+
+# OS Generated
+.DS_Store*
+Thumbs.db
+Desktop.ini
+
+# Builds
+*.apk
+*.aab
+*.app
+*.unitypackage
+
+# Addressable Assets
+**/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+**/[Aa]ssets/[Ss]treaming[Aa]ssets/aa.meta
+**/[Aa]ssets/[Ss]treaming[Aa]ssets/*/aa/*
+
+# User specifics
+_local asset
