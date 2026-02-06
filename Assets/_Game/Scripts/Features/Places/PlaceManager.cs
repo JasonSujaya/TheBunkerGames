@@ -110,13 +110,57 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
-        
         [HorizontalGroup("Discover")]
-        [SerializeField] private string debugPlaceId = "OldPharmacy";
+        [ValueDropdown("GetAllPlaceProfileList")]
+        [SerializeField] private PlaceDefinitionSO debugPlaceProfile;
 
         [HorizontalGroup("Discover")]
         [Button("Discover Place", ButtonSizes.Medium)]
         [GUIColor(0.5f, 1f, 0.5f)]
+        private void Debug_DiscoverPlaceSO()
+        {
+            if (debugPlaceProfile != null)
+            {
+                DiscoverPlace(debugPlaceProfile);
+            }
+            else
+            {
+                Debug.LogWarning("[PlaceManager] No Place Profile selected.");
+            }
+        }
+
+        private IEnumerable<ValueDropdownItem<PlaceDefinitionSO>> GetAllPlaceProfileList()
+        {
+            var list = new ValueDropdownList<PlaceDefinitionSO>();
+
+            // 1. Persistent
+            if (placeDatabase != null && placeDatabase.AllPlaces != null)
+            {
+                foreach (var p in placeDatabase.AllPlaces)
+                {
+                    if (p != null)
+                        list.Add($"[P] {p.PlaceName}", p);
+                }
+            }
+
+            // 2. Session
+            if (PlaceCreator.Instance != null && PlaceCreator.Instance.SessionPlaces != null)
+            {
+                foreach (var p in PlaceCreator.Instance.SessionPlaces)
+                {
+                    if (p != null)
+                        list.Add($"[S] {p.PlaceName}", p);
+                }
+            }
+
+            return list;
+        }
+
+        [HorizontalGroup("Manual")]
+        [SerializeField] private string debugPlaceId = "OldPharmacy";
+
+        [HorizontalGroup("Manual")]
+        [Button("Discover By ID", ButtonSizes.Medium)]
         private void Debug_DiscoverPlace()
         {
             if (Application.isPlaying)

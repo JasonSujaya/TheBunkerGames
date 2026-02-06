@@ -261,13 +261,36 @@ namespace TheBunkerGames
             #endif
         }
 
-        private IEnumerable<ItemData> GetAllItemDataList()
+        private IEnumerable<ValueDropdownItem<ItemData>> GetAllItemDataList()
         {
+            var list = new ValueDropdownList<ItemData>();
+
+            // 1. Add Persistent Items from Database
             if (itemDatabase != null && itemDatabase.AllItems != null)
             {
-                return itemDatabase.AllItems.Where(i => i != null);
+                foreach (var item in itemDatabase.AllItems)
+                {
+                    if (item != null)
+                    {
+                        list.Add($"[P] {item.ItemName}", item);
+                    }
+                }
             }
-            return new ItemData[] { };
+
+            // 2. Add Session-Bound Items from AIItemCreator
+            if (AIItemCreator.Instance != null && AIItemCreator.Instance.SessionItems != null)
+            {
+                foreach (var sessionItem in AIItemCreator.Instance.SessionItems)
+                {
+                    if (sessionItem != null)
+                    {
+                        // Add if not already in list (though session items usually differ)
+                        list.Add($"[S] {sessionItem.ItemName}", sessionItem);
+                    }
+                }
+            }
+
+            return list;
         }
 
         [Title("Auto Setup")]

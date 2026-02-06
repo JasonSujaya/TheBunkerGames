@@ -140,13 +140,58 @@ namespace TheBunkerGames
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
         [HorizontalGroup("QuestData")]
+        [ValueDropdown("GetAllQuestProfileList")]
+        [SerializeField] private QuestDefinitionSO debugQuestProfile;
+
+        [HorizontalGroup("QuestData")]
+        [Button("Add Quest From SO", ButtonSizes.Medium)]
+        [GUIColor(0.5f, 1f, 0.5f)]
+        private void Debug_AddQuestFromSO()
+        {
+            if (debugQuestProfile != null)
+            {
+                AddQuest(debugQuestProfile.QuestId, debugQuestProfile.Description);
+            }
+            else
+            {
+                Debug.LogWarning("[QuestManager] No Quest Profile selected.");
+            }
+        }
+
+        private IEnumerable<ValueDropdownItem<QuestDefinitionSO>> GetAllQuestProfileList()
+        {
+            var list = new ValueDropdownList<QuestDefinitionSO>();
+
+            // 1. Persistent
+            if (questDatabase != null && questDatabase.AllQuests != null)
+            {
+                foreach (var q in questDatabase.AllQuests)
+                {
+                    if (q != null)
+                        list.Add($"[P] {q.QuestId}", q);
+                }
+            }
+
+            // 2. Session
+            if (QuestCreator.Instance != null && QuestCreator.Instance.SessionQuests != null)
+            {
+                foreach (var q in QuestCreator.Instance.SessionQuests)
+                {
+                    if (q != null)
+                        list.Add($"[S] {q.QuestId}", q);
+                }
+            }
+
+            return list;
+        }
+
+        [HorizontalGroup("Manual")]
         [SerializeField] private string debugQuestId = "FindWater";
         
-        [HorizontalGroup("QuestData")]
+        [HorizontalGroup("Manual")]
         [SerializeField] private string debugDescription = "Locate a clean water source";
 
-        [Button("Add QuestData", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 1f, 0.5f)]
+        [Button("Add Manual Quest", ButtonSizes.Medium)]
         private void Debug_AddQuest()
         {
             if (Application.isPlaying)

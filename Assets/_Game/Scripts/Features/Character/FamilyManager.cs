@@ -121,7 +121,7 @@ namespace TheBunkerGames
         [Title("Debug Controls")]
         
         [HorizontalGroup("AddSO")]
-        [HideLabel]
+        [ValueDropdown("GetAllCharacterProfileList")]
         [SerializeField] private CharacterDefinitionSO debugCharacterProfile;
 
         [HorizontalGroup("AddSO")]
@@ -135,8 +135,35 @@ namespace TheBunkerGames
             }
             else
             {
-                Debug.LogWarning("[FamilyManager] No Character Data SO assigned.");
+                Debug.LogWarning("[FamilyManager] No Character Data SO selected.");
             }
+        }
+
+        private IEnumerable<ValueDropdownItem<CharacterDefinitionSO>> GetAllCharacterProfileList()
+        {
+            var list = new ValueDropdownList<CharacterDefinitionSO>();
+
+            // 1. Persistent from Database
+            if (characterDatabase != null && characterDatabase.AllCharacters != null)
+            {
+                foreach (var charDef in characterDatabase.AllCharacters)
+                {
+                    if (charDef != null)
+                        list.Add($"[P] {charDef.CharacterName}", charDef);
+                }
+            }
+
+            // 2. Session-Bound from Creator
+            if (CharacterCreator.Instance != null && CharacterCreator.Instance.SessionCharacters != null)
+            {
+                foreach (var charDef in CharacterCreator.Instance.SessionCharacters)
+                {
+                    if (charDef != null)
+                        list.Add($"[S] {charDef.CharacterName}", charDef);
+                }
+            }
+
+            return list;
         }
 
         [Button("Add Test Character (Manual)", ButtonSizes.Medium)]
