@@ -178,7 +178,7 @@ namespace TheBunkerGames
                 foreach (var q in QuestCreator.Instance.SessionQuests)
                 {
                     if (q != null)
-                        list.Add($"[S] {q.QuestId}", q);
+                        list.Add($"[S] {q.Id}", null); // QuestData cannot be cast to QuestDefinitionSO
                 }
             }
 

@@ -156,10 +156,10 @@ namespace TheBunkerGames
             // 2. Session-Bound from Creator
             if (CharacterCreator.Instance != null && CharacterCreator.Instance.SessionCharacters != null)
             {
-                foreach (var charDef in CharacterCreator.Instance.SessionCharacters)
+                foreach (var charData in CharacterCreator.Instance.SessionCharacters)
                 {
-                    if (charDef != null)
-                        list.Add($"[S] {charDef.CharacterName}", charDef);
+                    if (charData != null)
+                        list.Add($"[S] {charData.Name}", null); // CharacterData cannot be cast to CharacterDefinitionSO
                 }
             }
 
