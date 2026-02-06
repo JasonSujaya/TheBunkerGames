@@ -41,6 +41,10 @@ namespace TheBunkerGames.Editor
             saveLoadObj.transform.SetParent(gameSystems.transform);
             saveLoadObj.AddComponent<SaveLoadManager>();
 
+            var llmServiceObj = new GameObject("LLMService");
+            llmServiceObj.transform.SetParent(gameSystems.transform);
+            llmServiceObj.AddComponent<LLMService>();
+
             // ---------------------------------------------------------------
             // [Phase Controllers] — One per core loop phase
             // ---------------------------------------------------------------
@@ -89,7 +93,7 @@ namespace TheBunkerGames.Editor
             Debug.Log($"[TestSceneBuilder] SystemTest scene created at: {scenePath}");
             Debug.Log("[TestSceneBuilder] Hierarchy:");
             Debug.Log("  --- GAME SYSTEMS ---");
-            Debug.Log("    GameManager, FamilyManager, InventoryManager, QuestManager, SaveLoadManager");
+            Debug.Log("    GameManager, FamilyManager, InventoryManager, QuestManager, SaveLoadManager, LLMService");
             Debug.Log("  --- PHASE CONTROLLERS ---");
             Debug.Log("    StatusReviewController, AngelInteractionController, CityExplorationController, DailyChoiceController, NightCycleController");
             Debug.Log("  --- GAME SETUP ---");
