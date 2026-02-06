@@ -146,7 +146,7 @@ namespace TheBunkerGames
         [SerializeField] private string customPlaceName = "Mysterious Location";
         
         [TextArea(2, 4)]
-        [SerializeField] private string customDescription = "An unexplored location in the wasteland.";
+        [SerializeField] private string customDescription = "A new location in the wasteland.";
         
         [Range(1, 5)]
         [SerializeField] private int customDangerLevel = 1;

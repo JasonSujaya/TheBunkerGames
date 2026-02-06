@@ -191,7 +191,8 @@ namespace TheBunkerGames
             {
                 LocationName = "Abandoned Store",
                 Risk = ExplorationRisk.Medium,
-                Description = "A half-collapsed convenience store."
+                Description = "A half-collapsed convenience store.",
+                IsAvailable = true
             };
             SendCharacterToExplore(family.FamilyMembers[0], testLocation);
         }

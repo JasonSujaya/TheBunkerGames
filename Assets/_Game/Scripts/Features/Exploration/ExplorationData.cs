@@ -13,7 +13,7 @@ namespace TheBunkerGames
         public string LocationName = "Unknown";
         public string Description = "";
         public ExplorationRisk Risk = ExplorationRisk.Medium;
-        public bool IsDiscovered = true;
+        public bool IsAvailable = true;
     }
 
     /// <summary>

@@ -25,7 +25,7 @@ namespace TheBunkerGames
         #endif
         [SerializeField] private int dangerLevel = 1;
         [SerializeField] private int estimatedLootValue = 50;
-        [SerializeField] private bool isDiscovered = false;
+        [SerializeField] private bool isActive = false;
 
         // -------------------------------------------------------------------------
         // Public Properties
@@ -35,7 +35,7 @@ namespace TheBunkerGames
         public string Description => description;
         public int DangerLevel => dangerLevel;
         public int EstimatedLootValue => estimatedLootValue;
-        public bool IsDiscovered => isDiscovered;
+        public bool IsActive => isActive;
 
         // -------------------------------------------------------------------------
         // Runtime Initialization
@@ -47,12 +47,12 @@ namespace TheBunkerGames
             description = desc;
             dangerLevel = danger;
             estimatedLootValue = loot;
-            isDiscovered = false;
+            isActive = false;
         }
 
-        public void SetDiscovered(bool discovered)
+        public void SetActive(bool active)
         {
-            isDiscovered = discovered;
+            isActive = active;
         }
     }
 }

@@ -41,7 +41,7 @@ namespace TheBunkerGames.Tests
                 LocationName = name,
                 Description = $"Test location ({risk})",
                 Risk = risk,
-                IsDiscovered = true
+                IsAvailable = true
             };
         }
 
@@ -54,7 +54,7 @@ namespace TheBunkerGames.Tests
             var loc = new ExplorationLocation();
             AssertEqual("Unknown", loc.LocationName, "Default name");
             AssertEqual(ExplorationRisk.Medium, loc.Risk, "Default risk");
-            AssertTrue(loc.IsDiscovered, "Default discovered");
+            AssertTrue(loc.IsAvailable, "Default available");
         }
 
         // -------------------------------------------------------------------------

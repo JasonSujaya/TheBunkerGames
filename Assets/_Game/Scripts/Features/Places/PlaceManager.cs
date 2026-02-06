@@ -26,18 +26,18 @@ namespace TheBunkerGames
         [SerializeField] private PlaceDatabaseDataSO placeDatabase;
 
         // -------------------------------------------------------------------------
-        // Discovered Places
+        // Active Places
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Title("Discovered Places")]
+        [Title("Active Places")]
         [ListDrawerSettings(ShowIndexLabels = true)]
         #endif
-        [SerializeField] private List<PlaceDefinitionSO> discoveredPlaces = new List<PlaceDefinitionSO>();
+        [SerializeField] private List<PlaceDefinitionSO> activePlaces = new List<PlaceDefinitionSO>();
 
         // -------------------------------------------------------------------------
         // Public Properties
         // -------------------------------------------------------------------------
-        public List<PlaceDefinitionSO> DiscoveredPlaces => discoveredPlaces;
+        public List<PlaceDefinitionSO> ActivePlaces => activePlaces;
         public PlaceDatabaseDataSO Database => placeDatabase;
 
         // -------------------------------------------------------------------------
@@ -77,10 +77,10 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         public void AddPlace(PlaceDefinitionSO place)
         {
-            if (place != null && !discoveredPlaces.Contains(place))
+            if (place != null && !activePlaces.Contains(place))
             {
-                discoveredPlaces.Add(place);
-                place.SetDiscovered(true);
+                activePlaces.Add(place);
+                place.SetActive(true);
                 Debug.Log($"[PlaceManager] Added new location: {place.PlaceName}");
             }
         }
@@ -94,14 +94,14 @@ namespace TheBunkerGames
             }
         }
 
-        public bool IsDiscovered(string placeId)
+        public bool HasPlace(string placeId)
         {
-            return discoveredPlaces.Exists(p => p != null && p.PlaceId == placeId);
+            return activePlaces.Exists(p => p != null && p.PlaceId == placeId);
         }
 
         public void ClearAllPlaces()
         {
-            discoveredPlaces.Clear();
+            activePlaces.Clear();
             Debug.Log("[PlaceManager] Cleared all places.");
         }
 
@@ -170,15 +170,15 @@ namespace TheBunkerGames
         {
             if (Application.isPlaying && placeDatabase != null && placeDatabase.AllPlaces.Count > 0)
             {
-                var undiscovered = placeDatabase.AllPlaces.FindAll(p => !IsDiscovered(p.PlaceId));
-                if (undiscovered.Count > 0)
+                var available = placeDatabase.AllPlaces.FindAll(p => !HasPlace(p.PlaceId));
+                if (available.Count > 0)
                 {
-                    var randomPlace = undiscovered[Random.Range(0, undiscovered.Count)];
+                    var randomPlace = available[Random.Range(0, available.Count)];
                     AddPlace(randomPlace);
                 }
                 else
                 {
-                    Debug.Log("[PlaceManager] All places have been added/discovered!");
+                    Debug.Log("[PlaceManager] All places have been added.");
                 }
             }
         }
@@ -189,11 +189,11 @@ namespace TheBunkerGames
             ClearAllPlaces();
         }
 
-        [Button("Log All Discovered Places")]
-        private void Debug_LogDiscoveredPlaces()
+        [Button("Log All Active Places")]
+        private void Debug_LogActivePlaces()
         {
-            Debug.Log($"[PlaceManager] Discovered places ({discoveredPlaces.Count}):");
-            foreach (var place in discoveredPlaces)
+            Debug.Log($"[PlaceManager] Active places ({activePlaces.Count}):");
+            foreach (var place in activePlaces)
             {
                 if (place != null)
                 {
