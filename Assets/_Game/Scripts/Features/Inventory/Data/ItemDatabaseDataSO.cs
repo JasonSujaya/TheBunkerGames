@@ -171,12 +171,13 @@ namespace TheBunkerGames
 namespace TheBunkerGames
 {
     /// <summary>
-    /// Editor utility to auto-clean ItemDatabaseDataSO when exiting play mode.
+    /// Editor utility to auto-clean all database SOs when exiting play mode.
+    /// Handles ItemDatabaseDataSO, CharacterDatabaseDataSO, and QuestDatabaseDataSO.
     /// </summary>
     [UnityEditor.InitializeOnLoad]
-    public static class ItemDatabaseCleanup
+    public static class DatabaseCleanupUtility
     {
-        static ItemDatabaseCleanup()
+        static DatabaseCleanupUtility()
         {
             UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
         }
@@ -185,25 +186,59 @@ namespace TheBunkerGames
         {
             if (state == UnityEditor.PlayModeStateChange.EnteredEditMode)
             {
-                // Find all ItemDatabaseDataSO assets and clean them up
-                string[] guids = UnityEditor.AssetDatabase.FindAssets("t:ItemDatabaseDataSO");
-                foreach (string guid in guids)
+                CleanupAllDatabases();
+            }
+        }
+
+        private static void CleanupAllDatabases()
+        {
+            bool anyChanges = false;
+
+            // Clean ItemDatabaseDataSO
+            string[] itemGuids = UnityEditor.AssetDatabase.FindAssets("t:ItemDatabaseDataSO");
+            foreach (string guid in itemGuids)
+            {
+                string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                var db = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemDatabaseDataSO>(path);
+                if (db != null && db.RemoveNullEntries() > 0)
                 {
-                    string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
-                    var db = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemDatabaseDataSO>(path);
-                    if (db != null)
-                    {
-                        int removed = db.RemoveNullEntries();
-                        if (removed > 0)
-                        {
-                            UnityEditor.EditorUtility.SetDirty(db);
-                            UnityEditor.AssetDatabase.SaveAssets();
-                        }
-                    }
+                    UnityEditor.EditorUtility.SetDirty(db);
+                    anyChanges = true;
                 }
+            }
+
+            // Clean CharacterDatabaseDataSO
+            string[] charGuids = UnityEditor.AssetDatabase.FindAssets("t:CharacterDatabaseDataSO");
+            foreach (string guid in charGuids)
+            {
+                string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                var db = UnityEditor.AssetDatabase.LoadAssetAtPath<CharacterDatabaseDataSO>(path);
+                if (db != null && db.RemoveNullEntries() > 0)
+                {
+                    UnityEditor.EditorUtility.SetDirty(db);
+                    anyChanges = true;
+                }
+            }
+
+            // Clean QuestDatabaseDataSO
+            string[] questGuids = UnityEditor.AssetDatabase.FindAssets("t:QuestDatabaseDataSO");
+            foreach (string guid in questGuids)
+            {
+                string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                var db = UnityEditor.AssetDatabase.LoadAssetAtPath<QuestDatabaseDataSO>(path);
+                if (db != null && db.RemoveNullEntries() > 0)
+                {
+                    UnityEditor.EditorUtility.SetDirty(db);
+                    anyChanges = true;
+                }
+            }
+
+            if (anyChanges)
+            {
+                UnityEditor.AssetDatabase.SaveAssets();
+                Debug.Log("[DatabaseCleanupUtility] Cleaned up null entries from all databases.");
             }
         }
     }
 }
 #endif
-
