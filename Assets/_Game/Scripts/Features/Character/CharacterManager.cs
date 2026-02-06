@@ -122,13 +122,10 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/AddSO")]
         [ValueDropdown("GetAllCharacterProfileList")]
         [SerializeField] private CharacterDefinitionSO debugCharacterProfile;
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/AddSO")]
-        [Button("Add Character From SO", ButtonSizes.Medium)]
+        [Button("Add Character From SO")]
         private void Debug_AddCharacterFromSO()
         {
             if (debugCharacterProfile != null)
@@ -166,27 +163,21 @@ namespace TheBunkerGames
             return list;
         }
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Manual")]
         [SerializeField] private CharacterSubtype debugSubtype = CharacterSubtype.Family;
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Manual")]
-        [Button("Add Test Character", ButtonSizes.Medium)]
+        [Button("Add Test Character")]
         private void Debug_AddTestCharacter(string name = "Survivor", float hunger = 100, float thirst = 100, float sanity = 100, float health = 100)
         {
             AddCharacter(name, hunger, thirst, sanity, health, debugSubtype);
         }
 
-        [TitleGroup("Debug Controls")]
-        [Button("Clear All Characters", ButtonSizes.Medium)]
+        [Button("Clear All Characters")]
         private void Debug_ClearAll()
         {
             ClearAllCharacters();
         }
 
-        [TitleGroup("Debug Controls")]
-        [Button("Log All Characters", ButtonSizes.Medium)]
+        [Button("Log All Characters")]
         private void Debug_LogAllStats()
         {
             foreach (var c in allCharacters)

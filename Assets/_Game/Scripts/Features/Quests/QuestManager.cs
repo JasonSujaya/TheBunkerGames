@@ -139,13 +139,10 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/QuestData")]
         [ValueDropdown("GetAllQuestProfileList")]
         [SerializeField] private QuestDefinitionSO debugQuestProfile;
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/QuestData")]
-        [Button("Add Quest From SO", ButtonSizes.Medium)]
+        [Button("Add Quest From SO")]
         private void Debug_AddQuestFromSO()
         {
             if (debugQuestProfile != null)
@@ -185,16 +182,10 @@ namespace TheBunkerGames
             return list;
         }
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Manual")]
         [SerializeField] private string debugQuestId = "FindWater";
-        
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Manual")]
         [SerializeField] private string debugDescription = "Locate a clean water source";
 
-        [TitleGroup("Debug Controls")]
-        [Button("Add Manual Quest", ButtonSizes.Medium)]
+        [Button("Add Manual Quest")]
         private void Debug_AddQuest()
         {
             if (Application.isPlaying)
@@ -203,9 +194,7 @@ namespace TheBunkerGames
             }
         }
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/State")]
-        [Button("Complete QuestData", ButtonSizes.Medium)]
+        [Button("Complete Quest")]
         private void Debug_CompleteQuest()
         {
             if (Application.isPlaying)
@@ -214,9 +203,7 @@ namespace TheBunkerGames
             }
         }
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/State")]
-        [Button("Fail QuestData", ButtonSizes.Medium)]
+        [Button("Fail Quest")]
         private void Debug_FailQuest()
         {
             if (Application.isPlaying)
@@ -225,8 +212,7 @@ namespace TheBunkerGames
             }
         }
 
-        [TitleGroup("Debug Controls")]
-        [Button("Add Sample Quests", ButtonSizes.Medium)]
+        [Button("Add Sample Quests")]
         private void Debug_AddSampleQuests()
         {
             if (Application.isPlaying)
@@ -237,8 +223,7 @@ namespace TheBunkerGames
             }
         }
 
-        [TitleGroup("Debug Controls")]
-        [Button("Log All Quests", ButtonSizes.Medium)]
+        [Button("Log All Quests")]
         private void Debug_LogQuests()
         {
             Debug.Log($"[QuestManager] Total quests: {quests.Count}, Active: {ActiveQuests.Count}");

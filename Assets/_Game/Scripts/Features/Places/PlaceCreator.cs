@@ -152,7 +152,7 @@ namespace TheBunkerGames
         [Range(0, 500)]
         [SerializeField] private int customLootValue = 50;
 
-        [Button("Create Custom Place", ButtonSizes.Medium)]
+        [Button("Create Custom Place")]
         private void Debug_CreateCustomPlace()
         {
             CreateRuntimePlace(customPlaceId, customPlaceName, customDescription, customDangerLevel, customLootValue);

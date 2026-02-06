@@ -110,13 +110,10 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Discover")]
         [ValueDropdown("GetAllPlaceProfileList")]
         [SerializeField] private PlaceDefinitionSO debugPlaceProfile;
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Discover")]
-        [Button("Discover Place", ButtonSizes.Medium)]
+        [Button("Discover Place")]
         private void Debug_DiscoverPlaceSO()
         {
             if (debugPlaceProfile != null)
@@ -156,13 +153,9 @@ namespace TheBunkerGames
             return list;
         }
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Manual")]
         [SerializeField] private string debugPlaceId = "OldPharmacy";
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Manual")]
-        [Button("Discover By ID", ButtonSizes.Medium)]
+        [Button("Discover By ID")]
         private void Debug_DiscoverPlace()
         {
             if (Application.isPlaying)
@@ -171,8 +164,7 @@ namespace TheBunkerGames
             }
         }
 
-        [TitleGroup("Debug Controls")]
-        [Button("Discover Random Place", ButtonSizes.Medium)]
+        [Button("Discover Random Place")]
         private void Debug_DiscoverRandom()
         {
             if (Application.isPlaying && placeDatabase != null && placeDatabase.AllPlaces.Count > 0)
@@ -190,15 +182,13 @@ namespace TheBunkerGames
             }
         }
 
-        [TitleGroup("Debug Controls")]
-        [Button("Clear Discovered Places", ButtonSizes.Medium)]
+        [Button("Clear Discovered Places")]
         private void Debug_ClearDiscoveredPlaces()
         {
             ClearDiscoveredPlaces();
         }
 
-        [TitleGroup("Debug Controls")]
-        [Button("Log All Discovered Places", ButtonSizes.Medium)]
+        [Button("Log All Discovered Places")]
         private void Debug_LogDiscoveredPlaces()
         {
             Debug.Log($"[PlaceManager] Discovered places ({discoveredPlaces.Count}):");

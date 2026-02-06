@@ -185,7 +185,7 @@ namespace TheBunkerGames
         [Range(0, 100)]
         [SerializeField] private float customSanity = 100f;
 
-        [Button("Create Custom Entity", ButtonSizes.Medium)]
+        [Button("Create Custom Entity")]
         private void Debug_CreateCustomEntity()
         {
             CreateAndAdd(customName, customHunger, customThirst, customSanity, customHealth, customSubtype);

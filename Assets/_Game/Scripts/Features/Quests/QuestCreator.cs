@@ -146,7 +146,7 @@ namespace TheBunkerGames
         [TextArea(2, 4)]
         [SerializeField] private string customDescription = "A.N.G.E.L. has a new objective for you.";
 
-        [Button("Create Custom Quest", ButtonSizes.Medium)]
+        [Button("Create Custom Quest")]
         private void Debug_CreateCustomQuest()
         {
             CreateAndAddToManager(customQuestId, customDescription);

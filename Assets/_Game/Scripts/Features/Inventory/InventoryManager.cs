@@ -191,7 +191,6 @@ namespace TheBunkerGames
         [SerializeField] private ItemData debugSelectedItem;
 
         [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/ItemActions")]
         [Button("Add Item")]
         private void Debug_AddItem()
         {
@@ -200,7 +199,6 @@ namespace TheBunkerGames
         }
 
         [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/ItemActions")]
         [Button("Remove Item")]
         private void Debug_RemoveItem()
         {
@@ -227,7 +225,6 @@ namespace TheBunkerGames
         }
 
         [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Utils")]
         [Button("Clear All")]
         private void Debug_ClearAll()
         {
@@ -235,7 +232,6 @@ namespace TheBunkerGames
         }
 
         [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Utils")]
         [Button("Log All Items")]
         private void Debug_LogItems()
         {

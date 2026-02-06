@@ -175,7 +175,7 @@ namespace TheBunkerGames
         [TextArea(2, 4)]
         [SerializeField] private string customDescription = "A manual entry for testing purposes.";
 
-        [Button("Create Custom Item Instance", ButtonSizes.Medium)]
+        [Button("Create Custom Item Instance")]
         private void Debug_CreateCustomItem()
         {
             CreateAndAddToInventory(customItemName, customDescription, customItemType, 1);
