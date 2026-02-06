@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using System.Linq;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
@@ -9,33 +10,44 @@ namespace TheBunkerGames
     /// <summary>
     /// Handles runtime creation of items for AI-native gameplay.
     /// A.N.G.E.L. uses this to generate dynamic scavenged items on the fly.
+    /// Items created here are SESSION-BOUND and do not persist between sessions.
     /// </summary>
     public class AIItemCreator : MonoBehaviour
     {
+        // -------------------------------------------------------------------------
+        // Singleton
+        // -------------------------------------------------------------------------
+        public static AIItemCreator Instance { get; private set; }
+
         // -------------------------------------------------------------------------
         // Configuration
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Title("Settings")]
-        [Required("Item Database is required for creating items")]
-        #endif
-        [SerializeField] private ItemDatabaseDataSO itemDatabase;
-
-        #if ODIN_INSPECTOR
-        [Required("Inventory Manager is required for adding created items")]
         #endif
         [SerializeField] private InventoryManager inventoryManager;
+
+        // -------------------------------------------------------------------------
+        // Session-Bound Runtime Items (NOT persisted)
+        // -------------------------------------------------------------------------
+        private List<ItemData> sessionItems = new List<ItemData>();
+
+        /// <summary>
+        /// All items created during this session (read-only).
+        /// </summary>
+        public IReadOnlyList<ItemData> SessionItems => sessionItems;
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
         // -------------------------------------------------------------------------
         private void Awake()
         {
-            // Auto-find references if not set
-            if (itemDatabase == null)
+            if (Instance != null && Instance != this)
             {
-                itemDatabase = ItemDatabaseDataSO.Instance;
+                Destroy(gameObject);
+                return;
             }
+            Instance = this;
 
             if (inventoryManager == null)
             {
@@ -43,36 +55,34 @@ namespace TheBunkerGames
             }
         }
 
+        private void OnDestroy()
+        {
+            // Clear session items when this component is destroyed
+            ClearSessionItems();
+        }
+
         // -------------------------------------------------------------------------
-        // Public Methods - Item Creation
+        // Public Methods - Item Creation (Session-Bound)
         // -------------------------------------------------------------------------
         /// <summary>
-        /// Create a new item at runtime (for AI-generated items).
-        /// Perfect for AI-native games where A.N.G.E.L. generates items on the fly.
+        /// Create a new item at runtime. This item is SESSION-BOUND and will not persist.
         /// </summary>
         public ItemData CreateRuntimeItem(string itemName, string description, ItemType type, Sprite icon = null)
         {
-            if (itemDatabase == null)
-            {
-                Debug.LogError("[AIItemCreator] ItemDatabase is null! Cannot create item.");
-                return null;
-            }
-
             // Create a new ItemData ScriptableObject at runtime
             var newItem = ScriptableObject.CreateInstance<ItemData>();
             newItem.name = itemName;
             newItem.Initialize(itemName, description, type, icon);
 
-            // Add to database
-            itemDatabase.AddItem(newItem);
+            // Add to session list (NOT to persistent database)
+            sessionItems.Add(newItem);
 
-            Debug.Log($"[AIItemCreator] Created runtime item: {itemName}");
+            Debug.Log($"[AIItemCreator] Created session item: {itemName} (Total session items: {sessionItems.Count})");
             return newItem;
         }
 
         /// <summary>
         /// AI-powered item creation - generates an item and adds it to inventory.
-        /// For A.N.G.E.L. to dynamically create scavenged items.
         /// </summary>
         public ItemData CreateAndAddToInventory(string itemName, string description, ItemType type, int quantity = 1)
         {
@@ -92,7 +102,6 @@ namespace TheBunkerGames
 
         /// <summary>
         /// Generate a random AI item from predefined templates.
-        /// Useful for procedural scavenging results.
         /// </summary>
         public ItemData GenerateRandomAIItem()
         {
@@ -113,10 +122,38 @@ namespace TheBunkerGames
             return CreateAndAddToInventory(randomData[0], randomData[1], itemType, 1);
         }
 
+        /// <summary>
+        /// Look up a session item by name.
+        /// </summary>
+        public ItemData GetSessionItem(string itemName)
+        {
+            return sessionItems.FirstOrDefault(i => i != null && i.ItemName == itemName);
+        }
+
+        /// <summary>
+        /// Clear all session-bound items. Called automatically on destroy.
+        /// </summary>
+        public void ClearSessionItems()
+        {
+            foreach (var item in sessionItems)
+            {
+                if (item != null)
+                {
+                    Destroy(item);
+                }
+            }
+            sessionItems.Clear();
+            Debug.Log("[AIItemCreator] Cleared all session items.");
+        }
+
         // -------------------------------------------------------------------------
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
+        [TitleGroup("Session Items", "Items created this session (not persisted)")]
+        [ShowInInspector, ReadOnly]
+        private int SessionItemCount => sessionItems?.Count ?? 0;
+
         [TitleGroup("AI Generation", "A.N.G.E.L. procedurally generates items")]
         [HorizontalGroup("AI Generation/Buttons")]
         [Button("Generate 1 Random Item")]
@@ -150,6 +187,27 @@ namespace TheBunkerGames
         {
             CreateAndAddToInventory(customItemName, customDescription, customItemType, 1);
         }
+
+        [TitleGroup("Session Management")]
+        [Button("Clear All Session Items")]
+        private void Debug_ClearSession()
+        {
+            ClearSessionItems();
+        }
+
+        [Button("Log Session Items")]
+        private void Debug_LogSessionItems()
+        {
+            Debug.Log($"[AIItemCreator] Session items ({sessionItems.Count}):");
+            foreach (var item in sessionItems)
+            {
+                if (item != null)
+                {
+                    Debug.Log($"  - {item.ItemName}: {item.Description}");
+                }
+            }
+        }
         #endif
     }
 }
+
