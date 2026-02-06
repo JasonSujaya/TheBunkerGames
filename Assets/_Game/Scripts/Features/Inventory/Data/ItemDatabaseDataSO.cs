@@ -233,6 +233,19 @@ namespace TheBunkerGames
                 }
             }
 
+            // Clean PlaceDatabaseDataSO
+            string[] placeGuids = UnityEditor.AssetDatabase.FindAssets("t:PlaceDatabaseDataSO");
+            foreach (string guid in placeGuids)
+            {
+                string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                var db = UnityEditor.AssetDatabase.LoadAssetAtPath<PlaceDatabaseDataSO>(path);
+                if (db != null && db.RemoveNullEntries() > 0)
+                {
+                    UnityEditor.EditorUtility.SetDirty(db);
+                    anyChanges = true;
+                }
+            }
+
             if (anyChanges)
             {
                 UnityEditor.AssetDatabase.SaveAssets();
