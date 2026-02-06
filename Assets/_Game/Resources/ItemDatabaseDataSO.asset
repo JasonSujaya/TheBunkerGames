@@ -9,10 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95bd7aaa425614f20a91ea04a130e113, type: 3}
-  m_Name: ItemDatabase
-  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.ItemDatabase
+  m_Script: {fileID: 11500000, guid: 48e865fe6852c47c8adfa186826c6ec2, type: 3}
+  m_Name: ItemDatabaseDataSO
+  m_EditorClassIdentifier: 
   allItems:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 3525501b8f773461ea1351e792f68c4b, type: 3}
+  - {fileID: 11400000, guid: 2fd80d194305b484fb50aadc8d78e6f3, type: 3}
+  - {fileID: 11400000, guid: c374a84faab104bff87c91db8467d832, type: 3}
+  - {fileID: 11400000, guid: 82f9f2130e34b444fb20e3376c622336, type: 3}

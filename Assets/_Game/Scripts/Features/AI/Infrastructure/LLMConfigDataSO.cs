@@ -23,6 +23,19 @@ namespace TheBunkerGames
                 if (instance == null)
                 {
                     instance = Resources.Load<LLMConfigDataSO>("LLM/LLMConfigDataSO");
+                    
+                    #if UNITY_EDITOR
+                    if (instance == null)
+                    {
+                        string[] guids = UnityEditor.AssetDatabase.FindAssets("t:LLMConfigDataSO");
+                        if (guids.Length > 0)
+                        {
+                            string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
+                            instance = UnityEditor.AssetDatabase.LoadAssetAtPath<LLMConfigDataSO>(path);
+                        }
+                    }
+                    #endif
+
                     if (instance == null)
                     {
                         Debug.LogError("[LLMConfigDataSO] No LLMConfigDataSO found in Resources/LLM folder!");

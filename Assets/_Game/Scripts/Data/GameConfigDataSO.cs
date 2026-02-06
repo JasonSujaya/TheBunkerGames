@@ -23,6 +23,19 @@ namespace TheBunkerGames
                 if (instance == null)
                 {
                     instance = Resources.Load<GameConfigDataSO>("GameConfigDataSO");
+                    
+                    #if UNITY_EDITOR
+                    if (instance == null)
+                    {
+                        string[] guids = UnityEditor.AssetDatabase.FindAssets("t:GameConfigDataSO");
+                        if (guids.Length > 0)
+                        {
+                            string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
+                            instance = UnityEditor.AssetDatabase.LoadAssetAtPath<GameConfigDataSO>(path);
+                        }
+                    }
+                    #endif
+
                     if (instance == null)
                     {
                         Debug.LogError("[GameConfigDataSO] No GameConfigDataSO found in Resources folder!");
