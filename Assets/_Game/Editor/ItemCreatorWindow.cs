@@ -97,10 +97,14 @@ namespace TheBunkerGames.Editor
             }
 
             // Ensure folder exists
-            string folderPath = "Assets/_Data/Items";
+            string folderPath = "Assets/_Game/ScriptableObjects/Items";
+            if (!AssetDatabase.IsValidFolder("Assets/_Game/ScriptableObjects"))
+            {
+                AssetDatabase.CreateFolder("Assets/_Game", "ScriptableObjects");
+            }
             if (!AssetDatabase.IsValidFolder(folderPath))
             {
-                AssetDatabase.CreateFolder("Assets/_Data", "Items");
+                AssetDatabase.CreateFolder("Assets/_Game/ScriptableObjects", "Items");
             }
 
             // Create the asset
@@ -108,21 +112,21 @@ namespace TheBunkerGames.Editor
             string assetPath = $"{folderPath}/Item_{sanitizedName}.asset";
 
             // Check if exists
-            if (AssetDatabase.LoadAssetAtPath<ItemDataSO>(assetPath) != null)
+            if (AssetDatabase.LoadAssetAtPath<ItemData>(assetPath) != null)
             {
                 EditorUtility.DisplayDialog("Error", $"Item already exists at:\n{assetPath}", "OK");
                 return;
             }
 
-            // Create new ItemDataSO
-            ItemDataSO newItem = CreateInstance<ItemDataSO>();
+            // Create new ItemData
+            ItemData newItem = CreateInstance<ItemData>();
             
             // Use SerializedObject to set private fields
             AssetDatabase.CreateAsset(newItem, assetPath);
             
             SerializedObject so = new SerializedObject(newItem);
-            so.FindProperty("id").stringValue = sanitizedName.ToLower();
-            so.FindProperty("displayName").stringValue = itemName;
+            so.FindProperty("itemName").stringValue = itemName;
+            // so.FindProperty("id").stringValue = sanitizedName.ToLower(); // Id removed from ItemData
             so.FindProperty("itemType").enumValueIndex = (int)itemType;
             so.ApplyModifiedPropertiesWithoutUndo();
 

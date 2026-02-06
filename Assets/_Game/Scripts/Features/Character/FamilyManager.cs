@@ -56,7 +56,7 @@ namespace TheBunkerGames
             Debug.Log($"[FamilyManager] Added character: {name}");
         }
 
-        public void AddCharacter(CharacterDataSO data)
+        public void AddCharacter(CharacterDefinitionSO data)
         {
             if (data == null) return;
             var character = data.CreateCharacter();
@@ -93,7 +93,7 @@ namespace TheBunkerGames
         
         [HorizontalGroup("AddSO")]
         [HideLabel]
-        [SerializeField] private CharacterDataSO debugCharacterProfile;
+        [SerializeField] private CharacterDefinitionSO debugCharacterProfile;
 
         [HorizontalGroup("AddSO")]
         [Button("Add Character From SO", ButtonSizes.Medium)]

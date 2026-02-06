@@ -50,25 +50,25 @@ namespace TheBunkerGames.Editor
             // ---------------------------------------------------------------
             var phaseControllers = new GameObject("--- PHASE CONTROLLERS ---");
 
-            var statusReviewObj = new GameObject("StatusReviewController");
+            var statusReviewObj = new GameObject("StatusReviewManager");
             statusReviewObj.transform.SetParent(phaseControllers.transform);
-            statusReviewObj.AddComponent<StatusReviewController>();
+            statusReviewObj.AddComponent<StatusReviewManager>();
 
-            var angelObj = new GameObject("AngelInteractionController");
+            var angelObj = new GameObject("AngelLogicController");
             angelObj.transform.SetParent(phaseControllers.transform);
-            angelObj.AddComponent<AngelInteractionController>();
+            // angelObj.AddComponent<AngelLogicController>(); // Pure logic class - cannot be added as component
 
-            var explorationObj = new GameObject("CityExplorationController");
+            var explorationObj = new GameObject("CityExplorationManager");
             explorationObj.transform.SetParent(phaseControllers.transform);
-            explorationObj.AddComponent<CityExplorationController>();
+            explorationObj.AddComponent<CityExplorationManager>();
 
-            var choiceObj = new GameObject("DailyChoiceController");
+            var choiceObj = new GameObject("DailyChoiceManager");
             choiceObj.transform.SetParent(phaseControllers.transform);
-            choiceObj.AddComponent<DailyChoiceController>();
+            choiceObj.AddComponent<DailyChoiceManager>();
 
-            var nightObj = new GameObject("NightCycleController");
+            var nightObj = new GameObject("NightLogicController");
             nightObj.transform.SetParent(phaseControllers.transform);
-            nightObj.AddComponent<NightCycleController>();
+            // nightObj.AddComponent<NightLogicController>(); // Pure logic class - cannot be added as component
 
             // ---------------------------------------------------------------
             // [Game Setup] — Spawns initial family on Start

@@ -41,12 +41,12 @@ namespace TheBunkerGames
         [Searchable]
         [ListDrawerSettings(ShowIndexLabels = true)]
         #endif
-        [SerializeField] private List<ItemDataSO> allItems = new List<ItemDataSO>();
+        [SerializeField] private List<ItemData> allItems = new List<ItemData>();
 
         // -------------------------------------------------------------------------
         // Public Properties
         // -------------------------------------------------------------------------
-        public List<ItemDataSO> AllItems => allItems;
+        public List<ItemData> AllItems => allItems;
 
         // -------------------------------------------------------------------------
         // Public Methods
@@ -54,25 +54,26 @@ namespace TheBunkerGames
         /// <summary>
         /// Look up an item by its ID.
         /// </summary>
-        public ItemDataSO GetItem(string id)
+        public ItemData GetItem(string name)
         {
             for (int i = 0; i < allItems.Count; i++)
             {
-                if (allItems[i] != null && allItems[i].Id == id)
+                // Assuming ItemName acts as the id
+                if (allItems[i] != null && allItems[i].ItemName == name)
                 {
                     return allItems[i];
                 }
             }
-            Debug.LogWarning($"[ItemDatabaseDataSO] Item not found: {id}");
+            Debug.LogWarning($"[ItemDatabaseDataSO] Item not found: {name}");
             return null;
         }
 
         /// <summary>
         /// Get all items of a specific type.
         /// </summary>
-        public List<ItemDataSO> GetItemsByType(ItemType type)
+        public List<ItemData> GetItemsByType(ItemType type)
         {
-            List<ItemDataSO> result = new List<ItemDataSO>();
+            List<ItemData> result = new List<ItemData>();
             for (int i = 0; i < allItems.Count; i++)
             {
                 if (allItems[i] != null && allItems[i].Type == type)
@@ -86,7 +87,7 @@ namespace TheBunkerGames
         /// <summary>
         /// Add an item to the database (used by editor tools).
         /// </summary>
-        public void AddItem(ItemDataSO item)
+        public void AddItem(ItemData item)
         {
             if (item != null && !allItems.Contains(item))
             {
@@ -107,7 +108,7 @@ namespace TheBunkerGames
             {
                 if (item != null)
                 {
-                    Debug.Log($"  - {item.Id}: {item.DisplayName} ({item.Type})");
+                    Debug.Log($"  - {item.ItemName}: {item.Description} ({item.Type})");
                 }
             }
         }

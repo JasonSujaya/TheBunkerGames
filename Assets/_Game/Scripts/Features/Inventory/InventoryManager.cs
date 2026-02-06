@@ -71,7 +71,7 @@ namespace TheBunkerGames
             }
 
             var itemData = ItemDatabaseDataSO.Instance?.GetItem(itemId);
-            string displayName = itemData != null ? itemData.DisplayName : itemId;
+            string displayName = itemData != null ? itemData.ItemName : itemId;
             Debug.Log($"[InventoryManager] Added {quantity}x {displayName}");
         }
 
@@ -93,7 +93,7 @@ namespace TheBunkerGames
             }
 
             var itemData = ItemDatabaseDataSO.Instance?.GetItem(itemId);
-            string displayName = itemData != null ? itemData.DisplayName : itemId;
+            string displayName = itemData != null ? itemData.ItemName : itemId;
             Debug.Log($"[InventoryManager] Removed {quantity}x {displayName}");
             return true;
         }
@@ -173,7 +173,7 @@ namespace TheBunkerGames
             foreach (var slot in items)
             {
                 var data = slot.GetItemData();
-                string name = data != null ? data.DisplayName : slot.ItemId;
+                string name = data != null ? data.ItemName : slot.ItemId;
                 Debug.Log($"  - {name}: {slot.Quantity}");
             }
         }
@@ -183,7 +183,7 @@ namespace TheBunkerGames
             var db = ItemDatabaseDataSO.Instance;
             if (db != null && db.AllItems != null)
             {
-                return db.AllItems.Where(i => i != null).Select(i => i.Id);
+                return db.AllItems.Where(i => i != null).Select(i => i.ItemName);
             }
             return new string[] { "can_of_beans", "bandages", "broken_radio" }; // Fallback
         }

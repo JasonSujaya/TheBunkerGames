@@ -70,4 +70,16 @@ namespace TheBunkerGames
         public const string Completed = "COMPLETED";
         public const string Failed = "FAILED";
     }
+
+    // -------------------------------------------------------------------------
+    // Character Roles
+    // -------------------------------------------------------------------------
+    public enum CharacterRole
+    {
+        Father,
+        Mother,
+        Son,
+        Daughter,
+        Other
+    }
 }
