@@ -102,7 +102,6 @@ namespace TheBunkerGames
                 string userPrompt = characterPromptTemplate.BuildUserPrompt("Survivor", "desperate survivor found in the wasteland");
                 
                 LLMManager.Instance.QuickChat(
-                    LLMManager.Provider.OpenRouter,
                     userPrompt,
                     onSuccess: (response) => {
                         if (LLMJsonParser.TryParseCharacter(response, out var data))
@@ -151,7 +150,6 @@ namespace TheBunkerGames
                 string userPrompt = characterPromptTemplate.BuildUserPrompt("Hostile", "dangerous enemy in the wasteland");
                 
                 LLMManager.Instance.QuickChat(
-                    LLMManager.Provider.OpenRouter,
                     userPrompt,
                     onSuccess: (response) => {
                         if (LLMJsonParser.TryParseCharacter(response, out var data))

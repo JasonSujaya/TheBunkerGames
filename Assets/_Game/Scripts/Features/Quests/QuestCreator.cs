@@ -102,7 +102,6 @@ namespace TheBunkerGames
                 string userPrompt = questPromptTemplate.BuildUserPrompt("urgent bunker survival objective");
                 
                 LLMManager.Instance.QuickChat(
-                    LLMManager.Provider.OpenRouter,
                     userPrompt,
                     onSuccess: (response) => {
                         if (LLMJsonParser.TryParseQuest(response, out var data))

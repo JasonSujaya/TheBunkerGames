@@ -120,12 +120,11 @@ namespace TheBunkerGames
                 string userPrompt = itemPromptTemplate.BuildUserPrompt(itemTypes[Random.Range(0, itemTypes.Length)], "scavenged in post-apocalyptic bunker");
                 
                 LLMManager.Instance.QuickChat(
-                    LLMManager.Provider.OpenRouter,
                     userPrompt,
                     onSuccess: (response) => {
                         if (LLMJsonParser.TryParseItem(response, out var data))
                         {
-                            ItemType parsedType = ItemType.Misc;
+                            ItemType parsedType = ItemType.Junk;
                             System.Enum.TryParse(data.itemType, true, out parsedType);
                             var item = CreateAndAddToInventory(data.itemName, data.description, parsedType, 1);
                             Debug.Log($"[AIItemCreator] <color=cyan>[LLM]</color> Created: {data.itemName}");

@@ -56,12 +56,30 @@ public static LLMManager Instance { get; private set; }
         // Public API
         // -------------------------------------------------------------------------
 
+        [Obsolete("Use QuickChat() without provider parameter - reads from AIConfigSO.")]
         public enum Provider { OpenRouter, Mistral }
+
+        /// <summary>
+        /// Sends a quick chat request using the active provider from AIConfigSO.
+        /// </summary>
+        public void QuickChat(
+            string prompt,
+            Action<string> onSuccess,
+            Action<string> onError = null,
+            string systemPrompt = null)
+        {
+            StartCoroutine(SendChatCoroutineGeneric(prompt, systemPrompt, onSuccess, onError));
+        }
 
         /// <summary>
         /// Sends a quick chat request to the specified provider.
         /// </summary>
-        public void QuickChat(
+                /// <summary>
+        /// [DEPRECATED] Use QuickChat without provider parameter.
+        /// </summary>
+        [Obsolete("Use QuickChat() without provider - reads from AIConfigSO.")]
+        
+public void QuickChat(
             Provider provider,
             string prompt,
             Action<string> onSuccess,
@@ -157,6 +175,100 @@ public static LLMManager Instance { get; private set; }
 
         // -------------------------------------------------------------------------
         // Implementation
+
+        /// <summary>
+        /// Generic coroutine that uses active provider from AIConfigSO.
+        /// </summary>
+        private IEnumerator SendChatCoroutineGeneric(
+            string prompt,
+            string systemPrompt,
+            Action<string> onSuccess,
+            Action<string> onError)
+        {
+            if (configAsset == null)
+            {
+                string error = "[LLMManager] AIConfigSO is not assigned!";
+                Debug.LogError(error);
+                onError?.Invoke(error);
+                yield break;
+            }
+
+            string url = configAsset.GetActiveApiUrl();
+            string apiKey = configAsset.GetActiveApiKey();
+            string model = configAsset.GetActiveModel();
+            var provider = configAsset.ActiveProvider;
+
+            if (string.IsNullOrEmpty(apiKey))
+            {
+                string error = $"[LLMManager] API Key for {provider} is missing in AIConfigSO!";
+                Debug.LogError(error);
+                onError?.Invoke(error);
+                yield break;
+            }
+
+            // Debug log provider and model
+            if (configAsset.EnableDebugLogs)
+                Debug.Log($"[LLMManager] <color=cyan>[{provider}]</color> Model: {model}, Tier: {configAsset.ActiveModelTier}");
+
+            // Build payload
+            var messages = new List<object>();
+            if (!string.IsNullOrEmpty(systemPrompt))
+            {
+                messages.Add(new { role = "system", content = systemPrompt });
+            }
+            messages.Add(new { role = "user", content = prompt });
+
+            var payload = new
+            {
+                model = model,
+                messages = messages
+            };
+
+            string json = JsonConvert.SerializeObject(payload);
+
+            using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+            {
+                byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.SetRequestHeader("Content-Type", "application/json");
+                request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
+                
+                if (provider == LLMProvider.OpenRouter)
+                {
+                    request.SetRequestHeader("HTTP-Referer", "https://github.com/JasonSujaya/TheBunkerGames");
+                    request.SetRequestHeader("X-Title", "TheBunkerGames");
+                }
+
+                request.timeout = (int)configAsset.RequestTimeout;
+
+                yield return request.SendWebRequest();
+
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    string error = $"[LLMManager] Request failed: {request.error}";
+                    Debug.LogError(error);
+                    onError?.Invoke(error);
+                }
+                else
+                {
+                    try
+                    {
+                        var response = JsonConvert.DeserializeObject<ChatResponse>(request.downloadHandler.text);
+                        string content = response?.choices?[0]?.message?.content ?? "";
+                        if (configAsset.EnableDebugLogs) Debug.Log($"[LLMManager] <color=green>[SUCCESS]</color> {content.Substring(0, Mathf.Min(100, content.Length))}...");
+                        onSuccess?.Invoke(content);
+                    }
+                    catch (Exception ex)
+                    {
+                        string error = $"[LLMManager] Failed to parse response: {ex.Message}";
+                        Debug.LogError(error);
+                        onError?.Invoke(error);
+                    }
+                }
+            }
+        }
+
         // -------------------------------------------------------------------------
 
         private IEnumerator SendChatCoroutine(
@@ -176,19 +288,17 @@ public static LLMManager Instance { get; private set; }
 
             string url = "";
             string apiKey = "";
-            string model = "";
+            string model = configAsset.GetActiveModel(); // Use active model from config
 
             if (provider == Provider.OpenRouter)
             {
                 url = "https://openrouter.ai/api/v1/chat/completions";
                 apiKey = configAsset.OpenRouterApiKey;
-                model = configAsset.OpenRouterModel;
             }
             else
             {
                 url = "https://api.mistral.ai/v1/chat/completions";
                 apiKey = configAsset.MistralApiKey;
-                model = configAsset.MistralModel;
             }
 
             if (string.IsNullOrEmpty(apiKey))
