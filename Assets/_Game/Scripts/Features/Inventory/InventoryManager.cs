@@ -186,7 +186,7 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [TitleGroup("Debug Controls/Operations")]
+        [TitleGroup("Debug Controls")]
         [ValueDropdown("GetAllItemDataList")]
         [SerializeField] private ItemData debugSelectedItem;
 
@@ -221,7 +221,6 @@ namespace TheBunkerGames
             }
         }
 
-        [TitleGroup("Debug Controls/Utilities")]
         [Button("Clear All")]
         private void Debug_ClearAll()
         {

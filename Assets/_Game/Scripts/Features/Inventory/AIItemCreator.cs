@@ -150,7 +150,7 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [TitleGroup("Debug Controls/Operations")]
+        [TitleGroup("Debug Controls")]
         [ShowInInspector, ReadOnly]
         private int SessionItemCount => sessionItems?.Count ?? 0;
 
@@ -181,7 +181,6 @@ namespace TheBunkerGames
             CreateAndAddToInventory(customItemName, customDescription, customItemType, 1);
         }
 
-        [TitleGroup("Debug Controls/Utilities")]
         [Button("Clear All Session Items")]
         private void Debug_ClearSession()
         {

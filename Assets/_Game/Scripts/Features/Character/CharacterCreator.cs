@@ -145,7 +145,7 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [TitleGroup("Debug Controls/Operations")]
+        [TitleGroup("Debug Controls")]
         [ShowInInspector, ReadOnly]
         private int SessionCharacterCount => sessionCharacters?.Count ?? 0;
 
@@ -191,7 +191,6 @@ namespace TheBunkerGames
             CreateAndAdd(customName, customHunger, customThirst, customSanity, customHealth, customSubtype);
         }
 
-        [TitleGroup("Debug Controls/Utilities")]
         [Button("Clear All Session Characters")]
         private void Debug_ClearSession()
         {

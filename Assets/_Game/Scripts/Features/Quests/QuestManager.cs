@@ -138,7 +138,7 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [TitleGroup("Debug Controls/Operations")]
+        [TitleGroup("Debug Controls")]
         [ValueDropdown("GetAllQuestProfileList")]
         [SerializeField] private QuestDefinitionSO debugQuestProfile;
 
@@ -223,7 +223,6 @@ namespace TheBunkerGames
             }
         }
 
-        [TitleGroup("Debug Controls/Utilities")]
         [Button("Log All Quests")]
         private void Debug_LogQuests()
         {

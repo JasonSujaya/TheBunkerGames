@@ -121,7 +121,7 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [TitleGroup("Debug Controls/Operations")]
+        [TitleGroup("Debug Controls")]
         [ValueDropdown("GetAllCharacterProfileList")]
         [SerializeField] private CharacterDefinitionSO debugCharacterProfile;
 
@@ -171,7 +171,6 @@ namespace TheBunkerGames
             AddCharacter(name, hunger, thirst, sanity, health, debugSubtype);
         }
 
-        [TitleGroup("Debug Controls/Utilities")]
         [Button("Clear All Characters")]
         private void Debug_ClearAll()
         {
