@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ac15d99967e514a1f8c1dd760a0f9048, type: 3}
-  m_Name: Item_Bandages
+  m_Name: CannedFood
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.ItemData
-  id: bandages
-  displayName: Bandages
+  id: new_item
+  displayName: New Item
   icon: {fileID: 0}
   glitchIcon: {fileID: 0}
-  itemType: 1
+  itemType: 2
