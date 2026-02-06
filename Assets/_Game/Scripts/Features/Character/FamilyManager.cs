@@ -18,6 +18,15 @@ namespace TheBunkerGames
         public static FamilyManager Instance { get; private set; }
 
         // -------------------------------------------------------------------------
+        // Database Reference
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Database")]
+        [Required("Character Database is required")]
+        #endif
+        [SerializeField] private CharacterDatabaseDataSO characterDatabase;
+
+        // -------------------------------------------------------------------------
         // Family Data
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
@@ -32,6 +41,7 @@ namespace TheBunkerGames
         public List<CharacterData> FamilyMembers => familyMembers;
         public int AliveCount => familyMembers.FindAll(c => c.IsAlive).Count;
         public List<CharacterData> AvailableExplorers => familyMembers.FindAll(c => c.IsAvailableForExploration);
+        public CharacterDatabaseDataSO Database => characterDatabase;
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -44,6 +54,25 @@ namespace TheBunkerGames
                 return;
             }
             Instance = this;
+
+            // Initialize database singleton
+            if (characterDatabase != null)
+            {
+                CharacterDatabaseDataSO.SetInstance(characterDatabase);
+            }
+            else
+            {
+                // Try to load from Resources
+                characterDatabase = Resources.Load<CharacterDatabaseDataSO>("CharacterDatabaseDataSO");
+                if (characterDatabase != null)
+                {
+                    CharacterDatabaseDataSO.SetInstance(characterDatabase);
+                }
+                else
+                {
+                    Debug.LogWarning("[FamilyManager] CharacterDatabaseDataSO not assigned and not found in Resources!");
+                }
+            }
         }
 
         // -------------------------------------------------------------------------

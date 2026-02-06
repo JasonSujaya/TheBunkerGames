@@ -18,6 +18,15 @@ namespace TheBunkerGames
         public static QuestManager Instance { get; private set; }
 
         // -------------------------------------------------------------------------
+        // Database Reference
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Database")]
+        [Required("Quest Database is required")]
+        #endif
+        [SerializeField] private QuestDatabaseDataSO questDatabase;
+
+        // -------------------------------------------------------------------------
         // QuestData Data
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
@@ -32,6 +41,7 @@ namespace TheBunkerGames
         public List<QuestData> Quests => quests;
         public List<QuestData> ActiveQuests => quests.FindAll(q => q.IsActive);
         public List<QuestData> CompletedQuests => quests.FindAll(q => q.IsCompleted);
+        public QuestDatabaseDataSO Database => questDatabase;
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -44,6 +54,25 @@ namespace TheBunkerGames
                 return;
             }
             Instance = this;
+
+            // Initialize database singleton
+            if (questDatabase != null)
+            {
+                QuestDatabaseDataSO.SetInstance(questDatabase);
+            }
+            else
+            {
+                // Try to load from Resources
+                questDatabase = Resources.Load<QuestDatabaseDataSO>("QuestDatabaseDataSO");
+                if (questDatabase != null)
+                {
+                    QuestDatabaseDataSO.SetInstance(questDatabase);
+                }
+                else
+                {
+                    Debug.LogWarning("[QuestManager] QuestDatabaseDataSO not assigned and not found in Resources!");
+                }
+            }
         }
 
         // -------------------------------------------------------------------------
