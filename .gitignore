@@ -66,3 +66,5 @@ Desktop.ini
 # User specifics
 _local asset
 _LocalAssets.meta
+HotReloadData/
+HotReloadData.meta
