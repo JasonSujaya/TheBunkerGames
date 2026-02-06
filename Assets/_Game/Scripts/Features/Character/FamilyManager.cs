@@ -90,48 +90,47 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
-        [Button("Add Test CharacterData", ButtonSizes.Medium)]
+        
+        [HorizontalGroup("AddSO")]
+        [HideLabel]
+        [SerializeField] private CharacterDataSO debugCharacterProfile;
+
+        [HorizontalGroup("AddSO")]
+        [Button("Add Character From SO", ButtonSizes.Medium)]
         [GUIColor(0.5f, 1f, 0.5f)]
-        private void Debug_AddTestCharacter()
+        private void Debug_AddCharacterFromSO()
         {
-            if (Application.isPlaying)
+            if (debugCharacterProfile != null)
             {
-                AddCharacter($"Survivor_{familyMembers.Count + 1}");
+                AddCharacter(debugCharacterProfile);
+            }
+            else
+            {
+                Debug.LogWarning("[FamilyManager] No Character Data SO assigned.");
             }
         }
 
-        [Button("Add Family (Father, Mother, Child)", ButtonSizes.Medium)]
+        [Button("Add Test Character (Manual)", ButtonSizes.Medium)]
+        [GUIColor(0.5f, 1f, 0.8f)]
+        private void Debug_AddTestCharacter(string name = "Survivor", float hunger = 100, float thirst = 100, float sanity = 100, float health = 100)
+        {
+            AddCharacter(name, hunger, thirst, sanity, health);
+        }
+
+        [Button("Add Default Family", ButtonSizes.Medium)]
         [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_AddFamily()
         {
-            if (Application.isPlaying)
-            {
-                AddCharacter("Father", 90f, 85f, 70f, 100f);
-                AddCharacter("Mother", 95f, 90f, 80f, 100f);
-                AddCharacter("Child", 80f, 80f, 90f, 100f);
-            }
+            AddCharacter("Father", 90f, 85f, 70f, 100f);
+            AddCharacter("Mother", 95f, 90f, 80f, 100f);
+            AddCharacter("Child", 80f, 80f, 90f, 100f);
         }
 
-        [Button("Feed First CharacterData (+20 Hunger)", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 0.8f, 1f)]
-        private void Debug_FeedFirst()
+        [Button("Clear Family", ButtonSizes.Medium)]
+        [GUIColor(1f, 0.5f, 0.5f)]
+        private void Debug_ClearFamily()
         {
-            if (Application.isPlaying && familyMembers.Count > 0)
-            {
-                familyMembers[0].ModifyHunger(20f);
-                Debug.Log($"[FamilyManager] Fed {familyMembers[0].Name}, Hunger: {familyMembers[0].Hunger:F0}");
-            }
-        }
-
-        [Button("Scare First CharacterData (-20 Sanity)", ButtonSizes.Medium)]
-        [GUIColor(0.8f, 0.5f, 1f)]
-        private void Debug_ScareFirst()
-        {
-            if (Application.isPlaying && familyMembers.Count > 0)
-            {
-                familyMembers[0].ModifySanity(-20f);
-                Debug.Log($"[FamilyManager] Scared {familyMembers[0].Name}, Sanity: {familyMembers[0].Sanity:F0}");
-            }
+            ClearFamily();
         }
 
         [Button("Log All Stats", ButtonSizes.Medium)]

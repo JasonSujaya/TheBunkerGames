@@ -18,7 +18,7 @@ namespace TheBunkerGames.Editor
         // -------------------------------------------------------------------------
         private string itemName = "NewItem";
         private ItemType itemType = ItemType.Junk;
-        private ItemDatabaseSO targetDatabase;
+        private ItemDatabaseDataSO targetDatabase;
 
         // -------------------------------------------------------------------------
         // Menu Item
@@ -36,11 +36,11 @@ namespace TheBunkerGames.Editor
         private void OnEnable()
         {
             // Try to find existing database
-            string[] guids = AssetDatabase.FindAssets("t:ItemDatabaseSO");
+            string[] guids = AssetDatabase.FindAssets("t:ItemDatabaseDataSO");
             if (guids.Length > 0)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-                targetDatabase = AssetDatabase.LoadAssetAtPath<ItemDatabaseSO>(path);
+                targetDatabase = AssetDatabase.LoadAssetAtPath<ItemDatabaseDataSO>(path);
             }
         }
 
@@ -59,10 +59,10 @@ namespace TheBunkerGames.Editor
             GUILayout.Space(10);
 
             // Target Database
-            targetDatabase = (ItemDatabaseSO)EditorGUILayout.ObjectField(
+            targetDatabase = (ItemDatabaseDataSO)EditorGUILayout.ObjectField(
                 "Target Database", 
                 targetDatabase, 
-                typeof(ItemDatabaseSO), 
+                typeof(ItemDatabaseDataSO), 
                 false
             );
 

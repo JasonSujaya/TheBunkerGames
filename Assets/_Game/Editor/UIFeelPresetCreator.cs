@@ -42,7 +42,7 @@ namespace TheBunkerGames.Editor
         [MenuItem("TheBunkerGames/UI Feel/Create Presets/Button Press")]
         public static void CreateButtonPress()
         {
-            var asset = ScriptableObject.CreateInstance<UIFeelEffectData>();
+            var asset = ScriptableObject.CreateInstance<UIFeelEffectDataSO>();
             SetPrivateField(asset, "effectType", UIFeelType.Scale);
             SetPrivateField(asset, "duration", 0.1f);
             SetPrivateField(asset, "targetScale", new Vector3(0.92f, 0.92f, 1f));
@@ -54,7 +54,7 @@ namespace TheBunkerGames.Editor
         [MenuItem("TheBunkerGames/UI Feel/Create Presets/Button Release")]
         public static void CreateButtonRelease()
         {
-            var asset = ScriptableObject.CreateInstance<UIFeelEffectData>();
+            var asset = ScriptableObject.CreateInstance<UIFeelEffectDataSO>();
             SetPrivateField(asset, "effectType", UIFeelType.Scale);
             SetPrivateField(asset, "duration", 0.15f);
             SetPrivateField(asset, "targetScale", new Vector3(1f, 1f, 1f));
@@ -73,7 +73,7 @@ namespace TheBunkerGames.Editor
         [MenuItem("TheBunkerGames/UI Feel/Create Presets/Hover Enter")]
         public static void CreateHoverEnter()
         {
-            var asset = ScriptableObject.CreateInstance<UIFeelEffectData>();
+            var asset = ScriptableObject.CreateInstance<UIFeelEffectDataSO>();
             SetPrivateField(asset, "effectType", UIFeelType.Scale);
             SetPrivateField(asset, "duration", 0.12f);
             SetPrivateField(asset, "targetScale", new Vector3(1.05f, 1.05f, 1f));
@@ -85,7 +85,7 @@ namespace TheBunkerGames.Editor
         [MenuItem("TheBunkerGames/UI Feel/Create Presets/Hover Exit")]
         public static void CreateHoverExit()
         {
-            var asset = ScriptableObject.CreateInstance<UIFeelEffectData>();
+            var asset = ScriptableObject.CreateInstance<UIFeelEffectDataSO>();
             SetPrivateField(asset, "effectType", UIFeelType.Scale);
             SetPrivateField(asset, "duration", 0.12f);
             SetPrivateField(asset, "targetScale", new Vector3(1f, 1f, 1f));
@@ -97,7 +97,7 @@ namespace TheBunkerGames.Editor
         [MenuItem("TheBunkerGames/UI Feel/Create Presets/Pop In")]
         public static void CreatePopIn()
         {
-            var asset = ScriptableObject.CreateInstance<UIFeelEffectData>();
+            var asset = ScriptableObject.CreateInstance<UIFeelEffectDataSO>();
             SetPrivateField(asset, "effectType", UIFeelType.Scale);
             SetPrivateField(asset, "duration", 0.3f);
             SetPrivateField(asset, "targetScale", new Vector3(1f, 1f, 1f));
@@ -117,7 +117,7 @@ namespace TheBunkerGames.Editor
         [MenuItem("TheBunkerGames/UI Feel/Create Presets/Pulse")]
         public static void CreatePulse()
         {
-            var asset = ScriptableObject.CreateInstance<UIFeelEffectData>();
+            var asset = ScriptableObject.CreateInstance<UIFeelEffectDataSO>();
             SetPrivateField(asset, "effectType", UIFeelType.Scale);
             SetPrivateField(asset, "duration", 0.5f);
             SetPrivateField(asset, "targetScale", new Vector3(1.08f, 1.08f, 1f));
@@ -131,7 +131,7 @@ namespace TheBunkerGames.Editor
         [MenuItem("TheBunkerGames/UI Feel/Create Presets/Punch Click")]
         public static void CreatePunchClick()
         {
-            var asset = ScriptableObject.CreateInstance<UIFeelEffectData>();
+            var asset = ScriptableObject.CreateInstance<UIFeelEffectDataSO>();
             SetPrivateField(asset, "effectType", UIFeelType.PunchScale);
             SetPrivateField(asset, "duration", 0.3f);
             SetPrivateField(asset, "targetScale", new Vector3(0.2f, 0.2f, 0f));
@@ -145,7 +145,7 @@ namespace TheBunkerGames.Editor
         [MenuItem("TheBunkerGames/UI Feel/Create Presets/Shake")]
         public static void CreateShake()
         {
-            var asset = ScriptableObject.CreateInstance<UIFeelEffectData>();
+            var asset = ScriptableObject.CreateInstance<UIFeelEffectDataSO>();
             SetPrivateField(asset, "effectType", UIFeelType.PunchMove);
             SetPrivateField(asset, "duration", 0.4f);
             SetPrivateField(asset, "moveOffset", new Vector3(8f, 4f, 0f));
@@ -162,7 +162,7 @@ namespace TheBunkerGames.Editor
         [MenuItem("TheBunkerGames/UI Feel/Create Presets/Held Press")]
         public static void CreateHeldPress()
         {
-            var asset = ScriptableObject.CreateInstance<UIFeelEffectData>();
+            var asset = ScriptableObject.CreateInstance<UIFeelEffectDataSO>();
             SetPrivateField(asset, "effectType", UIFeelType.Scale);
             SetPrivateField(asset, "duration", 0.1f);
             SetPrivateField(asset, "targetScale", new Vector3(0.92f, 0.92f, 1f));
@@ -175,7 +175,7 @@ namespace TheBunkerGames.Editor
         [MenuItem("TheBunkerGames/UI Feel/Create Presets/Held Hover")]
         public static void CreateHeldHover()
         {
-            var asset = ScriptableObject.CreateInstance<UIFeelEffectData>();
+            var asset = ScriptableObject.CreateInstance<UIFeelEffectDataSO>();
             SetPrivateField(asset, "effectType", UIFeelType.Scale);
             SetPrivateField(asset, "duration", 0.12f);
             SetPrivateField(asset, "targetScale", new Vector3(1.05f, 1.05f, 1f));
@@ -188,7 +188,7 @@ namespace TheBunkerGames.Editor
         [MenuItem("TheBunkerGames/UI Feel/Create Presets/Held Pulse Press")]
         public static void CreateHeldPulsePress()
         {
-            var asset = ScriptableObject.CreateInstance<UIFeelEffectData>();
+            var asset = ScriptableObject.CreateInstance<UIFeelEffectDataSO>();
             SetPrivateField(asset, "effectType", UIFeelType.Scale);
             SetPrivateField(asset, "duration", 0.35f);
             SetPrivateField(asset, "targetScale", new Vector3(0.95f, 0.95f, 1f));
@@ -212,12 +212,12 @@ namespace TheBunkerGames.Editor
                 AssetDatabase.CreateFolder("Assets/_Game/Resources", "UIFeel");
         }
 
-        private static void SaveAsset(UIFeelEffectData asset, string name)
+        private static void SaveAsset(UIFeelEffectDataSO asset, string name)
         {
             EnsureFolder();
             string path = $"{BasePath}/{name}.asset";
 
-            var existing = AssetDatabase.LoadAssetAtPath<UIFeelEffectData>(path);
+            var existing = AssetDatabase.LoadAssetAtPath<UIFeelEffectDataSO>(path);
             if (existing != null)
             {
                 EditorUtility.CopySerialized(asset, existing);

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
@@ -121,6 +122,7 @@ namespace TheBunkerGames
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
         [HorizontalGroup("Add")]
+        [ValueDropdown("GetAllItemIds")]
         [SerializeField] private string debugItemId = "can_of_beans";
 
         [HorizontalGroup("Add")]
@@ -128,10 +130,7 @@ namespace TheBunkerGames
         [GUIColor(0.5f, 1f, 0.5f)]
         private void Debug_AddItem()
         {
-            if (Application.isPlaying)
-            {
-                AddItem(debugItemId, 1);
-            }
+            AddItem(debugItemId, 1);
         }
 
         [HorizontalGroup("Add")]
@@ -139,23 +138,24 @@ namespace TheBunkerGames
         [GUIColor(1f, 0.5f, 0.5f)]
         private void Debug_RemoveItem()
         {
-            if (Application.isPlaying)
-            {
-                RemoveItem(debugItemId, 1);
-            }
+            RemoveItem(debugItemId, 1);
         }
 
         [Button("Add 5 Random Items", ButtonSizes.Medium)]
         [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_AddRandomItems()
         {
-            if (Application.isPlaying)
+            var allIds = GetAllItemIds().ToList();
+            if (allIds.Count == 0)
             {
-                string[] testItems = { "can_of_beans", "bandages", "broken_radio" };
-                foreach (var id in testItems)
-                {
-                    AddItem(id, Random.Range(1, 3));
-                }
+                Debug.LogWarning("[InventoryManager] No items found in database.");
+                return;
+            }
+
+            for (int i = 0; i < 5; i++)
+            {
+                string randomId = allIds[Random.Range(0, allIds.Count)];
+                AddItem(randomId, Random.Range(1, 3));
             }
         }
 
@@ -163,10 +163,7 @@ namespace TheBunkerGames
         [GUIColor(1f, 0.7f, 0.3f)]
         private void Debug_ClearAll()
         {
-            if (Application.isPlaying)
-            {
-                ClearInventory();
-            }
+            ClearInventory();
         }
 
         [Button("Log All Items", ButtonSizes.Medium)]
@@ -179,6 +176,16 @@ namespace TheBunkerGames
                 string name = data != null ? data.DisplayName : slot.ItemId;
                 Debug.Log($"  - {name}: {slot.Quantity}");
             }
+        }
+
+        private IEnumerable<string> GetAllItemIds()
+        {
+            var db = ItemDatabaseDataSO.Instance;
+            if (db != null && db.AllItems != null)
+            {
+                return db.AllItems.Where(i => i != null).Select(i => i.Id);
+            }
+            return new string[] { "can_of_beans", "bandages", "broken_radio" }; // Fallback
         }
         #endif
     }
