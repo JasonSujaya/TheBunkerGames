@@ -121,7 +121,7 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [TitleGroup("Debug Controls")]
+        [TitleGroup("Debug Controls/Operations")]
         [ShowInInspector, ReadOnly]
         private int SessionPlaceCount => sessionPlaces?.Count ?? 0;
 
@@ -158,6 +158,7 @@ namespace TheBunkerGames
             CreateRuntimePlace(customPlaceId, customPlaceName, customDescription, customDangerLevel, customLootValue);
         }
 
+        [TitleGroup("Debug Controls/Utilities")]
         [Button("Clear All Session Places")]
         private void Debug_ClearSession()
         {

@@ -109,7 +109,7 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [TitleGroup("Debug Controls")]
+        [TitleGroup("Debug Controls/Operations")]
         [ValueDropdown("GetAllPlaceProfileList")]
         [SerializeField] private PlaceDefinitionSO debugPlaceProfile;
 
@@ -182,6 +182,7 @@ namespace TheBunkerGames
             }
         }
 
+        [TitleGroup("Debug Controls/Utilities")]
         [Button("Clear All Places")]
         private void Debug_ClearAllPlaces()
         {

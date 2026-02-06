@@ -186,11 +186,10 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [TitleGroup("Debug Controls")]
+        [TitleGroup("Debug Controls/Operations")]
         [ValueDropdown("GetAllItemDataList")]
         [SerializeField] private ItemData debugSelectedItem;
 
-        [TitleGroup("Debug Controls")]
         [Button("Add Item")]
         private void Debug_AddItem()
         {
@@ -198,7 +197,6 @@ namespace TheBunkerGames
                 AddItem(debugSelectedItem, 1);
         }
 
-        [TitleGroup("Debug Controls")]
         [Button("Remove Item")]
         private void Debug_RemoveItem()
         {
@@ -206,7 +204,6 @@ namespace TheBunkerGames
                 RemoveItem(debugSelectedItem, 1);
         }
 
-        [TitleGroup("Debug Controls")]
         [Button("Add 5 Random Items")]
         private void Debug_AddRandomItems()
         {
@@ -224,14 +221,13 @@ namespace TheBunkerGames
             }
         }
 
-        [TitleGroup("Debug Controls")]
+        [TitleGroup("Debug Controls/Utilities")]
         [Button("Clear All")]
         private void Debug_ClearAll()
         {
             ClearInventory();
         }
 
-        [TitleGroup("Debug Controls")]
         [Button("Log All Items")]
         private void Debug_LogItems()
         {

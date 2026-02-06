@@ -122,7 +122,7 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [TitleGroup("Debug Controls")]
+        [TitleGroup("Debug Controls/Operations")]
         [ShowInInspector, ReadOnly]
         private int SessionQuestCount => sessionQuests?.Count ?? 0;
 
@@ -152,6 +152,7 @@ namespace TheBunkerGames
             CreateAndAddToManager(customQuestId, customDescription);
         }
 
+        [TitleGroup("Debug Controls/Utilities")]
         [Button("Clear All Session Quests")]
         private void Debug_ClearSession()
         {
