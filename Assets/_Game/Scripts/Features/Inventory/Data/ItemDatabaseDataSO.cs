@@ -7,8 +7,8 @@ using Sirenix.OdinInspector;
 namespace TheBunkerGames
 {
     /// <summary>
-    /// Singleton ScriptableObject holding all items in the game.
-    /// The AI calls GetItem(id) to look up item data.
+    /// ScriptableObject holding all items in the game.
+    /// Initialize singleton via SetInstance() with a direct SerializeField reference.
     /// </summary>
     [CreateAssetMenu(fileName = "ItemDatabaseDataSO", menuName = "TheBunkerGames/Item Database Data")]
     public class ItemDatabaseDataSO : ScriptableObject
@@ -17,33 +17,19 @@ namespace TheBunkerGames
         // Singleton Access
         // -------------------------------------------------------------------------
         private static ItemDatabaseDataSO instance;
-        public static ItemDatabaseDataSO Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = Resources.Load<ItemDatabaseDataSO>("ItemDatabaseDataSO");
-                    
-                    #if UNITY_EDITOR
-                    if (instance == null)
-                    {
-                        string[] guids = UnityEditor.AssetDatabase.FindAssets("t:ItemDatabaseDataSO");
-                        if (guids.Length > 0)
-                        {
-                            string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
-                            instance = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemDatabaseDataSO>(path);
-                        }
-                    }
-                    #endif
+        public static ItemDatabaseDataSO Instance => instance;
 
-                    if (instance == null)
-                    {
-                        Debug.LogError("[ItemDatabaseDataSO] No ItemDatabaseDataSO found in Resources folder!");
-                    }
-                }
-                return instance;
+        /// <summary>
+        /// Initialize the singleton with a direct reference from a manager.
+        /// </summary>
+        public static void SetInstance(ItemDatabaseDataSO database)
+        {
+            if (database == null)
+            {
+                Debug.LogError("[ItemDatabaseDataSO] Attempted to set null instance!");
+                return;
             }
+            instance = database;
         }
 
         // -------------------------------------------------------------------------

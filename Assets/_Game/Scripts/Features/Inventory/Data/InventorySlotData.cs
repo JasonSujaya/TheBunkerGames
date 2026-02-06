@@ -24,9 +24,12 @@ namespace TheBunkerGames
             Quantity = quantity;
         }
 
-        public ItemData GetItemData()
+        /// <summary>
+        /// Get the full ItemData from the database.
+        /// </summary>
+        public ItemData GetItemData(ItemDatabaseDataSO database)
         {
-            return ItemDatabaseDataSO.Instance?.GetItem(ItemId);
+            return database?.GetItem(ItemId);
         }
     }
 }

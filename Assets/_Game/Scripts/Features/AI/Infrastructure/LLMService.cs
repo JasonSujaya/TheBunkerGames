@@ -21,6 +21,15 @@ namespace TheBunkerGames
         public static LLMService Instance { get; private set; }
 
         // -------------------------------------------------------------------------
+        // Configuration
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Settings")]
+        [Required("LLM Config is required for this service to function")]
+        #endif
+        [SerializeField] private LLMConfigDataSO llmConfig;
+
+        // -------------------------------------------------------------------------
         // Events
         // -------------------------------------------------------------------------
         public event Action<LLMResult<LLMChatResponse>> OnChatResponseReceived;
@@ -38,6 +47,16 @@ namespace TheBunkerGames
                 return;
             }
             Instance = this;
+
+            // Initialize the LLMConfig singleton
+            if (llmConfig != null)
+            {
+                LLMConfigDataSO.SetInstance(llmConfig);
+            }
+            else
+            {
+                Debug.LogError("[LLMService] LLMConfig reference is not assigned in Inspector!");
+            }
         }
 
         // -------------------------------------------------------------------------

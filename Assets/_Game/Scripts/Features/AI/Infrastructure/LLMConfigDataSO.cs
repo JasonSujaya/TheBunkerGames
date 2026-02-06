@@ -7,7 +7,7 @@ namespace TheBunkerGames
 {
     /// <summary>
     /// Configuration ScriptableObject for OpenRouter and Mistral API integration.
-    /// Stores API keys, endpoints, and default model settings.
+    /// Initialize singleton via SetInstance() with a direct SerializeField reference.
     /// </summary>
     [CreateAssetMenu(fileName = "LLMConfigDataSO", menuName = "TheBunkerGames/LLM Config")]
     public class LLMConfigDataSO : ScriptableObject
@@ -16,33 +16,19 @@ namespace TheBunkerGames
         // Singleton Access
         // -------------------------------------------------------------------------
         private static LLMConfigDataSO instance;
-        public static LLMConfigDataSO Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = Resources.Load<LLMConfigDataSO>("LLM/LLMConfigDataSO");
-                    
-                    #if UNITY_EDITOR
-                    if (instance == null)
-                    {
-                        string[] guids = UnityEditor.AssetDatabase.FindAssets("t:LLMConfigDataSO");
-                        if (guids.Length > 0)
-                        {
-                            string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
-                            instance = UnityEditor.AssetDatabase.LoadAssetAtPath<LLMConfigDataSO>(path);
-                        }
-                    }
-                    #endif
+        public static LLMConfigDataSO Instance => instance;
 
-                    if (instance == null)
-                    {
-                        Debug.LogError("[LLMConfigDataSO] No LLMConfigDataSO found in Resources/LLM folder!");
-                    }
-                }
-                return instance;
+        /// <summary>
+        /// Initialize the singleton with a direct reference from a manager.
+        /// </summary>
+        public static void SetInstance(LLMConfigDataSO config)
+        {
+            if (config == null)
+            {
+                Debug.LogError("[LLMConfigDataSO] Attempted to set null instance!");
+                return;
             }
+            instance = config;
         }
 
         // -------------------------------------------------------------------------

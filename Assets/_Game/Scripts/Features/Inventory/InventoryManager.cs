@@ -18,6 +18,15 @@ namespace TheBunkerGames
         public static InventoryManager Instance { get; private set; }
 
         // -------------------------------------------------------------------------
+        // Configuration
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Settings")]
+        [Required("Item Database is required for inventory to function")]
+        #endif
+        [SerializeField] private ItemDatabaseDataSO itemDatabase;
+
+        // -------------------------------------------------------------------------
         // Inventory Data
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
@@ -51,15 +60,50 @@ namespace TheBunkerGames
                 return;
             }
             Instance = this;
+
+            // Initialize the ItemDatabase singleton
+            if (itemDatabase != null)
+            {
+                ItemDatabaseDataSO.SetInstance(itemDatabase);
+            }
+            else
+            {
+                Debug.LogError("[InventoryManager] ItemDatabase reference is not assigned in Inspector!");
+            }
         }
 
         // -------------------------------------------------------------------------
         // Public Methods
         // -------------------------------------------------------------------------
-        public void AddItem(string itemId, int quantity = 1)
+        /// <summary>
+        /// Add an item to the inventory. Item must exist in ItemDatabaseDataSO.
+        /// </summary>
+        /// <param name="itemId">The ItemName from ItemData SO</param>
+        /// <param name="quantity">Amount to add</param>
+        /// <returns>True if item was added successfully</returns>
+        public bool AddItem(string itemId, int quantity = 1)
         {
-            if (string.IsNullOrEmpty(itemId) || quantity <= 0) return;
+            if (string.IsNullOrEmpty(itemId) || quantity <= 0)
+            {
+                Debug.LogWarning($"[InventoryManager] Invalid item ID or quantity: {itemId}, {quantity}");
+                return false;
+            }
 
+            if (itemDatabase == null)
+            {
+                Debug.LogError($"[InventoryManager] ItemDatabase reference is null! Assign it in the Inspector.");
+                return false;
+            }
+
+            // VALIDATE: Item must exist in the database
+            var itemData = itemDatabase.GetItem(itemId);
+            if (itemData == null)
+            {
+                Debug.LogError($"[InventoryManager] Cannot add item '{itemId}' - not found in ItemDatabaseDataSO! Add it to the database first.");
+                return false;
+            }
+
+            // Add to existing slot or create new slot
             var existingSlot = items.Find(s => s.ItemId == itemId);
             if (existingSlot != null)
             {
@@ -70,9 +114,8 @@ namespace TheBunkerGames
                 items.Add(new InventorySlotData(itemId, quantity));
             }
 
-            var itemData = ItemDatabaseDataSO.Instance?.GetItem(itemId);
-            string displayName = itemData != null ? itemData.ItemName : itemId;
-            Debug.Log($"[InventoryManager] Added {quantity}x {displayName}");
+            Debug.Log($"[InventoryManager] Added {quantity}x {itemData.ItemName} ({itemData.Type})");
+            return true;
         }
 
         public bool RemoveItem(string itemId, int quantity = 1)
@@ -92,7 +135,7 @@ namespace TheBunkerGames
                 items.Remove(slot);
             }
 
-            var itemData = ItemDatabaseDataSO.Instance?.GetItem(itemId);
+            var itemData = itemDatabase?.GetItem(itemId);
             string displayName = itemData != null ? itemData.ItemName : itemId;
             Debug.Log($"[InventoryManager] Removed {quantity}x {displayName}");
             return true;
@@ -172,7 +215,7 @@ namespace TheBunkerGames
             Debug.Log($"[InventoryManager] Total slots: {items.Count}, Total items: {TotalItemCount}");
             foreach (var slot in items)
             {
-                var data = slot.GetItemData();
+                var data = slot.GetItemData(itemDatabase);
                 string name = data != null ? data.ItemName : slot.ItemId;
                 Debug.Log($"  - {name}: {slot.Quantity}");
             }
@@ -180,10 +223,9 @@ namespace TheBunkerGames
 
         private IEnumerable<string> GetAllItemIds()
         {
-            var db = ItemDatabaseDataSO.Instance;
-            if (db != null && db.AllItems != null)
+            if (itemDatabase != null && itemDatabase.AllItems != null)
             {
-                return db.AllItems.Where(i => i != null).Select(i => i.ItemName);
+                return itemDatabase.AllItems.Where(i => i != null).Select(i => i.ItemName);
             }
             return new string[] { "can_of_beans", "bandages", "broken_radio" }; // Fallback
         }
