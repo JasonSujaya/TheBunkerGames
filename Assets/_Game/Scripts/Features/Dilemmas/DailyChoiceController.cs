@@ -108,6 +108,14 @@ namespace TheBunkerGames
             OnChoiceMade?.Invoke(chosenOption, outcome);
         }
 
+        public void CompleteChoicePhase()
+        {
+            currentDilemma = null;
+            Debug.Log("[DailyChoice] Choice phase complete. Moving to Night Cycle.");
+            OnChoicePhaseComplete?.Invoke();
+        }
+
+
         private DilemmaOutcomeData ApplyChoice(DilemmaOptionData option)
         {
             var outcome = new DilemmaOutcomeData
