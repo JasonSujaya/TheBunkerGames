@@ -60,7 +60,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Public Methods
         // -------------------------------------------------------------------------
-        public void SendMessage(string message)
+        public void SendNeocortexMessage(string message)
         {
             if (smartAgent == null)
             {
@@ -99,7 +99,7 @@ namespace TheBunkerGames
         {
             if (Application.isPlaying)
             {
-                SendMessage(messageToSend);
+                SendNeocortexMessage(messageToSend);
             }
             else
             {
