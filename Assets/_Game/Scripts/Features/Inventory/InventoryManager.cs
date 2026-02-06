@@ -76,48 +76,71 @@ namespace TheBunkerGames
         // Public Methods
         // -------------------------------------------------------------------------
         /// <summary>
-        /// Add an item to the inventory. Item must exist in ItemDatabaseDataSO.
+        /// Add an item to the inventory using a ScriptableObject reference.
+        /// Preferred for AI-native games where items are created at runtime.
         /// </summary>
-        /// <param name="itemId">The ItemName from ItemData SO</param>
+        /// <param name="itemData">The ItemData SO to add</param>
         /// <param name="quantity">Amount to add</param>
         /// <returns>True if item was added successfully</returns>
-        public bool AddItem(string itemId, int quantity = 1)
+        public bool AddItem(ItemData itemData, int quantity = 1)
         {
-            if (string.IsNullOrEmpty(itemId) || quantity <= 0)
+            if (itemData == null || quantity <= 0)
             {
-                Debug.LogWarning($"[InventoryManager] Invalid item ID or quantity: {itemId}, {quantity}");
+                Debug.LogWarning($"[InventoryManager] Invalid item or quantity");
                 return false;
             }
 
-            if (itemDatabase == null)
+            // Ensure the item exists in the database
+            if (!itemDatabase.AllItems.Contains(itemData))
             {
-                Debug.LogError($"[InventoryManager] ItemDatabase reference is null! Assign it in the Inspector.");
-                return false;
-            }
-
-            // VALIDATE: Item must exist in the database
-            var itemData = itemDatabase.GetItem(itemId);
-            if (itemData == null)
-            {
-                Debug.LogError($"[InventoryManager] Cannot add item '{itemId}' - not found in ItemDatabaseDataSO! Add it to the database first.");
-                return false;
+                Debug.LogWarning($"[InventoryManager] Item '{itemData.ItemName}' not in database. Adding it automatically.");
+                itemDatabase.AddItem(itemData);
             }
 
             // Add to existing slot or create new slot
-            var existingSlot = items.Find(s => s.ItemId == itemId);
+            var existingSlot = items.Find(s => s.ItemId == itemData.ItemName);
             if (existingSlot != null)
             {
                 existingSlot.Quantity += quantity;
             }
             else
             {
-                items.Add(new InventorySlotData(itemId, quantity));
+                items.Add(new InventorySlotData(itemData.ItemName, quantity));
             }
 
             Debug.Log($"[InventoryManager] Added {quantity}x {itemData.ItemName} ({itemData.Type})");
             return true;
         }
 
+        /// <summary>
+        /// Add an item to the inventory by ID (legacy support).
+        /// </summary>
+        public bool AddItem(string itemId, int quantity = 1)
+        {
+            if (string.IsNullOrEmpty(itemId) || quantity <= 0) return false;
+            
+            var itemData = itemDatabase?.GetItem(itemId);
+            if (itemData == null)
+            {
+                Debug.LogError($"[InventoryManager] Cannot add item '{itemId}' - not found in ItemDatabaseDataSO!");
+                return false;
+            }
+
+            return AddItem(itemData, quantity);
+        }
+
+        /// <summary>
+        /// Remove an item using a ScriptableObject reference.
+        /// </summary>
+        public bool RemoveItem(ItemData itemData, int quantity = 1)
+        {
+            if (itemData == null || quantity <= 0) return false;
+            return RemoveItem(itemData.ItemName, quantity);
+        }
+
+        /// <summary>
+        /// Remove an item by ID.
+        /// </summary>
         public bool RemoveItem(string itemId, int quantity = 1)
         {
             if (string.IsNullOrEmpty(itemId) || quantity <= 0) return false;
@@ -164,32 +187,29 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
-        [HorizontalGroup("Add")]
-        [ValueDropdown("GetAllItemIds")]
-        [SerializeField] private string debugItemId = "can_of_beans";
+        [ValueDropdown("GetAllItemDataList")]
+        [SerializeField] private ItemData debugSelectedItem;
 
-        [HorizontalGroup("Add")]
-        [Button("Add Item", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 1f, 0.5f)]
+        [HorizontalGroup("ItemActions")]
+        [Button("Add Item")]
         private void Debug_AddItem()
         {
-            AddItem(debugItemId, 1);
+            if (debugSelectedItem != null)
+                AddItem(debugSelectedItem, 1);
         }
 
-        [HorizontalGroup("Add")]
-        [Button("Remove Item", ButtonSizes.Medium)]
-        [GUIColor(1f, 0.5f, 0.5f)]
+        [HorizontalGroup("ItemActions")]
+        [Button("Remove Item")]
         private void Debug_RemoveItem()
         {
-            RemoveItem(debugItemId, 1);
+            if (debugSelectedItem != null)
+                RemoveItem(debugSelectedItem, 1);
         }
 
-        [Button("Add 5 Random Items", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 0.8f, 1f)]
+        [Button("Add 5 Random Items")]
         private void Debug_AddRandomItems()
         {
-            var allIds = GetAllItemIds().ToList();
-            if (allIds.Count == 0)
+            if (itemDatabase == null || itemDatabase.AllItems.Count == 0)
             {
                 Debug.LogWarning("[InventoryManager] No items found in database.");
                 return;
@@ -197,19 +217,21 @@ namespace TheBunkerGames
 
             for (int i = 0; i < 5; i++)
             {
-                string randomId = allIds[Random.Range(0, allIds.Count)];
-                AddItem(randomId, Random.Range(1, 3));
+                var randomItem = itemDatabase.AllItems[Random.Range(0, itemDatabase.AllItems.Count)];
+                if (randomItem != null)
+                    AddItem(randomItem, Random.Range(1, 3));
             }
         }
 
-        [Button("Clear All", ButtonSizes.Medium)]
-        [GUIColor(1f, 0.7f, 0.3f)]
+        [HorizontalGroup("Utils")]
+        [Button("Clear All")]
         private void Debug_ClearAll()
         {
             ClearInventory();
         }
 
-        [Button("Log All Items", ButtonSizes.Medium)]
+        [HorizontalGroup("Utils")]
+        [Button("Log All Items")]
         private void Debug_LogItems()
         {
             Debug.Log($"[InventoryManager] Total slots: {items.Count}, Total items: {TotalItemCount}");
@@ -221,18 +243,35 @@ namespace TheBunkerGames
             }
         }
 
-        private IEnumerable<string> GetAllItemIds()
+        [Title("AI Item Creation")]
+        [InfoBox("Use AIItemCreator component for runtime item generation")]
+        [Button("Add AIItemCreator Component")]
+        private void Debug_AddAIItemCreator()
+        {
+            #if UNITY_EDITOR
+            if (GetComponent<AIItemCreator>() == null)
+            {
+                gameObject.AddComponent<AIItemCreator>();
+                Debug.Log("[InventoryManager] Added AIItemCreator component.");
+            }
+            else
+            {
+                Debug.LogWarning("[InventoryManager] AIItemCreator already exists on this GameObject.");
+            }
+            #endif
+        }
+
+        private IEnumerable<ItemData> GetAllItemDataList()
         {
             if (itemDatabase != null && itemDatabase.AllItems != null)
             {
-                return itemDatabase.AllItems.Where(i => i != null).Select(i => i.ItemName);
+                return itemDatabase.AllItems.Where(i => i != null);
             }
-            return new string[] { "can_of_beans", "bandages", "broken_radio" }; // Fallback
+            return new ItemData[] { };
         }
 
         [Title("Auto Setup")]
-        [Button("Auto Setup Dependencies", ButtonSizes.Large)]
-        [GUIColor(0.4f, 1f, 0.4f)]
+        [Button("Auto Setup Dependencies")]
         private void AutoSetupDependencies()
         {
             #if UNITY_EDITOR

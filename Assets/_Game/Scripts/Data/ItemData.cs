@@ -58,5 +58,19 @@ namespace TheBunkerGames
         public float ThirstRestore => thirstRestore;
         public float SanityRestore => sanityRestore;
         public float HealthRestore => healthRestore;
+
+        /// <summary>
+        /// Initialize item data at runtime (for AI-generated items).
+        /// Use this when creating ScriptableObject.CreateInstance<ItemData>().
+        /// </summary>
+        public void Initialize(string name, string desc, ItemType type, Sprite itemIcon = null)
+        {
+            itemName = name;
+            description = desc;
+            itemType = type;
+            icon = itemIcon;
+            isConsumable = false;
+            value = 1.0f;
+        }
     }
 }

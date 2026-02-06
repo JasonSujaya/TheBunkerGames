@@ -259,6 +259,7 @@ GameObject:
   m_Component:
   - component: {fileID: 190765077}
   - component: {fileID: 190765078}
+  - component: {fileID: 190765079}
   m_Layer: 0
   m_Name: InventoryManager
   m_TagString: Untagged
@@ -293,8 +294,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e90ebaec94bef4d0b93833ef28ff701a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.InventoryManager
+  itemDatabase: {fileID: 11400000, guid: b6bc9f2876cdf4129b27b641365d7331, type: 2}
   items: []
-  debugItemId: can_of_beans
+  debugItemId: bandages
+--- !u!114 &190765079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 190765076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d9b3cbf786bd44ef963b180220e1b1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.Tests.InventoryManagerTester
+  results: []
+  passCount: 0
+  failCount: 0
+  isRunning: 0
+  autoRunOnStart: 0
 --- !u!1 &659944815
 GameObject:
   m_ObjectHideFlags: 0
@@ -484,8 +503,6 @@ MonoBehaviour:
     Title: 
     Description: 
     Options: []
-  isVotingActive: 0
-  voteTimer: 0
 --- !u!1 &1516304334
 GameObject:
   m_ObjectHideFlags: 0
@@ -777,8 +794,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1666803778}
   - {fileID: 190765077}
+  - {fileID: 1666803778}
   - {fileID: 61385604}
   - {fileID: 1286257722}
   - {fileID: 169631329}

@@ -68,7 +68,7 @@ namespace TheBunkerGames.Tests
         [TestMethod("AddItem ignores null or empty ID")]
         private void Test_AddItem_NullId()
         {
-            inv.AddItem(null, 1);
+            inv.AddItem((string)null, 1);
             inv.AddItem("", 1);
             AssertEqual(0, inv.Items.Count, "Should have 0 slots for null/empty IDs");
         }
@@ -121,7 +121,7 @@ namespace TheBunkerGames.Tests
         [TestMethod("RemoveItem ignores null or empty ID")]
         private void Test_RemoveItem_NullId()
         {
-            bool result = inv.RemoveItem(null, 1);
+            bool result = inv.RemoveItem((string)null, 1);
             AssertFalse(result, "Should return false for null ID");
         }
 
