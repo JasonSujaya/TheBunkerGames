@@ -8,7 +8,8 @@ namespace TheBunkerGames
 {
     /// <summary>
     /// Singleton manager holding master game state.
-    /// Tracks the 28-day loop and game phases.
+    /// Orchestrates the 5-phase Core Loop:
+    /// StatusReview -> AngelInteraction -> CityExploration -> DailyChoice -> NightCycle
     /// </summary>
     public class GameManager : MonoBehaviour
     {
@@ -23,6 +24,7 @@ namespace TheBunkerGames
         public static event Action OnDayStart;
         public static event Action OnNightStart;
         public static event Action<GameState> OnStateChanged;
+        public static event Action<bool> OnGameOver;
 
         // -------------------------------------------------------------------------
         // State
@@ -31,7 +33,7 @@ namespace TheBunkerGames
         [Title("Game State")]
         [ReadOnly]
         #endif
-        [SerializeField] private GameState currentState = GameState.Morning;
+        [SerializeField] private GameState currentState = GameState.StatusReview;
 
         #if ODIN_INSPECTOR
         [ReadOnly]
@@ -63,22 +65,51 @@ namespace TheBunkerGames
             Instance = this;
         }
 
+        private void OnEnable()
+        {
+            // Wire up phase completion events to auto-advance
+            StatusReviewController.OnStatusReviewComplete += AdvanceToAngelInteraction;
+            AngelInteractionController.OnInteractionComplete += AdvanceToCityExploration;
+            CityExplorationController.OnExplorationPhaseComplete += AdvanceToDailyChoice;
+            DailyChoiceController.OnChoicePhaseComplete += AdvanceToNightCycle;
+            NightCycleController.OnNightCycleComplete += AdvanceToNextDay;
+        }
+
+        private void OnDisable()
+        {
+            StatusReviewController.OnStatusReviewComplete -= AdvanceToAngelInteraction;
+            AngelInteractionController.OnInteractionComplete -= AdvanceToCityExploration;
+            CityExplorationController.OnExplorationPhaseComplete -= AdvanceToDailyChoice;
+            DailyChoiceController.OnChoicePhaseComplete -= AdvanceToNightCycle;
+            NightCycleController.OnNightCycleComplete -= AdvanceToNextDay;
+        }
+
         // -------------------------------------------------------------------------
         // Public Methods
         // -------------------------------------------------------------------------
+        public void StartNewGame()
+        {
+            currentDay = 1;
+            isGameOver = false;
+            Debug.Log("[GameManager] New game started.");
+            SetState(GameState.StatusReview);
+            OnDayStart?.Invoke();
+        }
+
         public void SetState(GameState newState)
         {
+            if (isGameOver) return;
             if (currentState == newState) return;
-            
+
             currentState = newState;
             Debug.Log($"[GameManager] State changed to: {newState}");
             OnStateChanged?.Invoke(newState);
 
-            if (newState == GameState.Morning)
+            if (newState == GameState.StatusReview)
             {
                 OnDayStart?.Invoke();
             }
-            else if (newState == GameState.NightProcessing)
+            else if (newState == GameState.NightCycle)
             {
                 OnNightStart?.Invoke();
             }
@@ -88,7 +119,7 @@ namespace TheBunkerGames
         {
             currentDay++;
             Debug.Log($"[GameManager] Day advanced to: {currentDay}");
-            
+
             var config = GameConfig.Instance;
             if (config != null && currentDay > config.TotalDays)
             {
@@ -100,6 +131,38 @@ namespace TheBunkerGames
         {
             isGameOver = true;
             Debug.Log($"[GameManager] Game Over! Survived: {survived}");
+            OnGameOver?.Invoke(survived);
+        }
+
+        // -------------------------------------------------------------------------
+        // Phase Advancement (wired to phase completion events)
+        // -------------------------------------------------------------------------
+        private void AdvanceToAngelInteraction()
+        {
+            SetState(GameState.AngelInteraction);
+        }
+
+        private void AdvanceToCityExploration()
+        {
+            SetState(GameState.CityExploration);
+        }
+
+        private void AdvanceToDailyChoice()
+        {
+            SetState(GameState.DailyChoice);
+        }
+
+        private void AdvanceToNightCycle()
+        {
+            SetState(GameState.NightCycle);
+        }
+
+        private void AdvanceToNextDay()
+        {
+            if (!isGameOver)
+            {
+                SetState(GameState.StatusReview);
+            }
         }
 
         // -------------------------------------------------------------------------
@@ -107,21 +170,29 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
-        [Button("Set Morning", ButtonSizes.Medium)]
+        [Button("Start New Game", ButtonSizes.Large)]
+        [GUIColor(0f, 1f, 0f)]
+        private void Debug_StartNewGame() { if (Application.isPlaying) StartNewGame(); }
+
+        [Button("Set StatusReview", ButtonSizes.Medium)]
         [GUIColor(1f, 0.9f, 0.5f)]
-        private void Debug_SetMorning() { if (Application.isPlaying) SetState(GameState.Morning); }
+        private void Debug_SetStatusReview() { if (Application.isPlaying) SetState(GameState.StatusReview); }
 
-        [Button("Set Scavenge", ButtonSizes.Medium)]
+        [Button("Set AngelInteraction", ButtonSizes.Medium)]
+        [GUIColor(0.8f, 0.5f, 1f)]
+        private void Debug_SetAngel() { if (Application.isPlaying) SetState(GameState.AngelInteraction); }
+
+        [Button("Set CityExploration", ButtonSizes.Medium)]
         [GUIColor(0.5f, 0.9f, 0.5f)]
-        private void Debug_SetScavenge() { if (Application.isPlaying) SetState(GameState.Scavenge); }
+        private void Debug_SetExploration() { if (Application.isPlaying) SetState(GameState.CityExploration); }
 
-        [Button("Set Voting", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 0.7f, 1f)]
-        private void Debug_SetVoting() { if (Application.isPlaying) SetState(GameState.Voting); }
+        [Button("Set DailyChoice", ButtonSizes.Medium)]
+        [GUIColor(1f, 0.7f, 0.5f)]
+        private void Debug_SetChoice() { if (Application.isPlaying) SetState(GameState.DailyChoice); }
 
-        [Button("Set Night", ButtonSizes.Medium)]
+        [Button("Set NightCycle", ButtonSizes.Medium)]
         [GUIColor(0.4f, 0.3f, 0.6f)]
-        private void Debug_SetNight() { if (Application.isPlaying) SetState(GameState.NightProcessing); }
+        private void Debug_SetNight() { if (Application.isPlaying) SetState(GameState.NightCycle); }
 
         [Button("Advance Day", ButtonSizes.Large)]
         [GUIColor(1f, 0.5f, 0.5f)]

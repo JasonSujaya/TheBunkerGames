@@ -33,7 +33,17 @@ namespace TheBunkerGames
         #if ODIN_INSPECTOR
         [PropertyRange(0, 100)]
         #endif
+        [SerializeField] private float startingThirst = 100f;
+
+        #if ODIN_INSPECTOR
+        [PropertyRange(0, 100)]
+        #endif
         [SerializeField] private float startingSanity = 100f;
+
+        #if ODIN_INSPECTOR
+        [PropertyRange(0, 100)]
+        #endif
+        [SerializeField] private float startingHealth = 100f;
 
         // -------------------------------------------------------------------------
         // Public Properties
@@ -41,17 +51,16 @@ namespace TheBunkerGames
         public string CharacterName => characterName;
         public Sprite Portrait => portrait;
         public float StartingHunger => startingHunger;
+        public float StartingThirst => startingThirst;
         public float StartingSanity => startingSanity;
+        public float StartingHealth => startingHealth;
 
         // -------------------------------------------------------------------------
         // Public Methods
         // -------------------------------------------------------------------------
-        /// <summary>
-        /// Creates a new Character instance from this template.
-        /// </summary>
         public Character CreateCharacter()
         {
-            return new Character(characterName, startingHunger, startingSanity);
+            return new Character(characterName, startingHunger, startingThirst, startingSanity, startingHealth);
         }
     }
 }

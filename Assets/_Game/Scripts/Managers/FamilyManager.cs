@@ -8,6 +8,7 @@ namespace TheBunkerGames
 {
     /// <summary>
     /// Manages the family members in the bunker.
+    /// Stat decay is now handled by NightCycleController.
     /// </summary>
     public class FamilyManager : MonoBehaviour
     {
@@ -30,6 +31,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         public List<Character> FamilyMembers => familyMembers;
         public int AliveCount => familyMembers.FindAll(c => c.IsAlive).Count;
+        public List<Character> AvailableExplorers => familyMembers.FindAll(c => c.IsAvailableForExploration);
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -44,22 +46,12 @@ namespace TheBunkerGames
             Instance = this;
         }
 
-        private void OnEnable()
-        {
-            GameManager.OnNightStart += ApplyDailyDecay;
-        }
-
-        private void OnDisable()
-        {
-            GameManager.OnNightStart -= ApplyDailyDecay;
-        }
-
         // -------------------------------------------------------------------------
         // Public Methods
         // -------------------------------------------------------------------------
-        public void AddCharacter(string name, float hunger = 100f, float sanity = 100f)
+        public void AddCharacter(string name, float hunger = 100f, float thirst = 100f, float sanity = 100f, float health = 100f)
         {
-            var character = new Character(name, hunger, sanity);
+            var character = new Character(name, hunger, thirst, sanity, health);
             familyMembers.Add(character);
             Debug.Log($"[FamilyManager] Added character: {name}");
         }
@@ -77,21 +69,6 @@ namespace TheBunkerGames
             return familyMembers.Find(c => c.Name == name);
         }
 
-        public void ApplyDailyDecay()
-        {
-            var config = GameConfig.Instance;
-            if (config == null) return;
-
-            foreach (var character in familyMembers)
-            {
-                if (!character.IsAlive) continue;
-                
-                character.ModifyHunger(-config.HungerDecayPerDay);
-                character.ModifySanity(-config.SanityDecayPerDay);
-                Debug.Log($"[FamilyManager] {character.Name} - Hunger: {character.Hunger:F0}, Sanity: {character.Sanity:F0}");
-            }
-        }
-
         // -------------------------------------------------------------------------
         // Debug Buttons
         // -------------------------------------------------------------------------
@@ -107,13 +84,15 @@ namespace TheBunkerGames
             }
         }
 
-        [Button("Apply Daily Decay", ButtonSizes.Medium)]
-        [GUIColor(1f, 0.7f, 0.5f)]
-        private void Debug_ApplyDecay()
+        [Button("Add Family (Father, Mother, Child)", ButtonSizes.Medium)]
+        [GUIColor(0.5f, 0.8f, 1f)]
+        private void Debug_AddFamily()
         {
             if (Application.isPlaying)
             {
-                ApplyDailyDecay();
+                AddCharacter("Father", 90f, 85f, 70f, 100f);
+                AddCharacter("Mother", 95f, 90f, 80f, 100f);
+                AddCharacter("Child", 80f, 80f, 90f, 100f);
             }
         }
 
@@ -136,6 +115,15 @@ namespace TheBunkerGames
             {
                 familyMembers[0].ModifySanity(-20f);
                 Debug.Log($"[FamilyManager] Scared {familyMembers[0].Name}, Sanity: {familyMembers[0].Sanity:F0}");
+            }
+        }
+
+        [Button("Log All Stats", ButtonSizes.Medium)]
+        private void Debug_LogAllStats()
+        {
+            foreach (var c in familyMembers)
+            {
+                Debug.Log($"[FamilyManager] {c.Name} - H:{c.Hunger:F0} T:{c.Thirst:F0} S:{c.Sanity:F0} HP:{c.Health:F0} | Alive:{c.IsAlive} Injured:{c.IsInjured}");
             }
         }
         #endif

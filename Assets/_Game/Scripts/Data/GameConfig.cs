@@ -42,7 +42,7 @@ namespace TheBunkerGames
         [SerializeField] private float dayDurationSeconds = 300f;
 
         // -------------------------------------------------------------------------
-        // Voting Settings
+        // Voting / Twitch Settings
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Title("Voting / Twitch")]
@@ -51,13 +51,32 @@ namespace TheBunkerGames
         [SerializeField] private bool streamerModeEnabled = false;
 
         // -------------------------------------------------------------------------
-        // Stat Decay Settings
+        // Stat Decay Settings (Per Day)
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Title("Stat Decay (Per Day)")]
         #endif
         [SerializeField] private float hungerDecayPerDay = 15f;
+        [SerializeField] private float thirstDecayPerDay = 20f;
         [SerializeField] private float sanityDecayPerDay = 10f;
+
+        // -------------------------------------------------------------------------
+        // Exploration Settings
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Exploration")]
+        #endif
+        [SerializeField] private int maxExplorersPerDay = 2;
+        [SerializeField] private float baseInjuryChance = 0.2f;
+
+        // -------------------------------------------------------------------------
+        // A.N.G.E.L. Settings
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("A.N.G.E.L.")]
+        #endif
+        [SerializeField] private int maxAngelInteractionsPerDay = 3;
+        [SerializeField] private float processingDegradePerDay = 3f;
 
         // -------------------------------------------------------------------------
         // Debug Settings
@@ -76,7 +95,12 @@ namespace TheBunkerGames
         public float VoteTimerDuration => voteTimerDuration;
         public bool StreamerModeEnabled => streamerModeEnabled;
         public float HungerDecayPerDay => hungerDecayPerDay;
+        public float ThirstDecayPerDay => thirstDecayPerDay;
         public float SanityDecayPerDay => sanityDecayPerDay;
+        public int MaxExplorersPerDay => maxExplorersPerDay;
+        public float BaseInjuryChance => baseInjuryChance;
+        public int MaxAngelInteractionsPerDay => maxAngelInteractionsPerDay;
+        public float ProcessingDegradePerDay => processingDegradePerDay;
         public bool UseMockAgent => useMockAgent;
         public bool EnableDebugLogs => enableDebugLogs;
     }
