@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4104020303135460106
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2308282114838216575}
+  - component: {fileID: 1403917356076865307}
+  - component: {fileID: 4884334003154802340}
+  - component: {fileID: 606034943926866123}
+  - component: {fileID: 1471919387538880701}
+  m_Layer: 0
+  m_Name: GameSystems
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2308282114838216575
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4104020303135460106}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1403917356076865307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4104020303135460106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d745bf643e744e37ba6a5e48980c6c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.GameManager
+  currentState: 0
+  currentDay: 1
+  isGameOver: 0
+--- !u!114 &4884334003154802340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4104020303135460106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d9312ac7e1524e3b91aef241db8249d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.FamilyManager
+  familyMembers: []
+--- !u!114 &606034943926866123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4104020303135460106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e90ebaec94bef4d0b93833ef28ff701a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.InventoryManager
+  items: []
+  debugItemId: can_of_beans
+--- !u!114 &1471919387538880701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4104020303135460106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f1d07b9fdc0b46c280d048f5be3cd7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.QuestManager
+  quests: []
+  debugQuestId: FindWater
+  debugDescription: Locate a clean water source
