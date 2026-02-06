@@ -19,23 +19,23 @@ namespace TheBunkerGames
             yield return null; // Wait one frame for Awake/Start of others
 
             Debug.Log("--- Checking Core Systems ---");
-            CheckSystem("GameManager", FindObjectOfType<GameManager>());
-            CheckSystem("AudioManager", FindObjectOfType<AudioManager>());
+            CheckSystem("GameManager", FindFirstObjectByType<GameManager>());
+            CheckSystem("AudioManager", FindFirstObjectByType<AudioManager>());
             
             Debug.Log("--- Checking Feature Managers ---");
             CheckSystem("FamilyManager", FamilyManager.Instance);
             CheckSystem("InventoryManager", InventoryManager.Instance);
-            CheckSystem("QuestManager", FindObjectOfType<QuestManager>()); // Assuming it might not be a singleton yet
+            CheckSystem("QuestManager", FindFirstObjectByType<QuestManager>()); // Assuming it might not be a singleton yet
             
             Debug.Log("--- Checking Managers ---");
-            CheckSystem("DailyChoiceManager", FindObjectOfType<DailyChoiceManager>());
-            CheckSystem("StatusReviewManager", FindObjectOfType<StatusReviewManager>());
-            CheckSystem("NightCycleManager", FindObjectOfType<NightCycleManager>());
-            CheckSystem("CityExplorationManager", FindObjectOfType<CityExplorationManager>());
+            CheckSystem("DailyChoiceManager", FindFirstObjectByType<DailyChoiceManager>());
+            CheckSystem("StatusReviewManager", FindFirstObjectByType<StatusReviewManager>());
+            CheckSystem("NightCycleManager", FindFirstObjectByType<NightCycleManager>());
+            CheckSystem("CityExplorationManager", FindFirstObjectByType<CityExplorationManager>());
             
             Debug.Log("--- Checking AI ---");
-            CheckSystem("NeocortexIntegrator", FindObjectOfType<NeocortexIntegrator>());
-            CheckSystem("AngelInteractionManager", FindObjectOfType<AngelInteractionManager>());
+            CheckSystem("NeocortexIntegrator", FindFirstObjectByType<NeocortexIntegrator>());
+            CheckSystem("AngelInteractionManager", FindFirstObjectByType<AngelInteractionManager>());
         }
 
         private void CheckSystem(string name, MonoBehaviour instance)

@@ -24,6 +24,19 @@ namespace TheBunkerGames
                 if (instance == null)
                 {
                     instance = Resources.Load<ItemDatabaseDataSO>("ItemDatabaseDataSO");
+                    
+                    #if UNITY_EDITOR
+                    if (instance == null)
+                    {
+                        string[] guids = UnityEditor.AssetDatabase.FindAssets("t:ItemDatabaseDataSO");
+                        if (guids.Length > 0)
+                        {
+                            string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
+                            instance = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemDatabaseDataSO>(path);
+                        }
+                    }
+                    #endif
+
                     if (instance == null)
                     {
                         Debug.LogError("[ItemDatabaseDataSO] No ItemDatabaseDataSO found in Resources folder!");

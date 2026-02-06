@@ -35,7 +35,7 @@ namespace TheBunkerGames
         {
             if (nextPhaseButton != null)
             {
-                var flowController = FindObjectOfType<GameFlowController>();
+                var flowController = FindFirstObjectByType<GameFlowController>();
                 if (flowController != null)
                 {
                     nextPhaseButton.onClick.AddListener(flowController.AdvancePhase);
