@@ -326,7 +326,6 @@ namespace TheBunkerGames
         [SerializeField] private string debugPrompt = "Hello! What model are you?";
 
         [Button("Test OpenRouter Chat", ButtonSizes.Large)]
-        [GUIColor(0, 1, 0)]
         private void Debug_TestOpenRouter()
         {
             if (!Application.isPlaying)
@@ -340,7 +339,6 @@ namespace TheBunkerGames
         }
 
         [Button("Test Mistral Chat", ButtonSizes.Large)]
-        [GUIColor(0.4f, 0.7f, 1f)]
         private void Debug_TestMistral()
         {
             if (!Application.isPlaying)

@@ -94,7 +94,6 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Button("Send Test Message", ButtonSizes.Large)]
-        [GUIColor(0, 1, 0)]
         private void Debug_SendTestMessage()
         {
             if (Application.isPlaying)

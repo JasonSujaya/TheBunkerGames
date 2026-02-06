@@ -112,7 +112,6 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Button("Log All Items", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_LogAllItems()
         {
             Debug.Log($"[ItemDatabaseDataSO] Total items: {allItems.Count}");
@@ -126,7 +125,6 @@ namespace TheBunkerGames
         }
 
         [Button("Find and Add All ItemData Assets", ButtonSizes.Large)]
-        [GUIColor(0.4f, 1f, 0.4f)]
         private void Debug_FindAndAddAll()
         {
 #if UNITY_EDITOR
@@ -151,7 +149,6 @@ namespace TheBunkerGames
         }
 
         [Button("Clean Up Missing Items", ButtonSizes.Medium)]
-        [GUIColor(1f, 0.6f, 0.3f)]
         private void Debug_CleanUpMissingItems()
         {
 #if UNITY_EDITOR

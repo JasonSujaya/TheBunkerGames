@@ -129,7 +129,6 @@ namespace TheBunkerGames
         [TitleGroup("Debug Controls")]
         [HorizontalGroup("Debug Controls/AddSO")]
         [Button("Add Character From SO", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 1f, 0.5f)]
         private void Debug_AddCharacterFromSO()
         {
             if (debugCharacterProfile != null)
@@ -174,7 +173,6 @@ namespace TheBunkerGames
         [TitleGroup("Debug Controls")]
         [HorizontalGroup("Debug Controls/Manual")]
         [Button("Add Test Character", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 1f, 0.8f)]
         private void Debug_AddTestCharacter(string name = "Survivor", float hunger = 100, float thirst = 100, float sanity = 100, float health = 100)
         {
             AddCharacter(name, hunger, thirst, sanity, health, debugSubtype);
@@ -182,7 +180,6 @@ namespace TheBunkerGames
 
         [TitleGroup("Debug Controls")]
         [Button("Clear All Characters", ButtonSizes.Medium)]
-        [GUIColor(1f, 0.5f, 0.5f)]
         private void Debug_ClearAll()
         {
             ClearAllCharacters();

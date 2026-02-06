@@ -220,21 +220,18 @@ namespace TheBunkerGames
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
         [Button("Request Resources (Mock)", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 1f, 0.5f)]
         private void Debug_RequestResources()
         {
             if (Application.isPlaying) RequestResources("Please give us food.");
         }
 
         [Button("Degrade Processing (-10)", ButtonSizes.Medium)]
-        [GUIColor(1f, 0.7f, 0.5f)]
         private void Debug_DegradeProcessing()
         {
             if (Application.isPlaying) DegradeProcessing(10f);
         }
 
         [Button("Complete Phase", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_CompletePhase()
         {
             if (Application.isPlaying) CompleteInteraction();
@@ -242,7 +239,6 @@ namespace TheBunkerGames
 
         [Title("Auto Setup")]
         [Button("Auto Setup Dependencies", ButtonSizes.Large)]
-        [GUIColor(0.4f, 1f, 0.4f)]
         private void AutoSetupDependencies()
         {
             #if UNITY_EDITOR

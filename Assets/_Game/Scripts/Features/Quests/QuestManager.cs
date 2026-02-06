@@ -21,7 +21,7 @@ namespace TheBunkerGames
         // Database Reference
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Title("Database")]
+        [Title("Settings")]
         [Required("Quest Database is required")]
         #endif
         [SerializeField] private QuestDatabaseDataSO questDatabase;
@@ -138,14 +138,14 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Title("Debug Controls")]
-        [HorizontalGroup("QuestData")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/QuestData")]
         [ValueDropdown("GetAllQuestProfileList")]
         [SerializeField] private QuestDefinitionSO debugQuestProfile;
 
-        [HorizontalGroup("QuestData")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/QuestData")]
         [Button("Add Quest From SO", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 1f, 0.5f)]
         private void Debug_AddQuestFromSO()
         {
             if (debugQuestProfile != null)
@@ -185,12 +185,15 @@ namespace TheBunkerGames
             return list;
         }
 
-        [HorizontalGroup("Manual")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Manual")]
         [SerializeField] private string debugQuestId = "FindWater";
         
-        [HorizontalGroup("Manual")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Manual")]
         [SerializeField] private string debugDescription = "Locate a clean water source";
 
+        [TitleGroup("Debug Controls")]
         [Button("Add Manual Quest", ButtonSizes.Medium)]
         private void Debug_AddQuest()
         {
@@ -200,9 +203,9 @@ namespace TheBunkerGames
             }
         }
 
-        [HorizontalGroup("State")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/State")]
         [Button("Complete QuestData", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_CompleteQuest()
         {
             if (Application.isPlaying)
@@ -211,9 +214,9 @@ namespace TheBunkerGames
             }
         }
 
-        [HorizontalGroup("State")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/State")]
         [Button("Fail QuestData", ButtonSizes.Medium)]
-        [GUIColor(1f, 0.5f, 0.5f)]
         private void Debug_FailQuest()
         {
             if (Application.isPlaying)
@@ -222,8 +225,8 @@ namespace TheBunkerGames
             }
         }
 
+        [TitleGroup("Debug Controls")]
         [Button("Add Sample Quests", ButtonSizes.Medium)]
-        [GUIColor(0.8f, 0.8f, 0.5f)]
         private void Debug_AddSampleQuests()
         {
             if (Application.isPlaying)
@@ -234,6 +237,7 @@ namespace TheBunkerGames
             }
         }
 
+        [TitleGroup("Debug Controls")]
         [Button("Log All Quests", ButtonSizes.Medium)]
         private void Debug_LogQuests()
         {
@@ -242,26 +246,6 @@ namespace TheBunkerGames
             {
                 Debug.Log($"  - [{quest.State}] {quest.Id}: {quest.Description}");
             }
-        }
-
-        [Title("Auto Setup")]
-        [Button("Auto Setup Dependencies", ButtonSizes.Large)]
-        [GUIColor(0.4f, 1f, 0.4f)]
-        private void AutoSetupDependencies()
-        {
-            #if UNITY_EDITOR
-            // Ensure Tester exists
-            var testerType = System.Type.GetType("TheBunkerGames.Tests.QuestTester");
-            if (testerType != null && GetComponent(testerType) == null)
-            {
-                gameObject.AddComponent(testerType);
-                Debug.Log("[QuestManager] Added QuestTester.");
-            }
-            else if (testerType == null)
-            {
-                Debug.LogWarning("[QuestManager] Could not find QuestTester type. Ensure it is in TheBunkerGames.Tests namespace.");
-            }
-            #endif
         }
         #endif
     }

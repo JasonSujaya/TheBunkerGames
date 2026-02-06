@@ -181,7 +181,6 @@ namespace TheBunkerGames
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
         [Button("Send First CharacterData (Medium Risk)", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 1f, 0.5f)]
         private void Debug_SendFirstCharacter()
         {
             if (!Application.isPlaying) return;
@@ -198,14 +197,12 @@ namespace TheBunkerGames
         }
 
         [Button("Resolve All Expeditions", ButtonSizes.Medium)]
-        [GUIColor(1f, 0.7f, 0.5f)]
         private void Debug_ResolveAll()
         {
             if (Application.isPlaying) ResolveExpeditions();
         }
 
         [Button("Complete Phase", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_CompletePhase()
         {
             if (Application.isPlaying) CompleteExplorationPhase();
@@ -213,7 +210,6 @@ namespace TheBunkerGames
 
         [Title("Auto Setup")]
         [Button("Auto Setup Dependencies", ButtonSizes.Large)]
-        [GUIColor(0.4f, 1f, 0.4f)]
         private void AutoSetupDependencies()
         {
             #if UNITY_EDITOR

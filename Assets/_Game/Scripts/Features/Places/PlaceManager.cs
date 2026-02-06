@@ -20,7 +20,7 @@ namespace TheBunkerGames
         // Database Reference
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Title("Database")]
+        [Title("Settings")]
         [Required("Place Database is required")]
         #endif
         [SerializeField] private PlaceDatabaseDataSO placeDatabase;
@@ -109,14 +109,14 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Title("Debug Controls")]
-        [HorizontalGroup("Discover")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Discover")]
         [ValueDropdown("GetAllPlaceProfileList")]
         [SerializeField] private PlaceDefinitionSO debugPlaceProfile;
 
-        [HorizontalGroup("Discover")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Discover")]
         [Button("Discover Place", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 1f, 0.5f)]
         private void Debug_DiscoverPlaceSO()
         {
             if (debugPlaceProfile != null)
@@ -156,10 +156,12 @@ namespace TheBunkerGames
             return list;
         }
 
-        [HorizontalGroup("Manual")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Manual")]
         [SerializeField] private string debugPlaceId = "OldPharmacy";
 
-        [HorizontalGroup("Manual")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Manual")]
         [Button("Discover By ID", ButtonSizes.Medium)]
         private void Debug_DiscoverPlace()
         {
@@ -169,8 +171,8 @@ namespace TheBunkerGames
             }
         }
 
+        [TitleGroup("Debug Controls")]
         [Button("Discover Random Place", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_DiscoverRandom()
         {
             if (Application.isPlaying && placeDatabase != null && placeDatabase.AllPlaces.Count > 0)
@@ -188,13 +190,14 @@ namespace TheBunkerGames
             }
         }
 
+        [TitleGroup("Debug Controls")]
         [Button("Clear Discovered Places", ButtonSizes.Medium)]
-        [GUIColor(1f, 0.5f, 0.5f)]
         private void Debug_ClearDiscoveredPlaces()
         {
             ClearDiscoveredPlaces();
         }
 
+        [TitleGroup("Debug Controls")]
         [Button("Log All Discovered Places", ButtonSizes.Medium)]
         private void Debug_LogDiscoveredPlaces()
         {

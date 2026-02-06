@@ -106,7 +106,6 @@ namespace TheBunkerGames
         #if ODIN_INSPECTOR
         [TitleGroup("Debug Controls")]
         [Button("Add Default Family", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_AddFamily()
         {
             if (CharacterManager.Instance != null)

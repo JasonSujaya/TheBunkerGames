@@ -209,28 +209,24 @@ namespace TheBunkerGames
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
         [Button("Generate Mock DilemmaData", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 1f, 0.5f)]
         private void Debug_GenerateDilemma()
         {
             if (Application.isPlaying) BeginChoicePhase();
         }
 
         [Button("Choose Option 0", ButtonSizes.Medium)]
-        [GUIColor(1f, 0.9f, 0.5f)]
         private void Debug_ChooseFirst()
         {
             if (Application.isPlaying) MakeChoice(0);
         }
 
         [Button("Choose Option 1", ButtonSizes.Medium)]
-        [GUIColor(1f, 0.7f, 0.5f)]
         private void Debug_ChooseSecond()
         {
             if (Application.isPlaying) MakeChoice(1);
         }
 
         [Button("Complete Phase", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_CompletePhase()
         {
             if (Application.isPlaying) CompleteChoicePhase();
@@ -238,7 +234,6 @@ namespace TheBunkerGames
 
         [Title("Auto Setup")]
         [Button("Auto Setup Dependencies", ButtonSizes.Large)]
-        [GUIColor(0.4f, 1f, 0.4f)]
         private void AutoSetupDependencies()
         {
             #if UNITY_EDITOR

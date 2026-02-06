@@ -95,7 +95,6 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Button("Log All Quests", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_LogAllQuests()
         {
             Debug.Log($"[QuestDatabaseDataSO] Total quests: {allQuests.Count}");
@@ -110,7 +109,6 @@ namespace TheBunkerGames
         }
 
         [Button("Find and Add All Quest Assets", ButtonSizes.Large)]
-        [GUIColor(0.4f, 1f, 0.4f)]
         private void Debug_FindAndAddAll()
         {
 #if UNITY_EDITOR
@@ -134,7 +132,6 @@ namespace TheBunkerGames
         }
 
         [Button("Clean Up Missing Quests", ButtonSizes.Medium)]
-        [GUIColor(1f, 0.6f, 0.3f)]
         private void Debug_CleanUpMissing()
         {
 #if UNITY_EDITOR

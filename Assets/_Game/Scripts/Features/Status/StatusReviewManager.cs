@@ -147,14 +147,12 @@ namespace TheBunkerGames
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
         [Button("Generate Report", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 1f, 0.5f)]
         private void Debug_GenerateReport()
         {
             if (Application.isPlaying) GenerateStatusReport();
         }
 
         [Button("Complete Phase", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_CompletePhase()
         {
             if (Application.isPlaying) CompleteStatusReview();
@@ -162,7 +160,6 @@ namespace TheBunkerGames
 
         [Title("Auto Setup")]
         [Button("Auto Setup Dependencies", ButtonSizes.Large)]
-        [GUIColor(0.4f, 1f, 0.4f)]
         private void AutoSetupDependencies()
         {
             #if UNITY_EDITOR

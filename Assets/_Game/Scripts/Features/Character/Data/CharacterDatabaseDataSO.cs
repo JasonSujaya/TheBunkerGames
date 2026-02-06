@@ -95,7 +95,6 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Button("Log All Characters", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_LogAllCharacters()
         {
             Debug.Log($"[CharacterDatabaseDataSO] Total characters: {allCharacters.Count}");
@@ -109,7 +108,6 @@ namespace TheBunkerGames
         }
 
         [Button("Find and Add All Character Assets", ButtonSizes.Large)]
-        [GUIColor(0.4f, 1f, 0.4f)]
         private void Debug_FindAndAddAll()
         {
 #if UNITY_EDITOR
@@ -133,7 +131,6 @@ namespace TheBunkerGames
         }
 
         [Button("Clean Up Missing Characters", ButtonSizes.Medium)]
-        [GUIColor(1f, 0.6f, 0.3f)]
         private void Debug_CleanUpMissing()
         {
 #if UNITY_EDITOR

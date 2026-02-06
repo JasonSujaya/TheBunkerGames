@@ -193,14 +193,12 @@ namespace TheBunkerGames
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
         [Button("Process Night Cycle", ButtonSizes.Medium)]
-        [GUIColor(0.4f, 0.3f, 0.6f)]
         private void Debug_ProcessNight()
         {
             if (Application.isPlaying) ProcessNightCycle();
         }
 
         [Button("Complete Night (Advance Day)", ButtonSizes.Large)]
-        [GUIColor(1f, 0.5f, 0.5f)]
         private void Debug_CompleteNight()
         {
             if (Application.isPlaying) CompleteNightCycle();
@@ -208,7 +206,6 @@ namespace TheBunkerGames
 
         [Title("Auto Setup")]
         [Button("Auto Setup Dependencies", ButtonSizes.Large)]
-        [GUIColor(0.4f, 1f, 0.4f)]
         private void AutoSetupDependencies()
         {
             #if UNITY_EDITOR
