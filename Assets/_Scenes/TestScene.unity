@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &3043862
+--- !u!1 &168614166
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,90 +127,73 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3043867}
-  - component: {fileID: 3043866}
-  - component: {fileID: 3043865}
-  - component: {fileID: 3043864}
-  - component: {fileID: 3043863}
+  - component: {fileID: 168614168}
+  - component: {fileID: 168614167}
+  - component: {fileID: 168614169}
   m_Layer: 0
-  m_Name: GameSystems
+  m_Name: NeoCortex
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &3043863
+--- !u!114 &168614167
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3043862}
+  m_GameObject: {fileID: 168614166}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f1d07b9fdc0b46c280d048f5be3cd7d, type: 3}
+  m_Script: {fileID: 11500000, guid: 5e6726b6a76dc27458cfb50d0d840e9a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.QuestManager
-  quests: []
-  debugQuestId: FindWater
-  debugDescription: Locate a clean water source
---- !u!114 &3043864
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3043862}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e90ebaec94bef4d0b93833ef28ff701a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.InventoryManager
-  items: []
-  debugItemId: can_of_beans
---- !u!114 &3043865
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3043862}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d9312ac7e1524e3b91aef241db8249d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.FamilyManager
-  familyMembers: []
---- !u!114 &3043866
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3043862}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d745bf643e744e37ba6a5e48980c6c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.GameManager
-  currentState: 0
-  currentDay: 1
-  isGameOver: 0
---- !u!4 &3043867
+  m_EditorClassIdentifier: Neocortex.Runtime::Neocortex.NeocortexSmartAgent
+  projectId: cmlavj35m0002l204gxo1p68h
+  OnChatResponseReceived:
+    m_PersistentCalls:
+      m_Calls: []
+  OnAudioResponseReceived:
+    m_PersistentCalls:
+      m_Calls: []
+  OnTranscriptionReceived:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRequestFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  OnChatHistoryReceived:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!4 &168614168
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3043862}
+  m_GameObject: {fileID: 168614166}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -3.96975, y: 1.38814, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &168614169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 168614166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0cb33c856eec47019e9e0950e2851c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.NeocortexIntegrator
+  smartAgent: {fileID: 168614167}
+  messageToSend: Hello, Neocortex!
 --- !u!1 &1864448066
 GameObject:
   m_ObjectHideFlags: 0
@@ -242,9 +225,71 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &68645517784498372
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 606034943926866123, guid: d6571ef1652ec4838bdfeb65b9756f55, type: 3}
+      propertyPath: items.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2308282114838216575, guid: d6571ef1652ec4838bdfeb65b9756f55, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2308282114838216575, guid: d6571ef1652ec4838bdfeb65b9756f55, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2308282114838216575, guid: d6571ef1652ec4838bdfeb65b9756f55, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2308282114838216575, guid: d6571ef1652ec4838bdfeb65b9756f55, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2308282114838216575, guid: d6571ef1652ec4838bdfeb65b9756f55, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2308282114838216575, guid: d6571ef1652ec4838bdfeb65b9756f55, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2308282114838216575, guid: d6571ef1652ec4838bdfeb65b9756f55, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2308282114838216575, guid: d6571ef1652ec4838bdfeb65b9756f55, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2308282114838216575, guid: d6571ef1652ec4838bdfeb65b9756f55, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2308282114838216575, guid: d6571ef1652ec4838bdfeb65b9756f55, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4104020303135460106, guid: d6571ef1652ec4838bdfeb65b9756f55, type: 3}
+      propertyPath: m_Name
+      value: GameSystems
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d6571ef1652ec4838bdfeb65b9756f55, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1864448067}
-  - {fileID: 3043867}
+  - {fileID: 68645517784498372}
+  - {fileID: 168614168}
