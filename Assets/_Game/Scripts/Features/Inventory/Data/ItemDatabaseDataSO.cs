@@ -111,6 +111,28 @@ namespace TheBunkerGames
                 }
             }
         }
+
+        [Button("Find and Add All ItemData Assets", ButtonSizes.Large)]
+        [GUIColor(0.4f, 1f, 0.4f)]
+        private void Debug_FindAndAddAll()
+        {
+#if UNITY_EDITOR
+            string[] guids = UnityEditor.AssetDatabase.FindAssets("t:ItemData");
+            int count = 0;
+            foreach (string guid in guids)
+            {
+                string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                ItemData item = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemData>(path);
+                if (item != null && !allItems.Contains(item))
+                {
+                    allItems.Add(item);
+                    count++;
+                }
+            }
+            UnityEditor.EditorUtility.SetDirty(this);
+            Debug.Log($"[ItemDatabaseDataSO] Added {count} new items to the database.");
+#endif
+        }
         #endif
     }
 }
