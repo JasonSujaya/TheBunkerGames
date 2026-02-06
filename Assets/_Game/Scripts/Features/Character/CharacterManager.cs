@@ -125,6 +125,7 @@ namespace TheBunkerGames
         [ValueDropdown("GetAllCharacterProfileList")]
         [SerializeField] private CharacterDefinitionSO debugCharacterProfile;
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Add Character From SO")]
         private void Debug_AddCharacterFromSO()
         {
@@ -165,6 +166,7 @@ namespace TheBunkerGames
 
         [SerializeField] private CharacterSubtype debugSubtype = CharacterSubtype.Family;
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Add Test Character")]
         private void Debug_AddTestCharacter(string name = "Survivor", float hunger = 100, float thirst = 100, float sanity = 100, float health = 100)
         {

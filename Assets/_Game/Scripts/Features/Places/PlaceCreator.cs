@@ -125,12 +125,14 @@ namespace TheBunkerGames
         [ShowInInspector, ReadOnly]
         private int SessionPlaceCount => sessionPlaces?.Count ?? 0;
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Generate 1 Random Place")]
         private void Debug_CreateRandomPlace()
         {
             GenerateRandomPlace();
         }
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Generate 3 Random Places")]
         private void Debug_Generate3Places()
         {
@@ -152,6 +154,7 @@ namespace TheBunkerGames
         [Range(0, 500)]
         [SerializeField] private int customLootValue = 50;
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Create Custom Place")]
         private void Debug_CreateCustomPlace()
         {

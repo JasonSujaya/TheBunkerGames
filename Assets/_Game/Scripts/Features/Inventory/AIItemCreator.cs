@@ -154,12 +154,14 @@ namespace TheBunkerGames
         [ShowInInspector, ReadOnly]
         private int SessionItemCount => sessionItems?.Count ?? 0;
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Generate 1 Random Item")]
         private void Debug_CreateRandomAIItem()
         {
             GenerateRandomAIItem();
         }
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Generate 5 Random Items")]
         private void Debug_Generate5Items()
         {
@@ -175,6 +177,7 @@ namespace TheBunkerGames
         [TextArea(2, 4)]
         [SerializeField] private string customDescription = "A manual entry for testing purposes.";
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Create Custom Item Instance")]
         private void Debug_CreateCustomItem()
         {

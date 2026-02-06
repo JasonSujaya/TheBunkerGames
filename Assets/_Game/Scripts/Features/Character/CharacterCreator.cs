@@ -149,12 +149,14 @@ namespace TheBunkerGames
         [ShowInInspector, ReadOnly]
         private int SessionCharacterCount => sessionCharacters?.Count ?? 0;
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Generate 1 Random Survivor")]
         private void Debug_CreateRandomSurvivor()
         {
             GenerateRandomSurvivor();
         }
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Generate 3 Random Survivors")]
         private void Debug_Generate3Survivors()
         {
@@ -164,6 +166,7 @@ namespace TheBunkerGames
             }
         }
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Generate 1 Random Enemy")]
         private void Debug_CreateRandomEnemy()
         {
@@ -185,6 +188,7 @@ namespace TheBunkerGames
         [Range(0, 100)]
         [SerializeField] private float customSanity = 100f;
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Create Custom Entity")]
         private void Debug_CreateCustomEntity()
         {

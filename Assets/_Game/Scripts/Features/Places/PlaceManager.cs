@@ -113,6 +113,7 @@ namespace TheBunkerGames
         [ValueDropdown("GetAllPlaceProfileList")]
         [SerializeField] private PlaceDefinitionSO debugPlaceProfile;
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Add Place From SO")]
         private void Debug_AddPlaceSO()
         {

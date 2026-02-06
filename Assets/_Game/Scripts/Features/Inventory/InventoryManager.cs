@@ -190,6 +190,7 @@ namespace TheBunkerGames
         [ValueDropdown("GetAllItemDataList")]
         [SerializeField] private ItemData debugSelectedItem;
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Add Item")]
         private void Debug_AddItem()
         {
@@ -197,6 +198,7 @@ namespace TheBunkerGames
                 AddItem(debugSelectedItem, 1);
         }
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Remove Item")]
         private void Debug_RemoveItem()
         {
@@ -204,6 +206,7 @@ namespace TheBunkerGames
                 RemoveItem(debugSelectedItem, 1);
         }
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Add 5 Random Items")]
         private void Debug_AddRandomItems()
         {

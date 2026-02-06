@@ -126,12 +126,14 @@ namespace TheBunkerGames
         [ShowInInspector, ReadOnly]
         private int SessionQuestCount => sessionQuests?.Count ?? 0;
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Generate 1 Random Quest")]
         private void Debug_CreateRandomQuest()
         {
             GenerateRandomQuest();
         }
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Generate 3 Random Quests")]
         private void Debug_Generate3Quests()
         {
@@ -146,6 +148,7 @@ namespace TheBunkerGames
         [TextArea(2, 4)]
         [SerializeField] private string customDescription = "A.N.G.E.L. has a new objective for you.";
 
+        [GUIColor(0.2f, 0.6f, 1.0f)]
         [Button("Create Custom Quest")]
         private void Debug_CreateCustomQuest()
         {
