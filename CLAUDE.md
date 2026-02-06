@@ -33,7 +33,7 @@ Simple `switch(currentState)` — States: `Morning`, `Scavenge`, `Voting`, `Nigh
 
 ### AI Integration (Neocortex)
 
-- **NeocortexIntegrator** (`Assets/_Scripts/AI/NeocortexIntegrator.cs`): Bridges Unity and the Neocortex SDK
+- **NeocortexIntegrator** (`Assets/_Game/Scripts/AI/NeocortexIntegrator.cs`): Bridges Unity and the Neocortex SDK
 - **Input**: `smartAgent.TextToText(userMessage)`
 - **Output**: Subscribe to `OnMessageReceived` event
 - **Context Variables**: Inject game state (`{sanity}`, `{day}`) via `smartAgent.SetVariable()`
@@ -47,27 +47,38 @@ UnityEvents and C# Actions decouple UI from logic. Event-driven: `smartAgent.OnM
 
 ## Directory Structure
 
+All custom game code and assets live under `Assets/_Game/`. Unity-required folders (`Editor/`, `Resources/`, `Settings/`) stay at the Assets root.
+
 ```
 Assets/
-├── _Scripts/
-│   ├── Managers/       # GameManager, FamilyManager, InventoryManager, QuestManager
-│   ├── Controllers/    # Logic & decisions
-│   ├── Actions/        # Single-responsibility doers
-│   ├── AI/             # NeocortexIntegrator
-│   ├── UI/             # View logic only (no game logic)
-│   └── Data/           # ScriptableObjects, Enums, Constants
-│       ├── CharacterData.cs, Character.cs
-│       ├── ItemData.cs, ItemDatabase.cs, InventorySlot.cs
-│       ├── Quest.cs
-│       ├── GameConfig.cs
-│       └── Enums.cs
-├── _Prefabs/
-├── _Scenes/
-├── _Data/              # ScriptableObject assets
-├── Editor/             # ProjectSetupTool, ItemCreatorWindow
-├── Resources/          # GameConfig.asset, ItemDatabase.asset, Neocortex settings
-└── Plugins/            # Third-party plugins
+├── _Game/                          # ALL custom game content
+│   ├── Scripts/
+│   │   ├── AI/                     # NeocortexIntegrator
+│   │   ├── Data/                   # ScriptableObjects, Enums, Constants
+│   │   │   ├── Character.cs, CharacterData.cs
+│   │   │   ├── ItemData.cs, ItemDatabase.cs, InventorySlot.cs
+│   │   │   ├── Quest.cs, GameConfig.cs, Enums.cs
+│   │   ├── Managers/               # GameManager, FamilyManager, InventoryManager, QuestManager
+│   │   ├── Controllers/            # Logic & decisions
+│   │   ├── Actions/                # Single-responsibility doers
+│   │   ├── UI/                     # View logic only (no game logic)
+│   │   └── Utils/                  # Helper classes
+│   ├── Prefabs/                    # GameSystems, etc.
+│   ├── Scenes/                     # SampleScene, TestScene
+│   └── Resources/
+│       └── Data/                   # ScriptableObject assets (Item_*.asset)
+├── Editor/                         # ProjectSetupTool, ItemCreatorWindow (Unity convention)
+├── Resources/                      # GameConfig.asset, ItemDatabase.asset, Neocortex settings
+├── Settings/                       # URP render pipeline config
+├── WebGLTemplates/                 # Neocortex WebGL template
+└── Plugins/                        # Third-party plugins
 ```
+
+### Why This Layout?
+- **`_Game/`** groups all your code so it's visually separated from third-party assets
+- **`Editor/`** must be at Assets root — Unity only compiles Editor scripts from this path
+- **`Resources/`** at root is required for `Resources.Load()` calls (Neocortex SDK, ItemDatabase)
+- **`_Game/Resources/Data/`** holds game-specific ScriptableObject assets that don't need `Resources.Load()`
 
 ## Coding Standards
 
