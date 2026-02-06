@@ -28,6 +28,14 @@ namespace TheBunkerGames
         public static event Action OnNightCycleComplete;
 
         // -------------------------------------------------------------------------
+        // Configuration
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Settings")]
+        #endif
+        [SerializeField] private DreamDatabaseSO dreamDatabase;
+
+        // -------------------------------------------------------------------------
         // State
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
@@ -35,6 +43,11 @@ namespace TheBunkerGames
         [ReadOnly]
         #endif
         [SerializeField] private NightReportData latestReport;
+
+        // -------------------------------------------------------------------------
+        // Logic Controller
+        // -------------------------------------------------------------------------
+        private NightLogicController logicController;
 
         // -------------------------------------------------------------------------
         // Public Properties
@@ -52,6 +65,9 @@ namespace TheBunkerGames
                 return;
             }
             Instance = this;
+
+            // Initialize Logic Controller
+            logicController = new NightLogicController();
         }
 
         private void OnEnable()
@@ -115,45 +131,9 @@ namespace TheBunkerGames
         {
             var config = GameConfigDataSO.Instance;
             var family = FamilyManager.Instance;
-            if (config == null || family == null) return;
+            if (family == null) return;
 
-            foreach (var character in family.FamilyMembers)
-            {
-                if (!character.IsAlive) continue;
-
-                character.ModifyHunger(-config.HungerDecayPerDay);
-                character.ModifyThirst(-config.ThirstDecayPerDay);
-                character.ModifySanity(-config.SanityDecayPerDay);
-
-                // Dehydration causes health damage
-                if (character.IsDehydrated)
-                {
-                    character.ModifyHealth(-10f);
-                }
-
-                // Starvation causes health damage
-                if (character.Hunger <= 0f)
-                {
-                    character.ModifyHealth(-15f);
-                }
-
-                // Insanity causes additional sanity spiral
-                if (character.IsInsane)
-                {
-                    character.ModifySanity(-5f);
-                }
-
-                // Injured characters heal slowly
-                if (character.IsInjured && character.Health > 50f)
-                {
-                    character.IsInjured = false;
-                }
-
-                latestReport.StatChanges.Add(
-                    $"{character.Name}: H:{character.Hunger:F0} T:{character.Thirst:F0} " +
-                    $"S:{character.Sanity:F0} HP:{character.Health:F0}"
-                );
-            }
+            logicController.ApplyStatDecay(family.FamilyMembers, config, latestReport.StatChanges);
         }
 
         private void CheckForDeaths()
@@ -187,48 +167,21 @@ namespace TheBunkerGames
             var angel = AngelInteractionManager.Instance;
             if (angel != null)
             {
-                float degradation = 5f; // Base degradation
-                if (LatestReport.IsNightmare) degradation += 10f;
-                // Characters dying causes massive logic failure
-                if (LatestReport.DeathsThisNight.Count > 0) degradation += 15f * LatestReport.DeathsThisNight.Count;
-
+                float degradation = logicController.CalculateAngelDegradation(latestReport);
                 angel.DegradeProcessing(degradation);
             }
         }
 
         private void GenerateDreamLog()
         {
-            // In production, Neocortex generates a narrative "dream" based on the day's events.
-            // For now, generate a mock log based on family state.
             var family = FamilyManager.Instance;
             if (family == null) return;
-
-            float averageSanity = 0f;
-            int aliveCount = 0;
-            foreach (var c in family.FamilyMembers)
-            {
-                if (c.IsAlive)
-                {
-                    averageSanity += c.Sanity;
-                    aliveCount++;
-                }
-            }
-            if (aliveCount > 0) averageSanity /= aliveCount;
-
-            bool isNightmare = averageSanity < 40f;
+            
+            bool isNightmare = false;
+            string log = logicController.GenerateDreamLog(family.FamilyMembers, dreamDatabase, out isNightmare);
+            
             latestReport.IsNightmare = isNightmare;
-
-            if (isNightmare)
-            {
-                latestReport.DreamLog = "The walls breathe. Someone is whispering numbers. " +
-                    "A.N.G.E.L.'s voice echoes: 'Efficiency requires sacrifice.' " +
-                    "The family sleeps, but nobody rests.";
-            }
-            else
-            {
-                latestReport.DreamLog = "A quiet night. The hum of the filtration system is almost comforting. " +
-                    "Someone dreams of sunlight. A.N.G.E.L. watches in silence.";
-            }
+            latestReport.DreamLog = log;
 
             Debug.Log($"[NightCycle] {(isNightmare ? "NIGHTMARE" : "Dream")}: {latestReport.DreamLog}");
             OnDreamLogGenerated?.Invoke(latestReport.DreamLog);

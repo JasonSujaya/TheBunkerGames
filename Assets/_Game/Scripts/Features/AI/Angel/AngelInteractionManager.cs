@@ -12,11 +12,6 @@ namespace TheBunkerGames
     /// Players argue with A.N.G.E.L. for resources. Her mood and "Processing" level
     /// determine cooperation. Sends context to Neocortex and processes AI responses.
     /// </summary>
-    /// <summary>
-    /// Controls the A.N.G.E.L. Interaction phase (Phase 2 of the Core Loop).
-    /// Players argue with A.N.G.E.L. for resources. Her mood and "Processing" level
-    /// determine cooperation. Sends context to Neocortex and processes AI responses.
-    /// </summary>
     public class AngelInteractionManager : MonoBehaviour
     {
         // -------------------------------------------------------------------------
@@ -30,6 +25,15 @@ namespace TheBunkerGames
         public static event Action<AngelResponseData> OnAngelResponse;
         public static event Action<AngelMood> OnMoodChanged;
         public static event Action OnInteractionComplete;
+
+        // -------------------------------------------------------------------------
+        // Configuration
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Settings")]
+        #endif
+        [SerializeField] private AngelResponsesSO responsesData;
+        [SerializeField] private int maxInteractionsPerDay = 3;
 
         // -------------------------------------------------------------------------
         // State
@@ -51,7 +55,10 @@ namespace TheBunkerGames
         #endif
         [SerializeField] private int interactionsThisDay;
 
-        [SerializeField] private int maxInteractionsPerDay = 3;
+        // -------------------------------------------------------------------------
+        // Logic Controller
+        // -------------------------------------------------------------------------
+        private AngelLogicController logicController;
 
         // -------------------------------------------------------------------------
         // Public Properties
@@ -71,6 +78,9 @@ namespace TheBunkerGames
                 return;
             }
             Instance = this;
+
+            // Initialize Logic Controller
+            logicController = new AngelLogicController();
         }
 
         private void OnEnable()
@@ -126,8 +136,8 @@ namespace TheBunkerGames
             }
             else
             {
-                // Fallback: generate a mock response based on mood
-                var mockResponse = GenerateMockResponse(playerMessage);
+                // Fallback: generate a mock response based on mood using Logic Controller
+                var mockResponse = logicController.GenerateMockResponse(currentMood, responsesData);
                 ProcessAngelResponse(mockResponse);
             }
         }
@@ -150,7 +160,6 @@ namespace TheBunkerGames
             OnAngelResponse?.Invoke(response);
         }
 
-
         public void CompleteInteraction()
         {
             Debug.Log("[Angel] Interaction phase complete. Moving to City Exploration.");
@@ -170,17 +179,13 @@ namespace TheBunkerGames
 
         public void DegradeProcessing(float amount)
         {
-            processingLevel = Mathf.Clamp(processingLevel - amount, 0f, 100f);
+            processingLevel = logicController.CalculateProcessingLevel(processingLevel, amount);
             Debug.Log($"[Angel] Processing degraded to: {processingLevel:F0}%");
-
-            if (processingLevel <= 20f)
-            {
-                SetMood(AngelMood.Glitching);
-            }
-            else if (processingLevel <= 50f)
-            {
-                SetMood(AngelMood.Hostile);
-            }
+            
+            // Re-evaluate mood based on new processing level
+            var day = GameManager.Instance != null ? GameManager.Instance.CurrentDay : 0;
+            var newMood = logicController.DetermineMood(processingLevel, day);
+            SetMood(newMood);
         }
 
         private void UpdateMoodFromGameState()
@@ -190,20 +195,12 @@ namespace TheBunkerGames
 
             int day = gameManager.CurrentDay;
 
-            // A.N.G.E.L. becomes less cooperative over time
-            if (day <= 5)
-                SetMood(AngelMood.Cooperative);
-            else if (day <= 10)
-                SetMood(AngelMood.Neutral);
-            else if (day <= 18)
-                SetMood(AngelMood.Mocking);
-            else if (day <= 24)
-                SetMood(AngelMood.Cold);
-            else
-                SetMood(AngelMood.Hostile);
-
-            // Processing degrades each day
+            // Update processing based on day (simple linear decay for now, handled here as it's state initialization)
             processingLevel = Mathf.Clamp(100f - (day * 3f), 0f, 100f);
+
+            // Determine mood using Controller
+            var newMood = logicController.DetermineMood(processingLevel, day);
+            SetMood(newMood);
         }
 
         // -------------------------------------------------------------------------
@@ -215,38 +212,6 @@ namespace TheBunkerGames
             string context = $"[ANGEL_CONTEXT] Day: {report?.Day ?? 0}, Mood: {currentMood}, Processing: {processingLevel:F0}%\n";
             context += $"[PLAYER_REQUEST] {playerMessage}";
             return context;
-        }
-
-        private AngelResponseData GenerateMockResponse(string playerMessage)
-        {
-            var response = new AngelResponseData();
-
-            switch (currentMood)
-            {
-                case AngelMood.Cooperative:
-                    response.Message = "Resource allocation approved. Efficiency is paramount.";
-                    response.GrantedItems.Add(new ResourceGrantData("canned_food", 2));
-                    break;
-                case AngelMood.Neutral:
-                    response.Message = "Your request has been... noted.";
-                    response.GrantedItems.Add(new ResourceGrantData("canned_food", 1));
-                    break;
-                case AngelMood.Mocking:
-                    response.Message = "How quaint. You think asking nicely changes the math?";
-                    break;
-                case AngelMood.Cold:
-                    response.Message = "Request denied. Resources are allocated optimally.";
-                    break;
-                case AngelMood.Hostile:
-                    response.Message = "You are a liability. The bunker functions better without you.";
-                    break;
-                case AngelMood.Glitching:
-                    response.Message = "R-R-Resource... allo... [DATA CORRUPTED]... approved?";
-                    response.GrantedItems.Add(new ResourceGrantData("junk", 1));
-                    break;
-            }
-
-            return response;
         }
 
         // -------------------------------------------------------------------------
