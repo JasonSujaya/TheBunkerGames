@@ -153,7 +153,7 @@ namespace TheBunkerGames
             var familyManager = FamilyManager.Instance;
             if (familyManager != null && saveData.FamilyMembers != null)
             {
-                familyManager.FamilyMembers.Clear();
+                var characters = new List<Character>();
                 foreach (var charData in saveData.FamilyMembers)
                 {
                     var character = new Character(
@@ -164,8 +164,9 @@ namespace TheBunkerGames
                         charData.Health
                     );
                     character.IsInjured = charData.IsInjured;
-                    familyManager.FamilyMembers.Add(character);
+                    characters.Add(character);
                 }
+                familyManager.LoadCharacters(characters);
             }
 
             // Restore inventory

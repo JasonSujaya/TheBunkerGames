@@ -69,6 +69,22 @@ namespace TheBunkerGames
             return familyMembers.Find(c => c.Name == name);
         }
 
+        public void ClearFamily()
+        {
+            familyMembers.Clear();
+            Debug.Log("[FamilyManager] Family cleared.");
+        }
+
+        public void LoadCharacters(List<Character> characters)
+        {
+            familyMembers.Clear();
+            if (characters != null)
+            {
+                familyMembers.AddRange(characters);
+            }
+            Debug.Log($"[FamilyManager] Loaded {familyMembers.Count} character(s).");
+        }
+
         // -------------------------------------------------------------------------
         // Debug Buttons
         // -------------------------------------------------------------------------
