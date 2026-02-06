@@ -150,19 +150,16 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [TitleGroup("Session Items", "Items created this session (not persisted)")]
+        [TitleGroup("Debug Controls")]
         [ShowInInspector, ReadOnly]
         private int SessionItemCount => sessionItems?.Count ?? 0;
 
-        [TitleGroup("AI Generation", "A.N.G.E.L. procedurally generates items")]
-        [HorizontalGroup("AI Generation/Buttons")]
         [Button("Generate 1 Random Item")]
         private void Debug_CreateRandomAIItem()
         {
             GenerateRandomAIItem();
         }
 
-        [HorizontalGroup("AI Generation/Buttons")]
         [Button("Generate 5 Random Items")]
         private void Debug_Generate5Items()
         {
@@ -172,11 +169,7 @@ namespace TheBunkerGames
             }
         }
 
-        [TitleGroup("Custom Factory", "Manually define and create new items")]
-        [HorizontalGroup("Custom Factory/Row1")]
         [SerializeField] private string customItemName = "New Prototype";
-        
-        [HorizontalGroup("Custom Factory/Row1")]
         [SerializeField] private ItemType customItemType = ItemType.Tools;
 
         [TextArea(2, 4)]
@@ -188,7 +181,6 @@ namespace TheBunkerGames
             CreateAndAddToInventory(customItemName, customDescription, customItemType, 1);
         }
 
-        [TitleGroup("Session Management")]
         [Button("Clear All Session Items")]
         private void Debug_ClearSession()
         {
@@ -196,7 +188,7 @@ namespace TheBunkerGames
         }
 
         [Button("Log Session Items")]
-        private void Debug_LogSessionItems()
+        private void Debug_LogSessionCharacters()
         {
             Debug.Log($"[AIItemCreator] Session items ({sessionItems.Count}):");
             foreach (var item in sessionItems)

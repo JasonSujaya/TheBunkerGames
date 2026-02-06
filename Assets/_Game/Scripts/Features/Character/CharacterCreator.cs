@@ -149,16 +149,12 @@ namespace TheBunkerGames
         [ShowInInspector, ReadOnly]
         private int SessionCharacterCount => sessionCharacters?.Count ?? 0;
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/AI Generation")]
         [Button("Generate 1 Random Survivor")]
         private void Debug_CreateRandomSurvivor()
         {
             GenerateRandomSurvivor();
         }
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/AI Generation")]
         [Button("Generate 3 Random Survivors")]
         private void Debug_Generate3Survivors()
         {
@@ -168,59 +164,39 @@ namespace TheBunkerGames
             }
         }
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/AI Generation")]
         [Button("Generate 1 Random Enemy")]
         private void Debug_CreateRandomEnemy()
         {
             GenerateRandomEnemy();
         }
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Custom Factory/Row1")]
         [SerializeField] private string customName = "New Entity";
-        
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Custom Factory/Row1")]
         [SerializeField] private CharacterSubtype customSubtype = CharacterSubtype.Family;
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Custom Factory/Row2")]
         [Range(0, 100)]
         [SerializeField] private float customHealth = 100f;
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Custom Factory/Row3")]
         [Range(0, 100)]
         [SerializeField] private float customHunger = 100f;
         
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Custom Factory/Row3")]
         [Range(0, 100)]
         [SerializeField] private float customThirst = 100f;
         
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Custom Factory/Row3")]
         [Range(0, 100)]
         [SerializeField] private float customSanity = 100f;
 
-        [TitleGroup("Debug Controls")]
         [Button("Create Custom Entity", ButtonSizes.Medium)]
         private void Debug_CreateCustomEntity()
         {
             CreateAndAdd(customName, customHunger, customThirst, customSanity, customHealth, customSubtype);
         }
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Management")]
         [Button("Clear All Session Characters")]
         private void Debug_ClearSession()
         {
             ClearSessionCharacters();
         }
 
-        [TitleGroup("Debug Controls")]
-        [HorizontalGroup("Debug Controls/Management")]
         [Button("Log Session Characters")]
         private void Debug_LogSessionCharacters()
         {

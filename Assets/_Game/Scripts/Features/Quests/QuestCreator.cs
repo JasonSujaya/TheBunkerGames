@@ -122,19 +122,16 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [TitleGroup("Session Quests", "Quests created this session (not persisted)")]
+        [TitleGroup("Debug Controls")]
         [ShowInInspector, ReadOnly]
         private int SessionQuestCount => sessionQuests?.Count ?? 0;
 
-        [TitleGroup("AI Generation", "A.N.G.E.L. procedurally generates objectives")]
-        [HorizontalGroup("AI Generation/Buttons")]
         [Button("Generate 1 Random Quest")]
         private void Debug_CreateRandomQuest()
         {
             GenerateRandomQuest();
         }
 
-        [HorizontalGroup("AI Generation/Buttons")]
         [Button("Generate 3 Random Quests")]
         private void Debug_Generate3Quests()
         {
@@ -144,7 +141,6 @@ namespace TheBunkerGames
             }
         }
 
-        [TitleGroup("Custom Factory", "Manually define and create new quests")]
         [SerializeField] private string customQuestId = "NewQuest";
         
         [TextArea(2, 4)]
@@ -156,7 +152,6 @@ namespace TheBunkerGames
             CreateAndAddToManager(customQuestId, customDescription);
         }
 
-        [TitleGroup("Session Management")]
         [Button("Clear All Session Quests")]
         private void Debug_ClearSession()
         {

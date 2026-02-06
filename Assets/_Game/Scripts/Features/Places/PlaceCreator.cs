@@ -121,19 +121,16 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [TitleGroup("Session Places", "Places created this session (not persisted)")]
+        [TitleGroup("Debug Controls")]
         [ShowInInspector, ReadOnly]
         private int SessionPlaceCount => sessionPlaces?.Count ?? 0;
 
-        [TitleGroup("AI Generation", "A.N.G.E.L. procedurally generates exploration targets")]
-        [HorizontalGroup("AI Generation/Buttons")]
         [Button("Generate 1 Random Place")]
         private void Debug_CreateRandomPlace()
         {
             GenerateRandomPlace();
         }
 
-        [HorizontalGroup("AI Generation/Buttons")]
         [Button("Generate 3 Random Places")]
         private void Debug_Generate3Places()
         {
@@ -143,9 +140,7 @@ namespace TheBunkerGames
             }
         }
 
-        [TitleGroup("Custom Factory", "Manually define and create new places")]
         [SerializeField] private string customPlaceId = "NewPlace";
-        
         [SerializeField] private string customPlaceName = "Mysterious Location";
         
         [TextArea(2, 4)]
@@ -163,7 +158,6 @@ namespace TheBunkerGames
             CreateRuntimePlace(customPlaceId, customPlaceName, customDescription, customDangerLevel, customLootValue);
         }
 
-        [TitleGroup("Session Management")]
         [Button("Clear All Session Places")]
         private void Debug_ClearSession()
         {
