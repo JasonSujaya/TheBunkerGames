@@ -7,8 +7,8 @@ using Sirenix.OdinInspector;
 namespace TheBunkerGames
 {
     /// <summary>
-    /// Manages the family members in the bunker.
-    /// Stat decay is now handled by NightCycleManager.
+    /// Specialized manager for the family members in the bunker.
+    /// Exposes high-level family logic and queries CharacterManager for data.
     /// </summary>
     public class FamilyManager : MonoBehaviour
     {
@@ -18,30 +18,14 @@ namespace TheBunkerGames
         public static FamilyManager Instance { get; private set; }
 
         // -------------------------------------------------------------------------
-        // Database Reference
+        // Public Properties (Filtering CharacterManager)
         // -------------------------------------------------------------------------
-        #if ODIN_INSPECTOR
-        [Title("Database")]
-        [Required("Character Database is required")]
-        #endif
-        [SerializeField] private CharacterDatabaseDataSO characterDatabase;
+        public List<CharacterData> FamilyMembers => CharacterManager.Instance != null 
+            ? CharacterManager.Instance.GetCharactersBySubtype(CharacterSubtype.Family) 
+            : new List<CharacterData>();
 
-        // -------------------------------------------------------------------------
-        // Family Data
-        // -------------------------------------------------------------------------
-        #if ODIN_INSPECTOR
-        [Title("Family Members")]
-        [ListDrawerSettings(ShowIndexLabels = true)]
-        #endif
-        [SerializeField] private List<CharacterData> familyMembers = new List<CharacterData>();
-
-        // -------------------------------------------------------------------------
-        // Public Properties
-        // -------------------------------------------------------------------------
-        public List<CharacterData> FamilyMembers => familyMembers;
-        public int AliveCount => familyMembers.FindAll(c => c.IsAlive).Count;
-        public List<CharacterData> AvailableExplorers => familyMembers.FindAll(c => c.IsAvailableForExploration);
-        public CharacterDatabaseDataSO Database => characterDatabase;
+        public int AliveCount => FamilyMembers.FindAll(c => c.IsAlive).Count;
+        public List<CharacterData> AvailableExplorers => FamilyMembers.FindAll(c => c.IsAvailableForExploration);
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -54,168 +38,99 @@ namespace TheBunkerGames
                 return;
             }
             Instance = this;
-
-            // Initialize database singleton
-            if (characterDatabase != null)
-            {
-                CharacterDatabaseDataSO.SetInstance(characterDatabase);
-            }
-            else
-            {
-                // Try to load from Resources
-                characterDatabase = Resources.Load<CharacterDatabaseDataSO>("CharacterDatabaseDataSO");
-                if (characterDatabase != null)
-                {
-                    CharacterDatabaseDataSO.SetInstance(characterDatabase);
-                }
-                else
-                {
-                    Debug.LogWarning("[FamilyManager] CharacterDatabaseDataSO not assigned and not found in Resources!");
-                }
-            }
         }
 
         // -------------------------------------------------------------------------
-        // Public Methods
+        // Public Methods (Wrappers for CharacterManager)
         // -------------------------------------------------------------------------
         public void AddCharacter(string name, float hunger = 100f, float thirst = 100f, float sanity = 100f, float health = 100f)
         {
-            var character = new CharacterData(name, hunger, thirst, sanity, health);
-            familyMembers.Add(character);
-            Debug.Log($"[FamilyManager] Added character: {name}");
+            if (CharacterManager.Instance != null)
+            {
+                CharacterManager.Instance.AddCharacter(name, hunger, thirst, sanity, health, CharacterSubtype.Family);
+            }
         }
 
         public void AddCharacter(CharacterDefinitionSO data)
         {
-            if (data == null) return;
-            var character = data.CreateCharacter();
-            familyMembers.Add(character);
-            Debug.Log($"[FamilyManager] Added character from data: {data.CharacterName}");
+            if (CharacterManager.Instance != null && data != null)
+            {
+                CharacterManager.Instance.AddCharacter(data);
+            }
         }
 
         public CharacterData GetCharacter(string name)
         {
-            return familyMembers.Find(c => c.Name == name);
+            return FamilyMembers.Find(c => c.Name == name);
         }
 
         public void ClearFamily()
         {
-            familyMembers.Clear();
-            Debug.Log("[FamilyManager] Family cleared.");
+            if (CharacterManager.Instance != null)
+            {
+                var family = FamilyMembers;
+                foreach (var member in family)
+                {
+                    CharacterManager.Instance.AllCharacters.Remove(member);
+                }
+                Debug.Log("[FamilyManager] Family members removed from CharacterManager.");
+            }
         }
 
         public void LoadCharacters(List<CharacterData> characters)
         {
-            familyMembers.Clear();
+            if (CharacterManager.Instance == null) return;
+
+            // Clear existing family first
+            ClearFamily();
+
             if (characters != null)
             {
-                familyMembers.AddRange(characters);
+                foreach (var c in characters)
+                {
+                    c.Subtype = CharacterSubtype.Family; // Ensure they are marked as family
+                    CharacterManager.Instance.AllCharacters.Add(c);
+                }
             }
-            Debug.Log($"[FamilyManager] Loaded {familyMembers.Count} character(s).");
+            Debug.Log($"[FamilyManager] Loaded {characters?.Count ?? 0} family member(s).");
+        }
+
+        public bool IsFamilyDead()
+        {
+            return AliveCount == 0;
         }
 
         // -------------------------------------------------------------------------
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Title("Debug Controls")]
-        
-        [HorizontalGroup("AddSO")]
-        [ValueDropdown("GetAllCharacterProfileList")]
-        [SerializeField] private CharacterDefinitionSO debugCharacterProfile;
-
-        [HorizontalGroup("AddSO")]
-        [Button("Add Character From SO", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 1f, 0.5f)]
-        private void Debug_AddCharacterFromSO()
-        {
-            if (debugCharacterProfile != null)
-            {
-                AddCharacter(debugCharacterProfile);
-            }
-            else
-            {
-                Debug.LogWarning("[FamilyManager] No Character Data SO selected.");
-            }
-        }
-
-        private IEnumerable<ValueDropdownItem<CharacterDefinitionSO>> GetAllCharacterProfileList()
-        {
-            var list = new ValueDropdownList<CharacterDefinitionSO>();
-
-            // 1. Persistent from Database
-            if (characterDatabase != null && characterDatabase.AllCharacters != null)
-            {
-                foreach (var charDef in characterDatabase.AllCharacters)
-                {
-                    if (charDef != null)
-                        list.Add($"[P] {charDef.CharacterName}", charDef);
-                }
-            }
-
-            // 2. Session-Bound from Creator
-            if (CharacterCreator.Instance != null && CharacterCreator.Instance.SessionCharacters != null)
-            {
-                foreach (var charData in CharacterCreator.Instance.SessionCharacters)
-                {
-                    if (charData != null)
-                        list.Add($"[S] {charData.Name}", null); // CharacterData cannot be cast to CharacterDefinitionSO
-                }
-            }
-
-            return list;
-        }
-
-        [Button("Add Test Character (Manual)", ButtonSizes.Medium)]
-        [GUIColor(0.5f, 1f, 0.8f)]
-        private void Debug_AddTestCharacter(string name = "Survivor", float hunger = 100, float thirst = 100, float sanity = 100, float health = 100)
-        {
-            AddCharacter(name, hunger, thirst, sanity, health);
-        }
-
+        [TitleGroup("Debug Controls")]
         [Button("Add Default Family", ButtonSizes.Medium)]
         [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_AddFamily()
         {
-            AddCharacter("Father", 90f, 85f, 70f, 100f);
-            AddCharacter("Mother", 95f, 90f, 80f, 100f);
-            AddCharacter("Child", 80f, 80f, 90f, 100f);
-        }
-
-        [Button("Clear Family", ButtonSizes.Medium)]
-        [GUIColor(1f, 0.5f, 0.5f)]
-        private void Debug_ClearFamily()
-        {
-            ClearFamily();
-        }
-
-        [Button("Log All Stats", ButtonSizes.Medium)]
-        private void Debug_LogAllStats()
-        {
-            foreach (var c in familyMembers)
+            if (CharacterManager.Instance != null)
             {
-                Debug.Log($"[FamilyManager] {c.Name} - H:{c.Hunger:F0} T:{c.Thirst:F0} S:{c.Sanity:F0} HP:{c.Health:F0} | Alive:{c.IsAlive} Injured:{c.IsInjured}");
+                CharacterManager.Instance.AddCharacter("Father", 90f, 85f, 70f, 100f, CharacterSubtype.Family);
+                CharacterManager.Instance.AddCharacter("Mother", 95f, 90f, 80f, 100f, CharacterSubtype.Family);
+                CharacterManager.Instance.AddCharacter("Child", 80f, 80f, 90f, 100f, CharacterSubtype.Family);
+            }
+            else
+            {
+                Debug.LogWarning("[FamilyManager] CharacterManager.Instance is null!");
             }
         }
 
-        [Title("Auto Setup")]
-        [Button("Auto Setup Dependencies", ButtonSizes.Large)]
-        [GUIColor(0.4f, 1f, 0.4f)]
-        private void AutoSetupDependencies()
+        [TitleGroup("Debug Controls")]
+        [Button("Log Family Stats", ButtonSizes.Medium)]
+        private void Debug_LogFamilyStats()
         {
-            #if UNITY_EDITOR
-            // Ensure Tester exists
-            var testerType = System.Type.GetType("TheBunkerGames.Tests.FamilyManagerTester");
-            if (testerType != null && GetComponent(testerType) == null)
+            var family = FamilyMembers;
+            Debug.Log($"[FamilyManager] Total Family: {family.Count} | Alive: {AliveCount}");
+            foreach (var c in family)
             {
-                gameObject.AddComponent(testerType);
-                Debug.Log("[FamilyManager] Added FamilyTester.");
+                Debug.Log($"  - {c.Name}: HP:{c.Health:F0} H:{c.Hunger:F0} T:{c.Thirst:F0} S:{c.Sanity:F0}");
             }
-            else if (testerType == null)
-            {
-                Debug.LogWarning("[FamilyManager] Could not find FamilyTester type. Ensure it is in TheBunkerGames.Tests namespace.");
-            }
-            #endif
         }
         #endif
     }

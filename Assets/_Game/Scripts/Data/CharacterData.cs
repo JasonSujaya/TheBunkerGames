@@ -23,6 +23,7 @@ namespace TheBunkerGames
         public float Thirst = 100f;
         public float Sanity = 100f;
         public float Health = 100f;
+        public CharacterSubtype Subtype = CharacterSubtype.Family;
 
         // -------------------------------------------------------------------------
         // Exploration State
@@ -40,15 +41,17 @@ namespace TheBunkerGames
             Thirst = 100f;
             Sanity = 100f;
             Health = 100f;
+            Subtype = CharacterSubtype.Family;
         }
 
-        public CharacterData(string name, float hunger = 100f, float thirst = 100f, float sanity = 100f, float health = 100f)
+        public CharacterData(string name, float hunger = 100f, float thirst = 100f, float sanity = 100f, float health = 100f, CharacterSubtype subtype = CharacterSubtype.Family)
         {
             Name = name;
             Hunger = Mathf.Clamp(hunger, 0f, 100f);
             Thirst = Mathf.Clamp(thirst, 0f, 100f);
             Sanity = Mathf.Clamp(sanity, 0f, 100f);
             Health = Mathf.Clamp(health, 0f, 100f);
+            Subtype = subtype;
         }
 
         // -------------------------------------------------------------------------

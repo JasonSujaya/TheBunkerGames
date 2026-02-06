@@ -25,7 +25,7 @@ namespace TheBunkerGames
         #if ODIN_INSPECTOR
         [Title("Settings")]
         #endif
-        [SerializeField] private FamilyManager familyManager;
+        [SerializeField] private CharacterManager characterManager;
 
         // -------------------------------------------------------------------------
         // Session-Bound Runtime Characters (NOT persisted)
@@ -46,9 +46,9 @@ namespace TheBunkerGames
             }
             Instance = this;
 
-            if (familyManager == null)
+            if (characterManager == null)
             {
-                familyManager = FamilyManager.Instance;
+                characterManager = CharacterManager.Instance;
             }
         }
 
@@ -60,27 +60,27 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Public Methods - Character Creation (Session-Bound)
         // -------------------------------------------------------------------------
-        public CharacterData CreateRuntimeCharacter(string name, float hunger = 100f, float thirst = 100f, float sanity = 100f, float health = 100f)
+        public CharacterData CreateRuntimeCharacter(string name, float hunger = 100f, float thirst = 100f, float sanity = 100f, float health = 100f, CharacterSubtype subtype = CharacterSubtype.Family)
         {
-            var newCharacter = new CharacterData(name, hunger, thirst, sanity, health);
+            var newCharacter = new CharacterData(name, hunger, thirst, sanity, health, subtype);
             sessionCharacters.Add(newCharacter);
 
-            Debug.Log($"[CharacterCreator] Created session character: {name} (Total: {sessionCharacters.Count})");
+            Debug.Log($"[CharacterCreator] Created session character: {name} ({subtype}) (Total: {sessionCharacters.Count})");
             return newCharacter;
         }
 
-        public CharacterData CreateAndAddToFamily(string name, float hunger = 100f, float thirst = 100f, float sanity = 100f, float health = 100f)
+        public CharacterData CreateAndAdd(string name, float hunger = 100f, float thirst = 100f, float sanity = 100f, float health = 100f, CharacterSubtype subtype = CharacterSubtype.Family)
         {
-            var newCharacter = CreateRuntimeCharacter(name, hunger, thirst, sanity, health);
+            var newCharacter = CreateRuntimeCharacter(name, hunger, thirst, sanity, health, subtype);
             
-            if (familyManager != null)
+            if (characterManager != null)
             {
-                familyManager.FamilyMembers.Add(newCharacter);
-                Debug.Log($"[CharacterCreator] Added {name} to family.");
+                characterManager.AllCharacters.Add(newCharacter);
+                Debug.Log($"[CharacterCreator] Added {name} to CharacterManager as {subtype}.");
             }
             else
             {
-                Debug.LogError("[CharacterCreator] FamilyManager is null! Cannot add character to family.");
+                Debug.LogError("[CharacterCreator] CharacterManager is null! Cannot add character.");
             }
 
             return newCharacter;
@@ -100,12 +100,33 @@ namespace TheBunkerGames
             };
             
             var data = survivors[Random.Range(0, survivors.Length)].Split('|');
-            return CreateAndAddToFamily(
+            return CreateAndAdd(
                 data[0], 
                 float.Parse(data[1]), 
                 float.Parse(data[2]), 
                 float.Parse(data[3]), 
-                float.Parse(data[4])
+                float.Parse(data[4]),
+                CharacterSubtype.Survivor
+            );
+        }
+
+        public CharacterData GenerateRandomEnemy()
+        {
+            string[] enemies = new[] {
+                "Raider Scavenger|60|50|30|100",
+                "Feral Dog|40|40|10|50",
+                "Bunker Guard (Corrupted)|100|100|50|150",
+                "The Watcher|200|200|200|300"
+            };
+            
+            var data = enemies[Random.Range(0, enemies.Length)].Split('|');
+            return CreateAndAdd(
+                data[0], 
+                float.Parse(data[1]), 
+                float.Parse(data[2]), 
+                float.Parse(data[3]), 
+                float.Parse(data[4]),
+                CharacterSubtype.Enemy
             );
         }
 
@@ -124,19 +145,20 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [TitleGroup("Session Characters", "Characters created this session (not persisted)")]
+        [TitleGroup("Debug Controls")]
         [ShowInInspector, ReadOnly]
         private int SessionCharacterCount => sessionCharacters?.Count ?? 0;
 
-        [TitleGroup("AI Generation", "A.N.G.E.L. procedurally generates survivors")]
-        [HorizontalGroup("AI Generation/Buttons")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/AI Generation")]
         [Button("Generate 1 Random Survivor")]
         private void Debug_CreateRandomSurvivor()
         {
             GenerateRandomSurvivor();
         }
 
-        [HorizontalGroup("AI Generation/Buttons")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/AI Generation")]
         [Button("Generate 3 Random Survivors")]
         private void Debug_Generate3Survivors()
         {
@@ -146,39 +168,59 @@ namespace TheBunkerGames
             }
         }
 
-        [TitleGroup("Custom Factory", "Manually define and create new characters")]
-        [HorizontalGroup("Custom Factory/Row1")]
-        [SerializeField] private string customName = "New Survivor";
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/AI Generation")]
+        [Button("Generate 1 Random Enemy")]
+        private void Debug_CreateRandomEnemy()
+        {
+            GenerateRandomEnemy();
+        }
+
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Custom Factory/Row1")]
+        [SerializeField] private string customName = "New Entity";
         
-        [HorizontalGroup("Custom Factory/Row1")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Custom Factory/Row1")]
+        [SerializeField] private CharacterSubtype customSubtype = CharacterSubtype.Family;
+
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Custom Factory/Row2")]
         [Range(0, 100)]
         [SerializeField] private float customHealth = 100f;
 
-        [HorizontalGroup("Custom Factory/Row2")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Custom Factory/Row3")]
         [Range(0, 100)]
         [SerializeField] private float customHunger = 100f;
         
-        [HorizontalGroup("Custom Factory/Row2")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Custom Factory/Row3")]
         [Range(0, 100)]
         [SerializeField] private float customThirst = 100f;
         
-        [HorizontalGroup("Custom Factory/Row2")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Custom Factory/Row3")]
         [Range(0, 100)]
         [SerializeField] private float customSanity = 100f;
 
-        [Button("Create Custom Character", ButtonSizes.Medium)]
-        private void Debug_CreateCustomCharacter()
+        [TitleGroup("Debug Controls")]
+        [Button("Create Custom Entity", ButtonSizes.Medium)]
+        private void Debug_CreateCustomEntity()
         {
-            CreateAndAddToFamily(customName, customHunger, customThirst, customSanity, customHealth);
+            CreateAndAdd(customName, customHunger, customThirst, customSanity, customHealth, customSubtype);
         }
 
-        [TitleGroup("Session Management")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Management")]
         [Button("Clear All Session Characters")]
         private void Debug_ClearSession()
         {
             ClearSessionCharacters();
         }
 
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Management")]
         [Button("Log Session Characters")]
         private void Debug_LogSessionCharacters()
         {

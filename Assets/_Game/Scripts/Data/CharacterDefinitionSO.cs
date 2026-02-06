@@ -13,6 +13,7 @@ namespace TheBunkerGames
         #endif
         [SerializeField] private string characterName;
         [SerializeField] private CharacterRole role;
+        [SerializeField] private CharacterSubtype subtype = CharacterSubtype.Family;
         [TextArea(3, 5)]
         [SerializeField] private string description;
         [SerializeField] private Sprite portrait;
@@ -33,6 +34,7 @@ namespace TheBunkerGames
 
         public string CharacterName => characterName;
         public CharacterRole Role => role;
+        public CharacterSubtype Subtype => subtype;
         public string Description => description;
         public Sprite Portrait => portrait;
         public float MaxHealth => maxHealth;
@@ -43,7 +45,7 @@ namespace TheBunkerGames
         // Factory method to create runtime data instance
         public CharacterData CreateCharacter()
         {
-            return new CharacterData(characterName, maxHunger, maxThirst, maxSanity, maxHealth);
+            return new CharacterData(characterName, maxHunger, maxThirst, maxSanity, maxHealth, subtype);
         }
     }
 }

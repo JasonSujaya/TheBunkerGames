@@ -82,4 +82,15 @@ namespace TheBunkerGames
         Daughter,
         Other
     }
+
+    // -------------------------------------------------------------------------
+    // Character Subtypes (Categorization)
+    // -------------------------------------------------------------------------
+    public enum CharacterSubtype
+    {
+        Family,
+        Enemy,
+        Survivor,
+        Neutral
+    }
 }
