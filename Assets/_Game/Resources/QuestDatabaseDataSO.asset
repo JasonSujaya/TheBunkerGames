@@ -9,7 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32818d42ffa884cd8ba02683ef99b606, type: 3}
+  m_Script: {fileID: 11500000, guid: 8945cf4cbd234473887ce1261d7c0f83, type: 3}
   m_Name: QuestDatabaseDataSO
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.QuestDatabaseDataSO
-  allQuests: []
+  allQuests:
+  - {fileID: 11400000, guid: f72231d252dab4ff5bd127f3e3074fdf, type: 2}
+  - {fileID: 11400000, guid: f2e421fbee3c34441b86d6c1db27ea79, type: 2}
+  - {fileID: 11400000, guid: b9916756a270349d6aa9eb81e69b2680, type: 2}

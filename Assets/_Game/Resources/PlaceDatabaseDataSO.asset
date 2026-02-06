@@ -9,7 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: PLACEHOLDER_GUID, type: 3}
+  m_Script: {fileID: 11500000, guid: 080cc90890f844979857d47e62d64020, type: 3}
   m_Name: PlaceDatabaseDataSO
-  m_EditorClassIdentifier: 
-  allPlaces: []
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.PlaceDatabaseDataSO
+  allPlaces:
+  - {fileID: 11400000, guid: 9810e3e74e6364f69987a2bde320a4d4, type: 2}
+  - {fileID: 11400000, guid: aba4be290f4bc43a6978b19f143b7d92, type: 2}
+  - {fileID: 11400000, guid: 425df46e4cccd4b7b8735918aca5bc5a, type: 2}
