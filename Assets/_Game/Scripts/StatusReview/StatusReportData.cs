@@ -8,20 +8,20 @@ namespace TheBunkerGames
     /// Passed to the UI and to A.N.G.E.L. for context.
     /// </summary>
     [Serializable]
-    public class StatusReport
+    public class StatusReportData
     {
         public int Day;
         public int AliveCount;
         public int TotalCount;
-        public List<CharacterStatus> CharacterStatuses;
+        public List<CharacterStatusData> CharacterStatuses;
         public List<string> Warnings;
     }
 
     /// <summary>
-    /// Individual character status entry within a StatusReport.
+    /// Individual character status entry within a StatusReportData.
     /// </summary>
     [Serializable]
-    public class CharacterStatus
+    public class CharacterStatusData
     {
         public string CharacterName;
         public float Hunger;

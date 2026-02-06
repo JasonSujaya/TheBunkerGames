@@ -10,7 +10,7 @@ using Sirenix.OdinInspector;
 namespace TheBunkerGames
 {
     /// <summary>
-    /// Character-by-character typewriter reveal for TMP text.
+    /// CharacterData-by-character typewriter reveal for TMP text.
     /// Supports custom tag stripping, punctuation pauses, and per-character events.
     /// </summary>
     [RequireComponent(typeof(TMP_Text))]

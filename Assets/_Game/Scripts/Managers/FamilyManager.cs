@@ -24,14 +24,14 @@ namespace TheBunkerGames
         [Title("Family Members")]
         [ListDrawerSettings(ShowIndexLabels = true)]
         #endif
-        [SerializeField] private List<Character> familyMembers = new List<Character>();
+        [SerializeField] private List<CharacterData> familyMembers = new List<CharacterData>();
 
         // -------------------------------------------------------------------------
         // Public Properties
         // -------------------------------------------------------------------------
-        public List<Character> FamilyMembers => familyMembers;
+        public List<CharacterData> FamilyMembers => familyMembers;
         public int AliveCount => familyMembers.FindAll(c => c.IsAlive).Count;
-        public List<Character> AvailableExplorers => familyMembers.FindAll(c => c.IsAvailableForExploration);
+        public List<CharacterData> AvailableExplorers => familyMembers.FindAll(c => c.IsAvailableForExploration);
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -51,7 +51,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         public void AddCharacter(string name, float hunger = 100f, float thirst = 100f, float sanity = 100f, float health = 100f)
         {
-            var character = new Character(name, hunger, thirst, sanity, health);
+            var character = new CharacterData(name, hunger, thirst, sanity, health);
             familyMembers.Add(character);
             Debug.Log($"[FamilyManager] Added character: {name}");
         }
@@ -64,7 +64,7 @@ namespace TheBunkerGames
             Debug.Log($"[FamilyManager] Added character from data: {data.CharacterName}");
         }
 
-        public Character GetCharacter(string name)
+        public CharacterData GetCharacter(string name)
         {
             return familyMembers.Find(c => c.Name == name);
         }
@@ -75,7 +75,7 @@ namespace TheBunkerGames
             Debug.Log("[FamilyManager] Family cleared.");
         }
 
-        public void LoadCharacters(List<Character> characters)
+        public void LoadCharacters(List<CharacterData> characters)
         {
             familyMembers.Clear();
             if (characters != null)
@@ -90,7 +90,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
-        [Button("Add Test Character", ButtonSizes.Medium)]
+        [Button("Add Test CharacterData", ButtonSizes.Medium)]
         [GUIColor(0.5f, 1f, 0.5f)]
         private void Debug_AddTestCharacter()
         {
@@ -112,7 +112,7 @@ namespace TheBunkerGames
             }
         }
 
-        [Button("Feed First Character (+20 Hunger)", ButtonSizes.Medium)]
+        [Button("Feed First CharacterData (+20 Hunger)", ButtonSizes.Medium)]
         [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_FeedFirst()
         {
@@ -123,7 +123,7 @@ namespace TheBunkerGames
             }
         }
 
-        [Button("Scare First Character (-20 Sanity)", ButtonSizes.Medium)]
+        [Button("Scare First CharacterData (-20 Sanity)", ButtonSizes.Medium)]
         [GUIColor(0.8f, 0.5f, 1f)]
         private void Debug_ScareFirst()
         {

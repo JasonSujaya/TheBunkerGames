@@ -23,12 +23,12 @@ namespace TheBunkerGames
         [Title("Inventory")]
         [ListDrawerSettings(ShowIndexLabels = true)]
         #endif
-        [SerializeField] private List<InventorySlot> items = new List<InventorySlot>();
+        [SerializeField] private List<InventorySlotData> items = new List<InventorySlotData>();
 
         // -------------------------------------------------------------------------
         // Public Properties
         // -------------------------------------------------------------------------
-        public List<InventorySlot> Items => items;
+        public List<InventorySlotData> Items => items;
         public int TotalItemCount
         {
             get
@@ -66,10 +66,10 @@ namespace TheBunkerGames
             }
             else
             {
-                items.Add(new InventorySlot(itemId, quantity));
+                items.Add(new InventorySlotData(itemId, quantity));
             }
 
-            var itemData = ItemDatabaseSO.Instance?.GetItem(itemId);
+            var itemData = ItemDatabaseDataSO.Instance?.GetItem(itemId);
             string displayName = itemData != null ? itemData.DisplayName : itemId;
             Debug.Log($"[InventoryManager] Added {quantity}x {displayName}");
         }
@@ -91,7 +91,7 @@ namespace TheBunkerGames
                 items.Remove(slot);
             }
 
-            var itemData = ItemDatabaseSO.Instance?.GetItem(itemId);
+            var itemData = ItemDatabaseDataSO.Instance?.GetItem(itemId);
             string displayName = itemData != null ? itemData.DisplayName : itemId;
             Debug.Log($"[InventoryManager] Removed {quantity}x {displayName}");
             return true;

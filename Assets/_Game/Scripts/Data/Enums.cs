@@ -62,7 +62,7 @@ namespace TheBunkerGames
     }
 
     // -------------------------------------------------------------------------
-    // Quest States (String constants for easy AI integration)
+    // QuestData States (String constants for easy AI integration)
     // -------------------------------------------------------------------------
     public static class QuestState
     {

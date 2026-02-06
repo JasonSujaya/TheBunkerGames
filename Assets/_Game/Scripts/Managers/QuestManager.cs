@@ -18,20 +18,20 @@ namespace TheBunkerGames
         public static QuestManager Instance { get; private set; }
 
         // -------------------------------------------------------------------------
-        // Quest Data
+        // QuestData Data
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Title("Active Quests")]
         [ListDrawerSettings(ShowIndexLabels = true)]
         #endif
-        [SerializeField] private List<Quest> quests = new List<Quest>();
+        [SerializeField] private List<QuestData> quests = new List<QuestData>();
 
         // -------------------------------------------------------------------------
         // Public Properties
         // -------------------------------------------------------------------------
-        public List<Quest> Quests => quests;
-        public List<Quest> ActiveQuests => quests.FindAll(q => q.IsActive);
-        public List<Quest> CompletedQuests => quests.FindAll(q => q.IsCompleted);
+        public List<QuestData> Quests => quests;
+        public List<QuestData> ActiveQuests => quests.FindAll(q => q.IsActive);
+        public List<QuestData> CompletedQuests => quests.FindAll(q => q.IsCompleted);
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -59,13 +59,13 @@ namespace TheBunkerGames
             var existing = GetQuest(id);
             if (existing != null)
             {
-                Debug.LogWarning($"[QuestManager] Quest already exists: {id}");
+                Debug.LogWarning($"[QuestManager] QuestData already exists: {id}");
                 return;
             }
 
-            var quest = new Quest(id, description, QuestState.Active);
+            var quest = new QuestData(id, description, QuestState.Active);
             quests.Add(quest);
-            Debug.Log($"[QuestManager] Quest added: {id} - {description}");
+            Debug.Log($"[QuestManager] QuestData added: {id} - {description}");
         }
 
         /// <summary>
@@ -76,18 +76,18 @@ namespace TheBunkerGames
             var quest = GetQuest(id);
             if (quest == null)
             {
-                Debug.LogWarning($"[QuestManager] Quest not found: {id}");
+                Debug.LogWarning($"[QuestManager] QuestData not found: {id}");
                 return;
             }
 
             quest.SetState(newState);
-            Debug.Log($"[QuestManager] Quest updated: {id} -> {newState}");
+            Debug.Log($"[QuestManager] QuestData updated: {id} -> {newState}");
         }
 
         /// <summary>
         /// Get a quest by ID.
         /// </summary>
-        public Quest GetQuest(string id)
+        public QuestData GetQuest(string id)
         {
             return quests.Find(q => q.Id == id);
         }
@@ -101,7 +101,7 @@ namespace TheBunkerGames
             if (quest != null)
             {
                 quests.Remove(quest);
-                Debug.Log($"[QuestManager] Quest removed: {id}");
+                Debug.Log($"[QuestManager] QuestData removed: {id}");
             }
         }
 
@@ -110,13 +110,13 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
-        [HorizontalGroup("Quest")]
+        [HorizontalGroup("QuestData")]
         [SerializeField] private string debugQuestId = "FindWater";
         
-        [HorizontalGroup("Quest")]
+        [HorizontalGroup("QuestData")]
         [SerializeField] private string debugDescription = "Locate a clean water source";
 
-        [Button("Add Quest", ButtonSizes.Medium)]
+        [Button("Add QuestData", ButtonSizes.Medium)]
         [GUIColor(0.5f, 1f, 0.5f)]
         private void Debug_AddQuest()
         {
@@ -127,7 +127,7 @@ namespace TheBunkerGames
         }
 
         [HorizontalGroup("State")]
-        [Button("Complete Quest", ButtonSizes.Medium)]
+        [Button("Complete QuestData", ButtonSizes.Medium)]
         [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_CompleteQuest()
         {
@@ -138,7 +138,7 @@ namespace TheBunkerGames
         }
 
         [HorizontalGroup("State")]
-        [Button("Fail Quest", ButtonSizes.Medium)]
+        [Button("Fail QuestData", ButtonSizes.Medium)]
         [GUIColor(1f, 0.5f, 0.5f)]
         private void Debug_FailQuest()
         {

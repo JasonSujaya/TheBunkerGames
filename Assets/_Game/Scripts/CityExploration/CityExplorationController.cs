@@ -23,7 +23,7 @@ namespace TheBunkerGames
         // Events
         // -------------------------------------------------------------------------
         public static event Action<ExplorationResult> OnExplorationComplete;
-        public static event Action<Character, ExplorationLocation> OnCharacterSentOut;
+        public static event Action<CharacterData, ExplorationLocation> OnCharacterSentOut;
         public static event Action OnExplorationPhaseComplete;
 
         // -------------------------------------------------------------------------
@@ -83,7 +83,7 @@ namespace TheBunkerGames
         /// <summary>
         /// Send a character to explore a location. Returns false if character isn't available.
         /// </summary>
-        public bool SendCharacterToExplore(Character character, ExplorationLocation location)
+        public bool SendCharacterToExplore(CharacterData character, ExplorationLocation location)
         {
             if (character == null || location == null)
             {
@@ -166,7 +166,7 @@ namespace TheBunkerGames
             {
                 ExplorerName = expedition.ExplorerName,
                 LocationName = expedition.Location.LocationName,
-                FoundItems = new List<ResourceGrant>(),
+                FoundItems = new List<ResourceGrantData>(),
                 NarrativeLog = ""
             };
 
@@ -182,7 +182,7 @@ namespace TheBunkerGames
             for (int i = 0; i < lootCount; i++)
             {
                 string itemId = GenerateRandomLootId(expedition.Location.Risk);
-                result.FoundItems.Add(new ResourceGrant(itemId, 1));
+                result.FoundItems.Add(new ResourceGrantData(itemId, 1));
             }
 
             result.NarrativeLog = $"{expedition.ExplorerName} ventured into {expedition.Location.LocationName}. ";
@@ -233,7 +233,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
-        [Button("Send First Character (Medium Risk)", ButtonSizes.Medium)]
+        [Button("Send First CharacterData (Medium Risk)", ButtonSizes.Medium)]
         [GUIColor(0.5f, 1f, 0.5f)]
         private void Debug_SendFirstCharacter()
         {

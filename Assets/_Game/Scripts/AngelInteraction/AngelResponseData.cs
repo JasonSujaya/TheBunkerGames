@@ -8,11 +8,11 @@ namespace TheBunkerGames
     /// Populated by the AI or by mock fallback logic.
     /// </summary>
     [Serializable]
-    public class AngelResponse
+    public class AngelResponseData
     {
         public string Message = "";
         public AngelMood Mood;
-        public List<ResourceGrant> GrantedItems = new List<ResourceGrant>();
+        public List<ResourceGrantData> GrantedItems = new List<ResourceGrantData>();
         public string EmotionalTag = "Neutral";
     }
 
@@ -20,14 +20,14 @@ namespace TheBunkerGames
     /// A single resource grant from A.N.G.E.L.
     /// </summary>
     [Serializable]
-    public class ResourceGrant
+    public class ResourceGrantData
     {
         public string ItemId;
         public int Quantity;
 
-        public ResourceGrant() { }
+        public ResourceGrantData() { }
 
-        public ResourceGrant(string itemId, int quantity)
+        public ResourceGrantData(string itemId, int quantity)
         {
             ItemId = itemId;
             Quantity = quantity;

@@ -37,10 +37,10 @@ namespace TheBunkerGames
         [SerializeField] private float punchElasticity = 0.5f;
 
         // -------------------------------------------------------------------------
-        // Per-Character Fade Settings
+        // Per-CharacterData Fade Settings
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Title("Per-Character Fade")]
+        [Title("Per-CharacterData Fade")]
         #endif
         [SerializeField] private float charFadeDelay = 0.02f;
         [SerializeField] private float charFadeDuration = 0.2f;
@@ -146,7 +146,7 @@ namespace TheBunkerGames
         }
 
         // -------------------------------------------------------------------------
-        // Public API — Per-Character Fade
+        // Public API — Per-CharacterData Fade
         // -------------------------------------------------------------------------
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace TheBunkerGames
         /// Works independently of the CanvasGroup fade.
         /// </summary>
         #if ODIN_INSPECTOR
-        [Button("Fade In Per Character")]
+        [Button("Fade In Per CharacterData")]
         #endif
         public void FadeInPerCharacter(System.Action onComplete = null)
         {

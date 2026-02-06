@@ -22,8 +22,8 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Events
         // -------------------------------------------------------------------------
-        public static event Action<StatusReport> OnStatusReportGenerated;
-        public static event Action<Character, string> OnCriticalWarning;
+        public static event Action<StatusReportData> OnStatusReportGenerated;
+        public static event Action<CharacterData, string> OnCriticalWarning;
         public static event Action OnStatusReviewComplete;
 
         // -------------------------------------------------------------------------
@@ -33,12 +33,12 @@ namespace TheBunkerGames
         [Title("Current Report")]
         [ReadOnly]
         #endif
-        [SerializeField] private StatusReport latestReport;
+        [SerializeField] private StatusReportData latestReport;
 
         // -------------------------------------------------------------------------
         // Public Properties
         // -------------------------------------------------------------------------
-        public StatusReport LatestReport => latestReport;
+        public StatusReportData LatestReport => latestReport;
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -79,14 +79,14 @@ namespace TheBunkerGames
             var familyManager = FamilyManager.Instance;
             if (familyManager == null) return;
 
-            latestReport = new StatusReport();
+            latestReport = new StatusReportData();
             latestReport.Day = GameManager.Instance != null ? GameManager.Instance.CurrentDay : 0;
-            latestReport.CharacterStatuses = new List<CharacterStatus>();
+            latestReport.CharacterStatuses = new List<CharacterStatusData>();
             latestReport.Warnings = new List<string>();
 
             foreach (var character in familyManager.FamilyMembers)
             {
-                var status = new CharacterStatus
+                var status = new CharacterStatusData
                 {
                     CharacterName = character.Name,
                     Hunger = character.Hunger,

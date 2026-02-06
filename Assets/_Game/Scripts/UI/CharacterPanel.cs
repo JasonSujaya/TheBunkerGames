@@ -5,7 +5,7 @@ namespace TheBunkerGames
 {
     /// <summary>
     /// Individual character display panel showing name and stat bars.
-    /// Updated every frame to reflect current Character state.
+    /// Updated every frame to reflect current CharacterData state.
     /// </summary>
     public class CharacterPanel : MonoBehaviour
     {
@@ -32,9 +32,9 @@ namespace TheBunkerGames
         [SerializeField] private GameObject deadOverlay;
         [SerializeField] private Text statusText;
 
-        private Character trackedCharacter;
+        private CharacterData trackedCharacter;
 
-        public void SetCharacter(Character character)
+        public void SetCharacter(CharacterData character)
         {
             trackedCharacter = character;
             if (nameText != null) nameText.text = character.Name;

@@ -7,9 +7,9 @@ namespace TheBunkerGames
 {
     /// <summary>
     /// ScriptableObject defining a character template.
-    /// Used to create instances of Character at runtime.
+    /// Used to create instances of CharacterData at runtime.
     /// </summary>
-    [CreateAssetMenu(fileName = "CharacterDataSO_", menuName = "TheBunkerGames/Character Data")]
+    [CreateAssetMenu(fileName = "CharacterDataSO_", menuName = "TheBunkerGames/CharacterData Data")]
     public class CharacterDataSO : ScriptableObject
     {
         // -------------------------------------------------------------------------
@@ -18,7 +18,7 @@ namespace TheBunkerGames
         #if ODIN_INSPECTOR
         [Title("Identity")]
         #endif
-        [SerializeField] private string characterName = "New Character";
+        [SerializeField] private string characterName = "New CharacterData";
         [SerializeField] private Sprite portrait;
 
         // -------------------------------------------------------------------------
@@ -58,9 +58,9 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Public Methods
         // -------------------------------------------------------------------------
-        public Character CreateCharacter()
+        public CharacterData CreateCharacter()
         {
-            return new Character(characterName, startingHunger, startingThirst, startingSanity, startingHealth);
+            return new CharacterData(characterName, startingHunger, startingThirst, startingSanity, startingHealth);
         }
     }
 }

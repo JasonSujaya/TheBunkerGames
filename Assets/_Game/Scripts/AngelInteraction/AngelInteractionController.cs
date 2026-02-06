@@ -22,7 +22,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Events
         // -------------------------------------------------------------------------
-        public static event Action<AngelResponse> OnAngelResponse;
+        public static event Action<AngelResponseData> OnAngelResponse;
         public static event Action<AngelMood> OnMoodChanged;
         public static event Action OnInteractionComplete;
 
@@ -130,7 +130,7 @@ namespace TheBunkerGames
         /// <summary>
         /// Process A.N.G.E.L.'s response (called after AI returns or from mock).
         /// </summary>
-        public void ProcessAngelResponse(AngelResponse response)
+        public void ProcessAngelResponse(AngelResponseData response)
         {
             Debug.Log($"[Angel] Response - Message: {response.Message}, Granted items: {response.GrantedItems.Count}");
 
@@ -209,19 +209,19 @@ namespace TheBunkerGames
             return context;
         }
 
-        private AngelResponse GenerateMockResponse(string playerMessage)
+        private AngelResponseData GenerateMockResponse(string playerMessage)
         {
-            var response = new AngelResponse();
+            var response = new AngelResponseData();
 
             switch (currentMood)
             {
                 case AngelMood.Cooperative:
                     response.Message = "Resource allocation approved. Efficiency is paramount.";
-                    response.GrantedItems.Add(new ResourceGrant("canned_food", 2));
+                    response.GrantedItems.Add(new ResourceGrantData("canned_food", 2));
                     break;
                 case AngelMood.Neutral:
                     response.Message = "Your request has been... noted.";
-                    response.GrantedItems.Add(new ResourceGrant("canned_food", 1));
+                    response.GrantedItems.Add(new ResourceGrantData("canned_food", 1));
                     break;
                 case AngelMood.Mocking:
                     response.Message = "How quaint. You think asking nicely changes the math?";
@@ -234,7 +234,7 @@ namespace TheBunkerGames
                     break;
                 case AngelMood.Glitching:
                     response.Message = "R-R-Resource... allo... [DATA CORRUPTED]... approved?";
-                    response.GrantedItems.Add(new ResourceGrant("junk", 1));
+                    response.GrantedItems.Add(new ResourceGrantData("junk", 1));
                     break;
             }
 

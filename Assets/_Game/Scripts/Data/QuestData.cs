@@ -8,10 +8,10 @@ namespace TheBunkerGames
     /// AI sends commands to add/update quests using string IDs.
     /// </summary>
     [Serializable]
-    public class Quest
+    public class QuestData
     {
         // -------------------------------------------------------------------------
-        // Quest Data
+        // QuestData Data
         // -------------------------------------------------------------------------
         /// <summary>
         /// Unique identifier (e.g., "FindWater", "FixFilter")
@@ -32,14 +32,14 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Constructors
         // -------------------------------------------------------------------------
-        public Quest()
+        public QuestData()
         {
             Id = string.Empty;
             Description = string.Empty;
             State = QuestState.Active;
         }
 
-        public Quest(string id, string description, string state = null)
+        public QuestData(string id, string description, string state = null)
         {
             Id = id;
             Description = description;

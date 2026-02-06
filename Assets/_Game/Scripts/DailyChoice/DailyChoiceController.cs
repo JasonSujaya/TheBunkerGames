@@ -22,19 +22,19 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Events
         // -------------------------------------------------------------------------
-        public static event Action<Dilemma> OnDilemmaPresented;
-        public static event Action<DilemmaOption, DilemmaOutcome> OnChoiceMade;
+        public static event Action<DilemmaData> OnDilemmaPresented;
+        public static event Action<DilemmaOptionData, DilemmaOutcomeData> OnChoiceMade;
         public static event Action OnChoicePhaseComplete;
-        public static event Action<DilemmaOption, float> OnVoteUpdated;
+        public static event Action<DilemmaOptionData, float> OnVoteUpdated;
 
         // -------------------------------------------------------------------------
         // State
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Title("Current Dilemma")]
+        [Title("Current DilemmaData")]
         [ReadOnly]
         #endif
-        [SerializeField] private Dilemma currentDilemma;
+        [SerializeField] private DilemmaData currentDilemma;
 
         #if ODIN_INSPECTOR
         [ReadOnly]
@@ -49,7 +49,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Public Properties
         // -------------------------------------------------------------------------
-        public Dilemma CurrentDilemma => currentDilemma;
+        public DilemmaData CurrentDilemma => currentDilemma;
         public bool IsVotingActive => isVotingActive;
         public float VoteTimer => voteTimer;
 
@@ -111,10 +111,10 @@ namespace TheBunkerGames
         /// <summary>
         /// Present a dilemma from the AI.
         /// </summary>
-        public void PresentDilemma(Dilemma dilemma)
+        public void PresentDilemma(DilemmaData dilemma)
         {
             currentDilemma = dilemma;
-            Debug.Log($"[DailyChoice] Dilemma: {dilemma.Title}");
+            Debug.Log($"[DailyChoice] DilemmaData: {dilemma.Title}");
             OnDilemmaPresented?.Invoke(dilemma);
         }
 
@@ -125,7 +125,7 @@ namespace TheBunkerGames
         {
             if (currentDilemma == null) return;
 
-            var config = GameConfigSO.Instance;
+            var config = GameConfigDataSO.Instance;
             voteTimer = config != null ? config.VoteTimerDuration : 30f;
             isVotingActive = true;
 
@@ -201,9 +201,9 @@ namespace TheBunkerGames
             MakeChoice(bestIndex);
         }
 
-        private DilemmaOutcome ApplyChoice(DilemmaOption option)
+        private DilemmaOutcomeData ApplyChoice(DilemmaOptionData option)
         {
-            var outcome = new DilemmaOutcome
+            var outcome = new DilemmaOutcomeData
             {
                 Description = option.OutcomeDescription,
                 OutcomeType = option.ExpectedOutcome
@@ -234,7 +234,7 @@ namespace TheBunkerGames
             return outcome;
         }
 
-        private void ApplyStatEffect(Character character, StatEffect effect)
+        private void ApplyStatEffect(CharacterData character, StatEffectData effect)
         {
             character.ModifyHunger(effect.HungerChange);
             character.ModifyThirst(effect.ThirstChange);
@@ -243,38 +243,38 @@ namespace TheBunkerGames
         }
 
         // -------------------------------------------------------------------------
-        // Mock Dilemma Generation
+        // Mock DilemmaData Generation
         // -------------------------------------------------------------------------
-        private Dilemma GenerateMockDilemma()
+        private DilemmaData GenerateMockDilemma()
         {
             int day = GameManager.Instance != null ? GameManager.Instance.CurrentDay : 1;
 
-            var dilemma = new Dilemma
+            var dilemma = new DilemmaData
             {
                 Title = $"Day {day}: The Air Filter",
                 Description = "A.N.G.E.L. reports the air filtration system is failing. Radiation levels are rising.",
-                Options = new List<DilemmaOption>
+                Options = new List<DilemmaOptionData>
                 {
-                    new DilemmaOption
+                    new DilemmaOptionData
                     {
                         Label = "Fix the Air Filter",
                         Description = "Send someone to repair it. High radiation risk.",
                         OutcomeDescription = "The filter is repaired, but at a cost.",
                         ExpectedOutcome = ChoiceOutcome.Mixed,
-                        StatEffects = new List<StatEffect>
+                        StatEffects = new List<StatEffectData>
                         {
-                            new StatEffect { HealthChange = -15f, SanityChange = 5f }
+                            new StatEffectData { HealthChange = -15f, SanityChange = 5f }
                         }
                     },
-                    new DilemmaOption
+                    new DilemmaOptionData
                     {
                         Label = "Ignore It",
                         Description = "Save energy. Let the air quality worsen.",
                         OutcomeDescription = "The bunker air grows thick and oppressive.",
                         ExpectedOutcome = ChoiceOutcome.Negative,
-                        StatEffects = new List<StatEffect>
+                        StatEffects = new List<StatEffectData>
                         {
-                            new StatEffect { SanityChange = -20f, HealthChange = -5f }
+                            new StatEffectData { SanityChange = -20f, HealthChange = -5f }
                         }
                     }
                 }
@@ -288,7 +288,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
-        [Button("Generate Mock Dilemma", ButtonSizes.Medium)]
+        [Button("Generate Mock DilemmaData", ButtonSizes.Medium)]
         [GUIColor(0.5f, 1f, 0.5f)]
         private void Debug_GenerateDilemma()
         {

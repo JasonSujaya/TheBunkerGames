@@ -23,7 +23,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Events
         // -------------------------------------------------------------------------
-        public static event Action<NightReport> OnNightReportGenerated;
+        public static event Action<NightReportData> OnNightReportGenerated;
         public static event Action<string> OnDreamLogGenerated;
         public static event Action OnNightCycleComplete;
 
@@ -34,12 +34,12 @@ namespace TheBunkerGames
         [Title("Night Report")]
         [ReadOnly]
         #endif
-        [SerializeField] private NightReport latestReport;
+        [SerializeField] private NightReportData latestReport;
 
         // -------------------------------------------------------------------------
         // Public Properties
         // -------------------------------------------------------------------------
-        public NightReport LatestReport => latestReport;
+        public NightReportData LatestReport => latestReport;
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -79,7 +79,7 @@ namespace TheBunkerGames
         {
             Debug.Log("[NightCycle] Processing night cycle...");
 
-            latestReport = new NightReport();
+            latestReport = new NightReportData();
             var gameManager = GameManager.Instance;
             latestReport.Day = gameManager != null ? gameManager.CurrentDay : 0;
 
@@ -113,7 +113,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         private void ApplyStatDecay()
         {
-            var config = GameConfigSO.Instance;
+            var config = GameConfigDataSO.Instance;
             var family = FamilyManager.Instance;
             if (config == null || family == null) return;
 

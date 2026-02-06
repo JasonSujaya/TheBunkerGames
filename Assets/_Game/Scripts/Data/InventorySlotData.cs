@@ -7,18 +7,18 @@ namespace TheBunkerGames
     /// Simple inventory slot holding an item ID and quantity.
     /// </summary>
     [Serializable]
-    public class InventorySlot
+    public class InventorySlotData
     {
         public string ItemId;
         public int Quantity;
 
-        public InventorySlot()
+        public InventorySlotData()
         {
             ItemId = string.Empty;
             Quantity = 0;
         }
 
-        public InventorySlot(string itemId, int quantity = 1)
+        public InventorySlotData(string itemId, int quantity = 1)
         {
             ItemId = itemId;
             Quantity = quantity;
@@ -26,7 +26,7 @@ namespace TheBunkerGames
 
         public ItemDataSO GetItemData()
         {
-            return ItemDatabaseSO.Instance?.GetItem(ItemId);
+            return ItemDatabaseDataSO.Instance?.GetItem(ItemId);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace TheBunkerGames
     /// Tracks four core stats: Hunger, Thirst, Sanity, Health.
     /// </summary>
     [Serializable]
-    public class Character
+    public class CharacterData
     {
         // -------------------------------------------------------------------------
         // Identity
@@ -33,7 +33,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Constructors
         // -------------------------------------------------------------------------
-        public Character()
+        public CharacterData()
         {
             Name = "Unknown";
             Hunger = 100f;
@@ -42,7 +42,7 @@ namespace TheBunkerGames
             Health = 100f;
         }
 
-        public Character(string name, float hunger = 100f, float thirst = 100f, float sanity = 100f, float health = 100f)
+        public CharacterData(string name, float hunger = 100f, float thirst = 100f, float sanity = 100f, float health = 100f)
         {
             Name = name;
             Hunger = Mathf.Clamp(hunger, 0f, 100f);

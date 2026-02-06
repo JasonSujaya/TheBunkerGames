@@ -9,7 +9,7 @@ namespace TheBunkerGames
     /// and any deaths that occurred.
     /// </summary>
     [Serializable]
-    public class NightReport
+    public class NightReportData
     {
         public int Day;
         public bool IsNightmare;

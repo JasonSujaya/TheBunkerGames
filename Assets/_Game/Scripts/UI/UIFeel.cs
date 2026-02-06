@@ -12,7 +12,7 @@ namespace TheBunkerGames
 {
     /// <summary>
     /// Drop this on any UI GameObject to add juice/feel effects.
-    /// Assign UIFeelEffectData ScriptableObjects for shared, reusable presets.
+    /// Assign UIFeelEffectDataSO ScriptableObjects for shared, reusable presets.
     /// Supports automatic triggers (hover, click, enable) and manual Play() calls.
     /// 
     /// Continuous triggers:
@@ -188,7 +188,7 @@ namespace TheBunkerGames
             }
         }
 
-        private void StartContinuousEffect(int index, UIFeelEffectData data)
+        private void StartContinuousEffect(int index, UIFeelEffectDataSO data)
         {
             // Stop any existing coroutine for this slot
             if (_runningEffects.TryGetValue(index, out var existing) && existing != null)
@@ -199,7 +199,7 @@ namespace TheBunkerGames
             _runningEffects[index] = StartCoroutine(RunContinuousForward(index, data));
         }
 
-        private void StartReverseEffect(int index, UIFeelEffectData data)
+        private void StartReverseEffect(int index, UIFeelEffectDataSO data)
         {
             // Stop any existing coroutine for this slot
             if (_runningEffects.TryGetValue(index, out var existing) && existing != null)
@@ -221,7 +221,7 @@ namespace TheBunkerGames
         /// Plays forward to target, then loops (if configured) while held.
         /// Stays at target value if no loop.
         /// </summary>
-        private IEnumerator RunContinuousForward(int index, UIFeelEffectData data)
+        private IEnumerator RunContinuousForward(int index, UIFeelEffectDataSO data)
         {
             if (data.Delay > 0f) yield return new WaitForSeconds(data.Delay);
 
@@ -301,7 +301,7 @@ namespace TheBunkerGames
         /// Smoothly reverses from wherever the effect currently is back to original (t=0).
         /// Duration scales proportionally to how far along we are.
         /// </summary>
-        private IEnumerator RunContinuousReverse(int index, UIFeelEffectData data, float startT)
+        private IEnumerator RunContinuousReverse(int index, UIFeelEffectDataSO data, float startT)
         {
             // Scale reverse duration proportionally so it feels consistent
             float duration = Mathf.Max(data.Duration, 0.001f) * Mathf.Abs(startT);
@@ -351,7 +351,7 @@ namespace TheBunkerGames
             _runningEffects[index] = StartCoroutine(RunEffect(index, entry.Data));
         }
 
-        private IEnumerator RunEffect(int index, UIFeelEffectData data)
+        private IEnumerator RunEffect(int index, UIFeelEffectDataSO data)
         {
             if (data.Delay > 0f) yield return new WaitForSeconds(data.Delay);
 
@@ -383,7 +383,7 @@ namespace TheBunkerGames
             _runningEffects.Remove(index);
         }
 
-        private IEnumerator RunSinglePass(UIFeelEffectData data, int index, bool forward)
+        private IEnumerator RunSinglePass(UIFeelEffectDataSO data, int index, bool forward)
         {
             float elapsed = 0f;
             float duration = Mathf.Max(data.Duration, 0.001f);
@@ -430,7 +430,7 @@ namespace TheBunkerGames
             _initialized = true;
         }
 
-        private void ApplyEffect(UIFeelEffectData data, float t)
+        private void ApplyEffect(UIFeelEffectDataSO data, float t)
         {
             if (_rectTransform == null) return;
 
@@ -479,7 +479,7 @@ namespace TheBunkerGames
 
         private enum PunchTarget { Scale, Rotation, Move }
 
-        private void ApplyPunch(UIFeelEffectData data, float t, PunchTarget target)
+        private void ApplyPunch(UIFeelEffectDataSO data, float t, PunchTarget target)
         {
             // Damped sine wave for punch feel
             float decay = 1f - t;
@@ -522,9 +522,9 @@ namespace TheBunkerGames
         #if ODIN_INSPECTOR
         [HorizontalGroup("Row")]
         #endif
-        [SerializeField] private UIFeelEffectData data;
+        [SerializeField] private UIFeelEffectDataSO data;
 
         public UIFeelTrigger Trigger => trigger;
-        public UIFeelEffectData Data => data;
+        public UIFeelEffectDataSO Data => data;
     }
 }

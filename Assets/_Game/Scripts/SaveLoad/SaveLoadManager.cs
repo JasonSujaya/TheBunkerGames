@@ -153,10 +153,10 @@ namespace TheBunkerGames
             var familyManager = FamilyManager.Instance;
             if (familyManager != null && saveData.FamilyMembers != null)
             {
-                var characters = new List<Character>();
+                var characters = new List<CharacterData>();
                 foreach (var charData in saveData.FamilyMembers)
                 {
-                    var character = new Character(
+                    var character = new CharacterData(
                         charData.Name,
                         charData.Hunger,
                         charData.Thirst,

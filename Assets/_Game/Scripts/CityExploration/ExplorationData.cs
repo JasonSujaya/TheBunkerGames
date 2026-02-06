@@ -37,7 +37,7 @@ namespace TheBunkerGames
     {
         public string ExplorerName;
         public string LocationName;
-        public List<ResourceGrant> FoundItems = new List<ResourceGrant>();
+        public List<ResourceGrantData> FoundItems = new List<ResourceGrantData>();
         public float HealthChange;
         public float SanityChange;
         public bool IsInjured;

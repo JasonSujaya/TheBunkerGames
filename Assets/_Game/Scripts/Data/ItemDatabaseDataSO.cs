@@ -10,23 +10,23 @@ namespace TheBunkerGames
     /// Singleton ScriptableObject holding all items in the game.
     /// The AI calls GetItem(id) to look up item data.
     /// </summary>
-    [CreateAssetMenu(fileName = "ItemDatabaseSO", menuName = "TheBunkerGames/Item Database")]
-    public class ItemDatabaseSO : ScriptableObject
+    [CreateAssetMenu(fileName = "ItemDatabaseDataSO", menuName = "TheBunkerGames/Item Database Data")]
+    public class ItemDatabaseDataSO : ScriptableObject
     {
         // -------------------------------------------------------------------------
         // Singleton Access
         // -------------------------------------------------------------------------
-        private static ItemDatabaseSO instance;
-        public static ItemDatabaseSO Instance
+        private static ItemDatabaseDataSO instance;
+        public static ItemDatabaseDataSO Instance
         {
             get
             {
                 if (instance == null)
                 {
-                    instance = Resources.Load<ItemDatabaseSO>("ItemDatabaseSO");
+                    instance = Resources.Load<ItemDatabaseDataSO>("ItemDatabaseDataSO");
                     if (instance == null)
                     {
-                        Debug.LogError("[ItemDatabaseSO] No ItemDatabaseSO found in Resources folder!");
+                        Debug.LogError("[ItemDatabaseDataSO] No ItemDatabaseDataSO found in Resources folder!");
                     }
                 }
                 return instance;
@@ -63,7 +63,7 @@ namespace TheBunkerGames
                     return allItems[i];
                 }
             }
-            Debug.LogWarning($"[ItemDatabaseSO] Item not found: {id}");
+            Debug.LogWarning($"[ItemDatabaseDataSO] Item not found: {id}");
             return null;
         }
 
@@ -102,7 +102,7 @@ namespace TheBunkerGames
         [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_LogAllItems()
         {
-            Debug.Log($"[ItemDatabaseSO] Total items: {allItems.Count}");
+            Debug.Log($"[ItemDatabaseDataSO] Total items: {allItems.Count}");
             foreach (var item in allItems)
             {
                 if (item != null)

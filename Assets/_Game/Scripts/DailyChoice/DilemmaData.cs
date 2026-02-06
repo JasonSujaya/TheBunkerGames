@@ -8,24 +8,24 @@ namespace TheBunkerGames
     /// Can be AI-generated via Neocortex or hand-authored.
     /// </summary>
     [Serializable]
-    public class Dilemma
+    public class DilemmaData
     {
         public string Title = "";
         public string Description = "";
-        public List<DilemmaOption> Options = new List<DilemmaOption>();
+        public List<DilemmaOptionData> Options = new List<DilemmaOptionData>();
     }
 
     /// <summary>
     /// One option within a dilemma. Includes stat consequences and vote tracking.
     /// </summary>
     [Serializable]
-    public class DilemmaOption
+    public class DilemmaOptionData
     {
         public string Label = "";
         public string Description = "";
         public string OutcomeDescription = "";
         public ChoiceOutcome ExpectedOutcome;
-        public List<StatEffect> StatEffects = new List<StatEffect>();
+        public List<StatEffectData> StatEffects = new List<StatEffectData>();
 
         // Voting (Twitch Audience Mode)
         public int VoteCount;
@@ -36,7 +36,7 @@ namespace TheBunkerGames
     /// Leave TargetCharacterName empty to apply to all family members.
     /// </summary>
     [Serializable]
-    public class StatEffect
+    public class StatEffectData
     {
         public string TargetCharacterName = "";
         public float HungerChange;
@@ -49,7 +49,7 @@ namespace TheBunkerGames
     /// The result of a dilemma choice after it is resolved.
     /// </summary>
     [Serializable]
-    public class DilemmaOutcome
+    public class DilemmaOutcomeData
     {
         public string Description = "";
         public ChoiceOutcome OutcomeType;

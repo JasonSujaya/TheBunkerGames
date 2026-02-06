@@ -69,16 +69,16 @@ namespace TheBunkerGames
             }
 
             // Check config
-            var config = LLMConfigSO.Instance;
+            var config = LLMConfigDataSO.Instance;
             if (config == null)
             {
-                SetStatus("ERROR: LLMConfigSO not found in Resources/LLM/");
+                SetStatus("ERROR: LLMConfigDataSO not found in Resources/LLM/");
                 return;
             }
 
             if (!config.HasOpenRouterKey && !config.HasMistralKey)
             {
-                SetStatus("Warning: No API keys configured in LLMConfigSO");
+                SetStatus("Warning: No API keys configured in LLMConfigDataSO");
             }
 
             // Hide image display by default
