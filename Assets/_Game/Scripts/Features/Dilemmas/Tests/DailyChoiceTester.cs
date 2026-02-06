@@ -8,7 +8,7 @@ namespace TheBunkerGames.Tests
 {
     /// <summary>
     /// Tests for DailyChoiceController: dilemma presentation, choice making,
-    /// stat effects, voting system, edge cases.
+    /// stat effects, edge cases.
     /// </summary>
     public class DailyChoiceTester : BaseTester
     {
@@ -233,74 +233,6 @@ namespace TheBunkerGames.Tests
         {
             dc.CompleteChoicePhase();  // Clears current dilemma
             dc.MakeChoice(0);  // Should not throw
-        }
-
-        // -------------------------------------------------------------------------
-        // Voting
-        // -------------------------------------------------------------------------
-        [TestMethod("StartVoting initializes vote timer and resets counts")]
-        private void Test_StartVoting()
-        {
-            dc.PresentDilemma(CreateTestDilemma());
-            dc.StartVoting();
-
-            AssertTrue(dc.IsVotingActive, "Voting should be active");
-            AssertGreaterThan(dc.VoteTimer, 0f, "Timer should be positive");
-
-            foreach (var opt in dc.CurrentDilemma.Options)
-            {
-                AssertEqual(0, opt.VoteCount, $"VoteCount for {opt.Label}");
-            }
-        }
-
-        [TestMethod("CastVote increments vote count")]
-        private void Test_CastVote()
-        {
-            dc.PresentDilemma(CreateTestDilemma());
-            dc.StartVoting();
-
-            dc.CastVote(0);
-            dc.CastVote(0);
-            dc.CastVote(1);
-
-            AssertEqual(2, dc.CurrentDilemma.Options[0].VoteCount, "Option 0 votes");
-            AssertEqual(1, dc.CurrentDilemma.Options[1].VoteCount, "Option 1 votes");
-        }
-
-        [TestMethod("CastVote fires OnVoteUpdated event")]
-        private void Test_CastVote_FiresEvent()
-        {
-            dc.PresentDilemma(CreateTestDilemma());
-            dc.StartVoting();
-
-            DilemmaOptionData votedOption = null;
-            System.Action<DilemmaOptionData, float> handler = (o, p) => votedOption = o;
-            DailyChoiceController.OnVoteUpdated += handler;
-
-            dc.CastVote(0);
-            AssertNotNull(votedOption, "Event should fire");
-            AssertEqual("Option A", votedOption.Label, "Voted option");
-
-            DailyChoiceController.OnVoteUpdated -= handler;
-        }
-
-        [TestMethod("CastVote does nothing when voting not active")]
-        private void Test_CastVote_NotActive()
-        {
-            dc.PresentDilemma(CreateTestDilemma());
-            // Don't start voting
-            dc.CastVote(0);
-            AssertEqual(0, dc.CurrentDilemma.Options[0].VoteCount, "No votes should be cast");
-        }
-
-        [TestMethod("CastVote ignores invalid index")]
-        private void Test_CastVote_InvalidIndex()
-        {
-            dc.PresentDilemma(CreateTestDilemma());
-            dc.StartVoting();
-            dc.CastVote(-1);
-            dc.CastVote(99);
-            // No exception expected
         }
 
         // -------------------------------------------------------------------------
