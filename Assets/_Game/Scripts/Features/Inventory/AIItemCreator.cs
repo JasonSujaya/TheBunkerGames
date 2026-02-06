@@ -60,6 +60,7 @@ namespace TheBunkerGames
 
             // Create a new ItemData ScriptableObject at runtime
             var newItem = ScriptableObject.CreateInstance<ItemData>();
+            newItem.name = itemName;
             newItem.Initialize(itemName, description, type, icon);
 
             // Add to database
