@@ -243,7 +243,7 @@ namespace TheBunkerGames
         {
             #if UNITY_EDITOR
             // Ensure Tester exists
-            var testerType = System.Type.GetType("TheBunkerGames.Tests.DailyChoiceTester");
+            var testerType = System.Type.GetType("TheBunkerGames.Tests.DailyChoiceManagerTester");
             if (testerType != null && GetComponent(testerType) == null)
             {
                 gameObject.AddComponent(testerType);

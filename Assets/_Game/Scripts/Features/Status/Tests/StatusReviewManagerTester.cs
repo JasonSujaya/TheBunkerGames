@@ -11,7 +11,7 @@ namespace TheBunkerGames.Tests
     /// Tests for StatusReviewManager: report generation, warnings,
     /// critical conditions, event firing.
     /// </summary>
-    public class StatusReviewTester : BaseTester
+    public class StatusReviewManagerTester : BaseTester
     {
         public override string TesterName => "StatusReview";
 

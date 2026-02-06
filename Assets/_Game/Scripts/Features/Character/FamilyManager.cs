@@ -149,7 +149,7 @@ namespace TheBunkerGames
         {
             #if UNITY_EDITOR
             // Ensure Tester exists
-            var testerType = System.Type.GetType("TheBunkerGames.Tests.FamilyTester");
+            var testerType = System.Type.GetType("TheBunkerGames.Tests.FamilyManagerTester");
             if (testerType != null && GetComponent(testerType) == null)
             {
                 gameObject.AddComponent(testerType);

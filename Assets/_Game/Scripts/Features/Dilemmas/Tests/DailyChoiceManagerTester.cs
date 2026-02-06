@@ -10,7 +10,7 @@ namespace TheBunkerGames.Tests
     /// Tests for DailyChoiceManager: dilemma presentation, choice making,
     /// stat effects, edge cases.
     /// </summary>
-    public class DailyChoiceTester : BaseTester
+    public class DailyChoiceManagerTester : BaseTester
     {
         public override string TesterName => "DailyChoice";
 

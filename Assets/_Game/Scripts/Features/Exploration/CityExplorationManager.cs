@@ -218,7 +218,7 @@ namespace TheBunkerGames
         {
             #if UNITY_EDITOR
             // Ensure Tester exists
-            var testerType = System.Type.GetType("TheBunkerGames.Tests.ExplorationTester");
+            var testerType = System.Type.GetType("TheBunkerGames.Tests.CityExplorationManagerTester");
             if (testerType != null && GetComponent(testerType) == null)
             {
                 gameObject.AddComponent(testerType);

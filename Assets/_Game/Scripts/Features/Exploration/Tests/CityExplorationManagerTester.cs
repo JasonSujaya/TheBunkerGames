@@ -10,7 +10,7 @@ namespace TheBunkerGames.Tests
     /// Tests for CityExplorationManager: sending characters, resolving expeditions,
     /// validation, risk factors, loot generation.
     /// </summary>
-    public class ExplorationTester : BaseTester
+    public class CityExplorationManagerTester : BaseTester
     {
         public override string TesterName => "Exploration";
 
