@@ -186,11 +186,12 @@ namespace TheBunkerGames
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Title("Debug Controls")]
+        [TitleGroup("Debug Controls")]
         [ValueDropdown("GetAllItemDataList")]
         [SerializeField] private ItemData debugSelectedItem;
 
-        [HorizontalGroup("ItemActions")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/ItemActions")]
         [Button("Add Item")]
         private void Debug_AddItem()
         {
@@ -198,7 +199,8 @@ namespace TheBunkerGames
                 AddItem(debugSelectedItem, 1);
         }
 
-        [HorizontalGroup("ItemActions")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/ItemActions")]
         [Button("Remove Item")]
         private void Debug_RemoveItem()
         {
@@ -206,6 +208,7 @@ namespace TheBunkerGames
                 RemoveItem(debugSelectedItem, 1);
         }
 
+        [TitleGroup("Debug Controls")]
         [Button("Add 5 Random Items")]
         private void Debug_AddRandomItems()
         {
@@ -223,14 +226,16 @@ namespace TheBunkerGames
             }
         }
 
-        [HorizontalGroup("Utils")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Utils")]
         [Button("Clear All")]
         private void Debug_ClearAll()
         {
             ClearInventory();
         }
 
-        [HorizontalGroup("Utils")]
+        [TitleGroup("Debug Controls")]
+        [HorizontalGroup("Debug Controls/Utils")]
         [Button("Log All Items")]
         private void Debug_LogItems()
         {
@@ -241,24 +246,6 @@ namespace TheBunkerGames
                 string name = data != null ? data.ItemName : slot.ItemId;
                 Debug.Log($"  - {name}: {slot.Quantity}");
             }
-        }
-
-        [Title("AI Item Creation")]
-        [InfoBox("Use AIItemCreator component for runtime item generation")]
-        [Button("Add AIItemCreator Component")]
-        private void Debug_AddAIItemCreator()
-        {
-            #if UNITY_EDITOR
-            if (GetComponent<AIItemCreator>() == null)
-            {
-                gameObject.AddComponent<AIItemCreator>();
-                Debug.Log("[InventoryManager] Added AIItemCreator component.");
-            }
-            else
-            {
-                Debug.LogWarning("[InventoryManager] AIItemCreator already exists on this GameObject.");
-            }
-            #endif
         }
 
         private IEnumerable<ValueDropdownItem<ItemData>> GetAllItemDataList()
@@ -291,25 +278,6 @@ namespace TheBunkerGames
             }
 
             return list;
-        }
-
-        [Title("Auto Setup")]
-        [Button("Auto Setup Dependencies")]
-        private void AutoSetupDependencies()
-        {
-            #if UNITY_EDITOR
-            // Ensure Tester exists
-            var testerType = System.Type.GetType("TheBunkerGames.Tests.InventoryManagerTester");
-            if (testerType != null && GetComponent(testerType) == null)
-            {
-                gameObject.AddComponent(testerType);
-                Debug.Log("[InventoryManager] Added InventoryManagerTester.");
-            }
-            else if (testerType == null)
-            {
-                Debug.LogWarning("[InventoryManager] Could not find InventoryManagerTester type. Ensure it is in TheBunkerGames.Tests namespace.");
-            }
-            #endif
         }
         #endif
     }
