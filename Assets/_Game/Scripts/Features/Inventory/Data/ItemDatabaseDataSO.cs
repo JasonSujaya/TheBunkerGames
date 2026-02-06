@@ -94,6 +94,19 @@ namespace TheBunkerGames
             }
         }
 
+        /// <summary>
+        /// Remove all null/missing entries from the database.
+        /// </summary>
+        public int RemoveNullEntries()
+        {
+            int removed = allItems.RemoveAll(item => item == null);
+            if (removed > 0)
+            {
+                Debug.Log($"[ItemDatabaseDataSO] Removed {removed} null/missing entries.");
+            }
+            return removed;
+        }
+
         // -------------------------------------------------------------------------
         // Debug
         // -------------------------------------------------------------------------
@@ -117,6 +130,9 @@ namespace TheBunkerGames
         private void Debug_FindAndAddAll()
         {
 #if UNITY_EDITOR
+            // First clean up null entries
+            RemoveNullEntries();
+            
             string[] guids = UnityEditor.AssetDatabase.FindAssets("t:ItemData");
             int count = 0;
             foreach (string guid in guids)
@@ -133,6 +149,61 @@ namespace TheBunkerGames
             Debug.Log($"[ItemDatabaseDataSO] Added {count} new items to the database.");
 #endif
         }
+
+        [Button("Clean Up Missing Items", ButtonSizes.Medium)]
+        [GUIColor(1f, 0.6f, 0.3f)]
+        private void Debug_CleanUpMissingItems()
+        {
+#if UNITY_EDITOR
+            int removed = RemoveNullEntries();
+            UnityEditor.EditorUtility.SetDirty(this);
+            if (removed == 0)
+            {
+                Debug.Log("[ItemDatabaseDataSO] No missing items to clean up.");
+            }
+#endif
+        }
         #endif
     }
 }
+
+#if UNITY_EDITOR
+namespace TheBunkerGames
+{
+    /// <summary>
+    /// Editor utility to auto-clean ItemDatabaseDataSO when exiting play mode.
+    /// </summary>
+    [UnityEditor.InitializeOnLoad]
+    public static class ItemDatabaseCleanup
+    {
+        static ItemDatabaseCleanup()
+        {
+            UnityEditor.EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+        }
+
+        private static void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange state)
+        {
+            if (state == UnityEditor.PlayModeStateChange.EnteredEditMode)
+            {
+                // Find all ItemDatabaseDataSO assets and clean them up
+                string[] guids = UnityEditor.AssetDatabase.FindAssets("t:ItemDatabaseDataSO");
+                foreach (string guid in guids)
+                {
+                    string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+                    var db = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemDatabaseDataSO>(path);
+                    if (db != null)
+                    {
+                        int removed = db.RemoveNullEntries();
+                        if (removed > 0)
+                        {
+                            UnityEditor.EditorUtility.SetDirty(db);
+                            UnityEditor.AssetDatabase.SaveAssets();
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+#endif
+
