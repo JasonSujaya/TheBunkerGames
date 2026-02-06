@@ -9,23 +9,23 @@ namespace TheBunkerGames
     /// Game configuration ScriptableObject.
     /// Central place for tunable game settings.
     /// </summary>
-    [CreateAssetMenu(fileName = "GameConfig", menuName = "TheBunkerGames/Game Config")]
-    public class GameConfig : ScriptableObject
+    [CreateAssetMenu(fileName = "GameConfigSO", menuName = "TheBunkerGames/Game Config")]
+    public class GameConfigSO : ScriptableObject
     {
         // -------------------------------------------------------------------------
         // Singleton Access
         // -------------------------------------------------------------------------
-        private static GameConfig instance;
-        public static GameConfig Instance
+        private static GameConfigSO instance;
+        public static GameConfigSO Instance
         {
             get
             {
                 if (instance == null)
                 {
-                    instance = Resources.Load<GameConfig>("GameConfig");
+                    instance = Resources.Load<GameConfigSO>("GameConfigSO");
                     if (instance == null)
                     {
-                        Debug.LogError("[GameConfig] No GameConfig found in Resources folder!");
+                        Debug.LogError("[GameConfigSO] No GameConfigSO found in Resources folder!");
                     }
                 }
                 return instance;

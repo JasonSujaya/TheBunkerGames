@@ -9,8 +9,8 @@ namespace TheBunkerGames
     /// ScriptableObject defining a character template.
     /// Used to create instances of Character at runtime.
     /// </summary>
-    [CreateAssetMenu(fileName = "CharacterData_", menuName = "TheBunkerGames/Character Data")]
-    public class CharacterData : ScriptableObject
+    [CreateAssetMenu(fileName = "CharacterDataSO_", menuName = "TheBunkerGames/Character Data")]
+    public class CharacterDataSO : ScriptableObject
     {
         // -------------------------------------------------------------------------
         // Identity

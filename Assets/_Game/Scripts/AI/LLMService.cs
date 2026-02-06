@@ -66,7 +66,7 @@ namespace TheBunkerGames
             Action<LLMResult<LLMChatResponse>> callback = null,
             string modelOverride = null)
         {
-            var config = LLMConfig.Instance;
+            var config = LLMConfigSO.Instance;
             if (config == null) return;
 
             string model = !string.IsNullOrEmpty(modelOverride)
@@ -125,7 +125,7 @@ namespace TheBunkerGames
             float? temperature = null,
             int? maxTokens = null)
         {
-            var config = LLMConfig.Instance;
+            var config = LLMConfigSO.Instance;
             if (config == null) return;
 
             string apiKey = config.GetApiKey(provider);
@@ -205,7 +205,7 @@ namespace TheBunkerGames
             LLMChatRequest request,
             Action<LLMResult<LLMChatResponse>> callback)
         {
-            var config = LLMConfig.Instance;
+            var config = LLMConfigSO.Instance;
             if (config == null) yield break;
 
             string url = config.GetBaseUrl(provider).TrimEnd('/') + "/chat/completions";
@@ -253,7 +253,7 @@ namespace TheBunkerGames
                 });
         }
 
-        private Dictionary<string, string> BuildHeaders(LLMProvider provider, LLMConfig config)
+        private Dictionary<string, string> BuildHeaders(LLMProvider provider, LLMConfigSO config)
         {
             var headers = new Dictionary<string, string>
             {

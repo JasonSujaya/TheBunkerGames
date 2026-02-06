@@ -125,7 +125,7 @@ namespace TheBunkerGames
         {
             if (currentDilemma == null) return;
 
-            var config = GameConfig.Instance;
+            var config = GameConfigSO.Instance;
             voteTimer = config != null ? config.VoteTimerDuration : 30f;
             isVotingActive = true;
 

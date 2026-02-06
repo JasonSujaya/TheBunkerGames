@@ -10,23 +10,23 @@ namespace TheBunkerGames
     /// Singleton ScriptableObject holding all items in the game.
     /// The AI calls GetItem(id) to look up item data.
     /// </summary>
-    [CreateAssetMenu(fileName = "ItemDatabase", menuName = "TheBunkerGames/Item Database")]
-    public class ItemDatabase : ScriptableObject
+    [CreateAssetMenu(fileName = "ItemDatabaseSO", menuName = "TheBunkerGames/Item Database")]
+    public class ItemDatabaseSO : ScriptableObject
     {
         // -------------------------------------------------------------------------
         // Singleton Access
         // -------------------------------------------------------------------------
-        private static ItemDatabase instance;
-        public static ItemDatabase Instance
+        private static ItemDatabaseSO instance;
+        public static ItemDatabaseSO Instance
         {
             get
             {
                 if (instance == null)
                 {
-                    instance = Resources.Load<ItemDatabase>("ItemDatabase");
+                    instance = Resources.Load<ItemDatabaseSO>("ItemDatabaseSO");
                     if (instance == null)
                     {
-                        Debug.LogError("[ItemDatabase] No ItemDatabase found in Resources folder!");
+                        Debug.LogError("[ItemDatabaseSO] No ItemDatabaseSO found in Resources folder!");
                     }
                 }
                 return instance;
@@ -41,12 +41,12 @@ namespace TheBunkerGames
         [Searchable]
         [ListDrawerSettings(ShowIndexLabels = true)]
         #endif
-        [SerializeField] private List<ItemData> allItems = new List<ItemData>();
+        [SerializeField] private List<ItemDataSO> allItems = new List<ItemDataSO>();
 
         // -------------------------------------------------------------------------
         // Public Properties
         // -------------------------------------------------------------------------
-        public List<ItemData> AllItems => allItems;
+        public List<ItemDataSO> AllItems => allItems;
 
         // -------------------------------------------------------------------------
         // Public Methods
@@ -54,7 +54,7 @@ namespace TheBunkerGames
         /// <summary>
         /// Look up an item by its ID.
         /// </summary>
-        public ItemData GetItem(string id)
+        public ItemDataSO GetItem(string id)
         {
             for (int i = 0; i < allItems.Count; i++)
             {
@@ -63,16 +63,16 @@ namespace TheBunkerGames
                     return allItems[i];
                 }
             }
-            Debug.LogWarning($"[ItemDatabase] Item not found: {id}");
+            Debug.LogWarning($"[ItemDatabaseSO] Item not found: {id}");
             return null;
         }
 
         /// <summary>
         /// Get all items of a specific type.
         /// </summary>
-        public List<ItemData> GetItemsByType(ItemType type)
+        public List<ItemDataSO> GetItemsByType(ItemType type)
         {
-            List<ItemData> result = new List<ItemData>();
+            List<ItemDataSO> result = new List<ItemDataSO>();
             for (int i = 0; i < allItems.Count; i++)
             {
                 if (allItems[i] != null && allItems[i].Type == type)
@@ -86,7 +86,7 @@ namespace TheBunkerGames
         /// <summary>
         /// Add an item to the database (used by editor tools).
         /// </summary>
-        public void AddItem(ItemData item)
+        public void AddItem(ItemDataSO item)
         {
             if (item != null && !allItems.Contains(item))
             {
@@ -102,7 +102,7 @@ namespace TheBunkerGames
         [GUIColor(0.5f, 0.8f, 1f)]
         private void Debug_LogAllItems()
         {
-            Debug.Log($"[ItemDatabase] Total items: {allItems.Count}");
+            Debug.Log($"[ItemDatabaseSO] Total items: {allItems.Count}");
             foreach (var item in allItems)
             {
                 if (item != null)

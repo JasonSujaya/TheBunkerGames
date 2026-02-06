@@ -56,7 +56,7 @@ namespace TheBunkerGames
             Debug.Log($"[FamilyManager] Added character: {name}");
         }
 
-        public void AddCharacter(CharacterData data)
+        public void AddCharacter(CharacterDataSO data)
         {
             if (data == null) return;
             var character = data.CreateCharacter();

@@ -10,7 +10,7 @@ namespace TheBunkerGames
     /// Data-only - no behavior code here.
     /// </summary>
     [CreateAssetMenu(fileName = "Item_", menuName = "TheBunkerGames/Item Data")]
-    public class ItemData : ScriptableObject
+    public class ItemDataSO : ScriptableObject
     {
         // -------------------------------------------------------------------------
         // Identity

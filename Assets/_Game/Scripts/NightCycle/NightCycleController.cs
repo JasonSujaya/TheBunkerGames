@@ -113,7 +113,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         private void ApplyStatDecay()
         {
-            var config = GameConfig.Instance;
+            var config = GameConfigSO.Instance;
             var family = FamilyManager.Instance;
             if (config == null || family == null) return;
 

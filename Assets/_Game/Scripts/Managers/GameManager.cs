@@ -120,7 +120,7 @@ namespace TheBunkerGames
             currentDay++;
             Debug.Log($"[GameManager] Day advanced to: {currentDay}");
 
-            var config = GameConfig.Instance;
+            var config = GameConfigSO.Instance;
             if (config != null && currentDay > config.TotalDays)
             {
                 EndGame(true);

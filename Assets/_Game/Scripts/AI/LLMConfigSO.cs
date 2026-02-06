@@ -9,23 +9,23 @@ namespace TheBunkerGames
     /// Configuration ScriptableObject for OpenRouter and Mistral API integration.
     /// Stores API keys, endpoints, and default model settings.
     /// </summary>
-    [CreateAssetMenu(fileName = "LLMConfig", menuName = "TheBunkerGames/LLM Config")]
-    public class LLMConfig : ScriptableObject
+    [CreateAssetMenu(fileName = "LLMConfigSO", menuName = "TheBunkerGames/LLM Config")]
+    public class LLMConfigSO : ScriptableObject
     {
         // -------------------------------------------------------------------------
         // Singleton Access
         // -------------------------------------------------------------------------
-        private static LLMConfig instance;
-        public static LLMConfig Instance
+        private static LLMConfigSO instance;
+        public static LLMConfigSO Instance
         {
             get
             {
                 if (instance == null)
                 {
-                    instance = Resources.Load<LLMConfig>("LLM/LLMConfig");
+                    instance = Resources.Load<LLMConfigSO>("LLM/LLMConfigSO");
                     if (instance == null)
                     {
-                        Debug.LogError("[LLMConfig] No LLMConfig found in Resources/LLM folder!");
+                        Debug.LogError("[LLMConfigSO] No LLMConfigSO found in Resources/LLM folder!");
                     }
                 }
                 return instance;

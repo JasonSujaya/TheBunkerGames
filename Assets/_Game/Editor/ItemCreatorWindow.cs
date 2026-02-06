@@ -9,7 +9,7 @@ namespace TheBunkerGames.Editor
 {
     /// <summary>
     /// Fast item creation window.
-    /// Creates ItemData assets quickly and adds them to the database.
+    /// Creates ItemDataSO assets quickly and adds them to the database.
     /// </summary>
     public class ItemCreatorWindow : EditorWindow
     {
@@ -18,7 +18,7 @@ namespace TheBunkerGames.Editor
         // -------------------------------------------------------------------------
         private string itemName = "NewItem";
         private ItemType itemType = ItemType.Junk;
-        private ItemDatabase targetDatabase;
+        private ItemDatabaseSO targetDatabase;
 
         // -------------------------------------------------------------------------
         // Menu Item
@@ -36,11 +36,11 @@ namespace TheBunkerGames.Editor
         private void OnEnable()
         {
             // Try to find existing database
-            string[] guids = AssetDatabase.FindAssets("t:ItemDatabase");
+            string[] guids = AssetDatabase.FindAssets("t:ItemDatabaseSO");
             if (guids.Length > 0)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guids[0]);
-                targetDatabase = AssetDatabase.LoadAssetAtPath<ItemDatabase>(path);
+                targetDatabase = AssetDatabase.LoadAssetAtPath<ItemDatabaseSO>(path);
             }
         }
 
@@ -59,10 +59,10 @@ namespace TheBunkerGames.Editor
             GUILayout.Space(10);
 
             // Target Database
-            targetDatabase = (ItemDatabase)EditorGUILayout.ObjectField(
+            targetDatabase = (ItemDatabaseSO)EditorGUILayout.ObjectField(
                 "Target Database", 
                 targetDatabase, 
-                typeof(ItemDatabase), 
+                typeof(ItemDatabaseSO), 
                 false
             );
 
@@ -108,14 +108,14 @@ namespace TheBunkerGames.Editor
             string assetPath = $"{folderPath}/Item_{sanitizedName}.asset";
 
             // Check if exists
-            if (AssetDatabase.LoadAssetAtPath<ItemData>(assetPath) != null)
+            if (AssetDatabase.LoadAssetAtPath<ItemDataSO>(assetPath) != null)
             {
                 EditorUtility.DisplayDialog("Error", $"Item already exists at:\n{assetPath}", "OK");
                 return;
             }
 
-            // Create new ItemData
-            ItemData newItem = CreateInstance<ItemData>();
+            // Create new ItemDataSO
+            ItemDataSO newItem = CreateInstance<ItemDataSO>();
             
             // Use SerializedObject to set private fields
             AssetDatabase.CreateAsset(newItem, assetPath);

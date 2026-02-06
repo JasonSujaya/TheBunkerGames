@@ -71,7 +71,7 @@ namespace TheBunkerGames
 
             if (dayText != null && GameManager.Instance != null)
             {
-                int totalDays = GameConfig.Instance != null ? GameConfig.Instance.TotalDays : 28;
+                int totalDays = GameConfigSO.Instance != null ? GameConfigSO.Instance.TotalDays : 28;
                 dayText.text = $"Day {GameManager.Instance.CurrentDay} / {totalDays}";
             }
 
@@ -105,7 +105,7 @@ namespace TheBunkerGames
                 if (gameOverPanel != null) gameOverPanel.SetActive(true);
                 if (gameOverText != null)
                 {
-                    int totalDays = GameConfig.Instance != null ? GameConfig.Instance.TotalDays : 28;
+                    int totalDays = GameConfigSO.Instance != null ? GameConfigSO.Instance.TotalDays : 28;
                     gameOverText.text = GameManager.Instance.CurrentDay > totalDays
                         ? "You Survived!" : "Game Over";
                 }

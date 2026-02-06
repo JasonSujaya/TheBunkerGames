@@ -69,7 +69,7 @@ namespace TheBunkerGames
                 items.Add(new InventorySlot(itemId, quantity));
             }
 
-            var itemData = ItemDatabase.Instance?.GetItem(itemId);
+            var itemData = ItemDatabaseSO.Instance?.GetItem(itemId);
             string displayName = itemData != null ? itemData.DisplayName : itemId;
             Debug.Log($"[InventoryManager] Added {quantity}x {displayName}");
         }
@@ -91,7 +91,7 @@ namespace TheBunkerGames
                 items.Remove(slot);
             }
 
-            var itemData = ItemDatabase.Instance?.GetItem(itemId);
+            var itemData = ItemDatabaseSO.Instance?.GetItem(itemId);
             string displayName = itemData != null ? itemData.DisplayName : itemId;
             Debug.Log($"[InventoryManager] Removed {quantity}x {displayName}");
             return true;

@@ -12,7 +12,7 @@ namespace TheBunkerGames
 {
     /// <summary>
     /// Drop this on any UI GameObject to add juice/feel effects.
-    /// Assign UIFeelEffectData ScriptableObjects for shared, reusable presets.
+    /// Assign UIFeelEffectDataSO ScriptableObjects for shared, reusable presets.
     /// Supports automatic triggers (hover, click, enable) and manual Play() calls.
     /// Zero dependencies - uses coroutines + AnimationCurves.
     /// </summary>
@@ -170,7 +170,7 @@ namespace TheBunkerGames
             _runningEffects[index] = StartCoroutine(RunEffect(index, entry.Data));
         }
 
-        private IEnumerator RunEffect(int index, UIFeelEffectData data)
+        private IEnumerator RunEffect(int index, UIFeelEffectDataSO data)
         {
             if (data.Delay > 0f) yield return new WaitForSeconds(data.Delay);
 
@@ -202,7 +202,7 @@ namespace TheBunkerGames
             _runningEffects.Remove(index);
         }
 
-        private IEnumerator RunSinglePass(UIFeelEffectData data, bool forward)
+        private IEnumerator RunSinglePass(UIFeelEffectDataSO data, bool forward)
         {
             float elapsed = 0f;
             float duration = Mathf.Max(data.Duration, 0.001f);
@@ -223,7 +223,7 @@ namespace TheBunkerGames
             ApplyEffect(data, data.EaseCurve.Evaluate(finalT));
         }
 
-        private void ApplyEffect(UIFeelEffectData data, float t)
+        private void ApplyEffect(UIFeelEffectDataSO data, float t)
         {
             if (_rectTransform == null) return;
 
@@ -272,7 +272,7 @@ namespace TheBunkerGames
 
         private enum PunchTarget { Scale, Rotation, Move }
 
-        private void ApplyPunch(UIFeelEffectData data, float t, PunchTarget target)
+        private void ApplyPunch(UIFeelEffectDataSO data, float t, PunchTarget target)
         {
             // Damped sine wave for punch feel
             float decay = 1f - t;
@@ -315,9 +315,9 @@ namespace TheBunkerGames
         #if ODIN_INSPECTOR
         [HorizontalGroup("Row")]
         #endif
-        [SerializeField] private UIFeelEffectData data;
+        [SerializeField] private UIFeelEffectDataSO data;
 
         public UIFeelTrigger Trigger => trigger;
-        public UIFeelEffectData Data => data;
+        public UIFeelEffectDataSO Data => data;
     }
 }

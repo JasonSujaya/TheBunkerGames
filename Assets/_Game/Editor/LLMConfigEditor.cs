@@ -3,8 +3,8 @@ using UnityEditor;
 
 namespace TheBunkerGames.Editor
 {
-    [CustomEditor(typeof(LLMConfig))]
-    public class LLMConfigEditor : UnityEditor.Editor
+    [CustomEditor(typeof(LLMConfigSO))]
+    public class LLMConfigSOEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
@@ -13,7 +13,7 @@ namespace TheBunkerGames.Editor
             GUILayout.Space(10);
             EditorGUILayout.LabelField("API Validation", EditorStyles.boldLabel);
 
-            var config = (LLMConfig)target;
+            var config = (LLMConfigSO)target;
 
             // OpenRouter validation
             EditorGUILayout.BeginHorizontal();
