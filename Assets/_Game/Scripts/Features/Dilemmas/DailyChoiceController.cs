@@ -25,7 +25,6 @@ namespace TheBunkerGames
         public static event Action<DilemmaData> OnDilemmaPresented;
         public static event Action<DilemmaOptionData, DilemmaOutcomeData> OnChoiceMade;
         public static event Action OnChoicePhaseComplete;
-        public static event Action<DilemmaOptionData, float> OnVoteUpdated;
 
         // -------------------------------------------------------------------------
         // State
@@ -36,22 +35,10 @@ namespace TheBunkerGames
         #endif
         [SerializeField] private DilemmaData currentDilemma;
 
-        #if ODIN_INSPECTOR
-        [ReadOnly]
-        #endif
-        [SerializeField] private bool isVotingActive;
-
-        #if ODIN_INSPECTOR
-        [ReadOnly]
-        #endif
-        [SerializeField] private float voteTimer;
-
         // -------------------------------------------------------------------------
         // Public Properties
         // -------------------------------------------------------------------------
         public DilemmaData CurrentDilemma => currentDilemma;
-        public bool IsVotingActive => isVotingActive;
-        public float VoteTimer => voteTimer;
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -74,18 +61,6 @@ namespace TheBunkerGames
         private void OnDisable()
         {
             GameManager.OnStateChanged -= HandleStateChanged;
-        }
-
-        private void Update()
-        {
-            if (isVotingActive)
-            {
-                voteTimer -= Time.deltaTime;
-                if (voteTimer <= 0f)
-                {
-                    EndVoting();
-                }
-            }
         }
 
         // -------------------------------------------------------------------------
@@ -119,86 +94,18 @@ namespace TheBunkerGames
         }
 
         /// <summary>
-        /// Start the voting timer (for Twitch Audience Mode).
-        /// </summary>
-        public void StartVoting()
-        {
-            if (currentDilemma == null) return;
-
-            var config = GameConfigDataSO.Instance;
-            voteTimer = config != null ? config.VoteTimerDuration : 30f;
-            isVotingActive = true;
-
-            foreach (var option in currentDilemma.Options)
-            {
-                option.VoteCount = 0;
-            }
-
-            Debug.Log($"[DailyChoice] Voting started. Timer: {voteTimer:F0}s");
-        }
-
-        /// <summary>
-        /// Register a vote for an option (Twitch chat command).
-        /// </summary>
-        public void CastVote(int optionIndex)
-        {
-            if (!isVotingActive || currentDilemma == null) return;
-            if (optionIndex < 0 || optionIndex >= currentDilemma.Options.Count) return;
-
-            var option = currentDilemma.Options[optionIndex];
-            option.VoteCount++;
-
-            float totalVotes = 0;
-            foreach (var opt in currentDilemma.Options) totalVotes += opt.VoteCount;
-            float percentage = totalVotes > 0 ? option.VoteCount / totalVotes : 0f;
-
-            OnVoteUpdated?.Invoke(option, percentage);
-        }
-
-        /// <summary>
-        /// Player makes a direct choice (solo mode) or voting ends.
+        /// Player makes a direct choice.
         /// </summary>
         public void MakeChoice(int optionIndex)
         {
             if (currentDilemma == null) return;
             if (optionIndex < 0 || optionIndex >= currentDilemma.Options.Count) return;
 
-            isVotingActive = false;
             var chosenOption = currentDilemma.Options[optionIndex];
             var outcome = ApplyChoice(chosenOption);
 
             Debug.Log($"[DailyChoice] Choice made: {chosenOption.Label} -> {outcome.OutcomeType}");
             OnChoiceMade?.Invoke(chosenOption, outcome);
-        }
-
-        public void CompleteChoicePhase()
-        {
-            currentDilemma = null;
-            Debug.Log("[DailyChoice] Choice phase complete. Moving to Night Cycle.");
-            OnChoicePhaseComplete?.Invoke();
-        }
-
-        // -------------------------------------------------------------------------
-        // Internal Logic
-        // -------------------------------------------------------------------------
-        private void EndVoting()
-        {
-            isVotingActive = false;
-
-            // Pick the option with the most votes
-            int bestIndex = 0;
-            int bestVotes = 0;
-            for (int i = 0; i < currentDilemma.Options.Count; i++)
-            {
-                if (currentDilemma.Options[i].VoteCount > bestVotes)
-                {
-                    bestVotes = currentDilemma.Options[i].VoteCount;
-                    bestIndex = i;
-                }
-            }
-
-            Debug.Log($"[DailyChoice] Voting ended. Winner: {currentDilemma.Options[bestIndex].Label}");
-            MakeChoice(bestIndex);
         }
 
         private DilemmaOutcomeData ApplyChoice(DilemmaOptionData option)
@@ -307,13 +214,6 @@ namespace TheBunkerGames
         private void Debug_ChooseSecond()
         {
             if (Application.isPlaying) MakeChoice(1);
-        }
-
-        [Button("Start Voting", ButtonSizes.Medium)]
-        [GUIColor(0.7f, 0.5f, 1f)]
-        private void Debug_StartVoting()
-        {
-            if (Application.isPlaying) StartVoting();
         }
 
         [Button("Complete Phase", ButtonSizes.Medium)]

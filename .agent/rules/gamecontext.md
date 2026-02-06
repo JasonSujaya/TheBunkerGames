@@ -28,7 +28,6 @@ The player is not just surviving a post-apocalyptic wasteland — they are survi
 
 ## Winning Features
 *   **A.N.G.E.L.'s Voice**: Full Text-to-Speech with emotional depth.
-*   **Audience Mode**: Twitch viewers vote on the "Daily Sacrifice" via chat commands.
 *   **Dynamic Inventory**: Items are generated on the fly by the AI based on exploration results.
 *   **Infinite Replayability**: Powered by **Neocortex.link** for a truly organic narrative that reacts to every player failure.
 
@@ -36,4 +35,4 @@ The player is not just surviving a post-apocalyptic wasteland — they are survi
 *   The UI should feel visceral — math and consequences are displayed openly, not hidden
 *   AI-generated content should feel glitchy and analog, not clean and modern
 *   Every system should reinforce the tension between the player and A.N.G.E.L.
-*   The game is designed to be both a solo experience and a collaborative social event via Twitch
+*   The game is designed to be a solo narrative experience.

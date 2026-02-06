@@ -42,15 +42,6 @@ namespace TheBunkerGames
         [SerializeField] private float dayDurationSeconds = 300f;
 
         // -------------------------------------------------------------------------
-        // Voting / Twitch Settings
-        // -------------------------------------------------------------------------
-        #if ODIN_INSPECTOR
-        [Title("Voting / Twitch")]
-        #endif
-        [SerializeField] private float voteTimerDuration = 30f;
-        [SerializeField] private bool streamerModeEnabled = false;
-
-        // -------------------------------------------------------------------------
         // Stat Decay Settings (Per Day)
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
@@ -92,8 +83,6 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         public int TotalDays => totalDays;
         public float DayDurationSeconds => dayDurationSeconds;
-        public float VoteTimerDuration => voteTimerDuration;
-        public bool StreamerModeEnabled => streamerModeEnabled;
         public float HungerDecayPerDay => hungerDecayPerDay;
         public float ThirstDecayPerDay => thirstDecayPerDay;
         public float SanityDecayPerDay => sanityDecayPerDay;

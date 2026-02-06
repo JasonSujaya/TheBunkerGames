@@ -140,8 +140,11 @@ namespace TheBunkerGames
                 InventoryManager.Instance?.AddItem(grant.ItemId, grant.Quantity);
             }
 
+            // Trigger a minor glitch burst on response for juice
+            UIGlitchController.Instance?.TriggerBurst(0.3f, 0.2f);
             OnAngelResponse?.Invoke(response);
         }
+
 
         public void CompleteInteraction()
         {
