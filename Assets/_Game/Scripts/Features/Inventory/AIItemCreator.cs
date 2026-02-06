@@ -26,6 +26,14 @@ namespace TheBunkerGames
         [Title("Settings")]
         #endif
         [SerializeField] private InventoryManager inventoryManager;
+        
+        #if ODIN_INSPECTOR
+        [Title("LLM Settings")]
+        [InfoBox("When enabled, items are generated via LLM. When disabled, uses static fallback data.")]
+        #endif
+        [SerializeField] private bool useLLM = true;
+        [SerializeField] private LLMPromptTemplateSO itemPromptTemplate;
+
 
         // -------------------------------------------------------------------------
         // Session-Bound Runtime Items (NOT persisted)
@@ -103,22 +111,58 @@ namespace TheBunkerGames
         /// <summary>
         /// Generate a random AI item from predefined templates.
         /// </summary>
-        public ItemData GenerateRandomAIItem()
+        public void GenerateRandomAIItem(System.Action<ItemData> onComplete = null)
         {
-            string[] randomItems = new[] { 
+            if (useLLM && LLMManager.Instance != null && itemPromptTemplate != null)
+            {
+                Debug.Log("[AIItemCreator] <color=cyan>[LLM]</color> Generating item via AI...");
+                string[] itemTypes = { "Food", "Water", "Medicine", "Tool", "Resource" };
+                string userPrompt = itemPromptTemplate.BuildUserPrompt(itemTypes[Random.Range(0, itemTypes.Length)], "scavenged in post-apocalyptic bunker");
+                
+                LLMManager.Instance.QuickChat(
+                    LLMManager.Provider.OpenRouter,
+                    userPrompt,
+                    onSuccess: (response) => {
+                        if (LLMJsonParser.TryParseItem(response, out var data))
+                        {
+                            ItemType parsedType = ItemType.Misc;
+                            System.Enum.TryParse(data.itemType, true, out parsedType);
+                            var item = CreateAndAddToInventory(data.itemName, data.description, parsedType, 1);
+                            Debug.Log($"[AIItemCreator] <color=cyan>[LLM]</color> Created: {data.itemName}");
+                            onComplete?.Invoke(item);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("[AIItemCreator] <color=yellow>[LLM]</color> Failed to parse, using fallback.");
+                            var fallback = GenerateFallbackItem();
+                            onComplete?.Invoke(fallback);
+                        }
+                    },
+                    onError: (err) => {
+                        Debug.LogError($"[AIItemCreator] <color=red>[LLM ERROR]</color> {err}");
+                        var fallback = GenerateFallbackItem();
+                        onComplete?.Invoke(fallback);
+                    },
+                    systemPrompt: itemPromptTemplate.SystemPrompt
+                );
+            }
+            else
+            {
+                Debug.Log("[AIItemCreator] <color=orange>[STATIC]</color> LLM disabled, using fallback data.");
+                var item = GenerateFallbackItem();
+                onComplete?.Invoke(item);
+            }
+        }
+
+        private ItemData GenerateFallbackItem()
+        {
+            string[] randomItems = { 
                 "Rusted Wrench|A.N.G.E.L. found this in sector 7-B|Tools",
-                "Moldy Bread|Expired 3 years ago, but calories are calories|Food",
-                "Broken Clock|Time stopped at 3:47 AM|Tools",
-                "Mysterious Pill Bottle|Label too faded to read|Meds",
-                "Cracked Flashlight|Battery at 12%|Tools",
-                "Stale Crackers|Best by 2019|Food",
-                "Frayed Wire|Might be useful for repairs|Tools",
-                "Dusty Photo Album|Memories from before|Tools"
+                "Moldy Bread|Expired 3 years ago|Food",
+                "Cracked Flashlight|Battery at 12%|Tools"
             };
-            
             var randomData = randomItems[Random.Range(0, randomItems.Length)].Split('|');
             var itemType = System.Enum.Parse<ItemType>(randomData[2]);
-            
             return CreateAndAddToInventory(randomData[0], randomData[1], itemType, 1);
         }
 

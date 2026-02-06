@@ -26,6 +26,14 @@ namespace TheBunkerGames
         [Title("Settings")]
         #endif
         [SerializeField] private PlaceManager placeManager;
+        
+        #if ODIN_INSPECTOR
+        [Title("LLM Settings")]
+        [InfoBox("When enabled, places are generated via LLM. When disabled, uses static fallback data.")]
+        #endif
+        [SerializeField] private bool useLLM = true;
+        [SerializeField] private LLMPromptTemplateSO placePromptTemplate;
+
 
         // -------------------------------------------------------------------------
         // Session-Bound Runtime Places (NOT persisted)
@@ -71,31 +79,56 @@ namespace TheBunkerGames
             return newPlace;
         }
 
-        public PlaceDefinitionSO GenerateRandomPlace()
+        public void GenerateRandomPlace(System.Action<PlaceDefinitionSO> onComplete = null)
+        {
+            if (useLLM && LLMManager.Instance != null && placePromptTemplate != null)
+            {
+                Debug.Log("[PlaceCreator] <color=cyan>[LLM]</color> Generating place via AI...");
+                string userPrompt = placePromptTemplate.BuildUserPrompt(Random.Range(1, 6), "post-apocalyptic bunker survival");
+                
+                LLMManager.Instance.QuickChat(
+                    LLMManager.Provider.OpenRouter,
+                    userPrompt,
+                    onSuccess: (response) => {
+                        if (LLMJsonParser.TryParsePlace(response, out var data))
+                        {
+                            var place = CreateRuntimePlace(data.placeId, data.placeName, data.description, data.dangerLevel, data.estimatedLootValue);
+                            Debug.Log($"[PlaceCreator] <color=cyan>[LLM]</color> Created: {data.placeName}");
+                            onComplete?.Invoke(place);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("[PlaceCreator] <color=yellow>[LLM]</color> Failed to parse response, using fallback.");
+                            var fallback = GenerateFallbackPlace();
+                            onComplete?.Invoke(fallback);
+                        }
+                    },
+                    onError: (err) => {
+                        Debug.LogError($"[PlaceCreator] <color=red>[LLM ERROR]</color> {err}");
+                        var fallback = GenerateFallbackPlace();
+                        onComplete?.Invoke(fallback);
+                    },
+                    systemPrompt: placePromptTemplate.SystemPrompt
+                );
+            }
+            else
+            {
+                Debug.Log("[PlaceCreator] <color=orange>[STATIC]</color> LLM disabled, using fallback data.");
+                var place = GenerateFallbackPlace();
+                onComplete?.Invoke(place);
+            }
+        }
+
+        private PlaceDefinitionSO GenerateFallbackPlace()
         {
             string[] places = new[] {
-                "OldPharmacy|Abandoned Pharmacy|Shelves of expired medicine and bandages|2|75",
+                "OldPharmacy|Abandoned Pharmacy|Shelves of expired medicine|2|75",
                 "SuperMarket|Looted Supermarket|Empty aisles, some canned goods remain|3|100",
-                "RadioStation|Radio Transmission Hub|Old broadcasting equipment, possible survivors|4|50",
-                "WaterTreatment|Water Treatment Plant|Clean water source, heavily irradiated|5|150",
-                "MilitaryDepot|Military Supply Depot|Weapons cache, dangerous territory|5|200",
-                "Laboratory|Research Laboratory|Unknown experiments, hazardous materials|4|120",
-                "Bunker7B|Sector 7B Bunker|Abandoned shelter, strange noises reported|3|80",
-                "GasStation|Highway Gas Station|Fuel reserves, overrun by bandits|2|60"
+                "RadioStation|Radio Transmission Hub|Old broadcasting equipment|4|50"
             };
-            
             var data = places[Random.Range(0, places.Length)].Split('|');
-            
-            // Add a unique suffix to avoid duplicate IDs
             string uniqueId = $"{data[0]}_{System.DateTime.Now.Ticks % 10000}";
-            
-            return CreateRuntimePlace(
-                uniqueId,
-                data[1],
-                data[2],
-                int.Parse(data[3]),
-                int.Parse(data[4])
-            );
+            return CreateRuntimePlace(uniqueId, data[1], data[2], int.Parse(data[3]), int.Parse(data[4]));
         }
 
         public PlaceDefinitionSO GetSessionPlace(string id)

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4c4e8c77788444bdbfd29341e3be9db, type: 3}
+  m_Name: CharacterPromptTemplate
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.LLMPromptTemplateSO
+  templateName: Character Generator
+  templateDescription: Generates a family member or NPC for the bunker.
+  systemPrompt: 'You are an AI for "Entropy''s Watch", an analog horror survival
+    game. Generate characters with dark, nuanced backstories. They are survivors
+    in an underground bunker. Always respond with ONLY a valid JSON object.
+
+
+    Subtypes:
+    Family, Outsider, Hostile'
+  userPromptTemplate: 'Generate a {0} character. Context: {1}'
+  jsonSchemaExample: "{\n  \"name\": \"Margaret\",\n  \"hunger\": 75,\n  \"thirst\":
+    60,\n  \"sanity\": 40,\n  \"health\": 85,\n  \"subtype\": \"Family\",\n  \"backstory\":
+    \"She still talks to her dead husband through the static on the radio.\"\n}"

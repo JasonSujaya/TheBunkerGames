@@ -34,7 +34,7 @@ namespace TheBunkerGames
             CheckSystem("CityExplorationManager", FindFirstObjectByType<CityExplorationManager>());
             
             Debug.Log("--- Checking AI ---");
-            CheckSystem("NeocortexIntegrator", FindFirstObjectByType<NeocortexIntegrator>());
+            CheckSystem("LLMManager", LLMManager.Instance);
             CheckSystem("AngelInteractionManager", FindFirstObjectByType<AngelInteractionManager>());
         }
 

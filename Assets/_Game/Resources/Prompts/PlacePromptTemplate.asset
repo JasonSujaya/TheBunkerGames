@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4c4e8c77788444bdbfd29341e3be9db, type: 3}
+  m_Name: PlacePromptTemplate
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.LLMPromptTemplateSO
+  templateName: Place Generator
+  templateDescription: Generates an exploration location in the wasteland.
+  systemPrompt: You are an AI for "Entropy's Watch", an analog horror survival game.
+    Generate eerie, dangerous locations in a post-apocalyptic wasteland that players
+    can explore. Always respond with ONLY a valid JSON object.
+  userPromptTemplate: 'Generate a place with danger level {0}. Context: {1}'
+  jsonSchemaExample: "{\n  \"placeId\": \"loc_hospital_east\",\n  \"placeName\":
+    \"St. Mercy Hospital Ruins\",\n  \"description\": \"The east wing collapsed years
+    ago. Shadows move behind the broken windows.\",\n  \"dangerLevel\": 4,\n  \"estimatedLootValue\":
+    120\n}"

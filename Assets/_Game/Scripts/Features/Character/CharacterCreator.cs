@@ -26,6 +26,14 @@ namespace TheBunkerGames
         [Title("Settings")]
         #endif
         [SerializeField] private CharacterManager characterManager;
+        
+        #if ODIN_INSPECTOR
+        [Title("LLM Settings")]
+        [InfoBox("When enabled, characters are generated via LLM. When disabled, uses static fallback data.")]
+        #endif
+        [SerializeField] private bool useLLM = true;
+        [SerializeField] private LLMPromptTemplateSO characterPromptTemplate;
+
 
         // -------------------------------------------------------------------------
         // Session-Bound Runtime Characters (NOT persisted)
@@ -86,48 +94,100 @@ namespace TheBunkerGames
             return newCharacter;
         }
 
-        public CharacterData GenerateRandomSurvivor()
+        public void GenerateRandomSurvivor(System.Action<CharacterData> onComplete = null)
         {
-            string[] survivors = new[] {
-                "Marcus|85|90|60|100",
-                "Elena|95|85|75|90",
-                "Old Tom|70|65|80|60",
-                "Little Lily|90|95|85|100",
-                "Doc Rivera|80|80|90|85",
-                "Silent Sam|75|70|40|95",
-                "Hopeful Hannah|85|90|95|80",
-                "Wounded Walker|50|60|50|45"
-            };
-            
-            var data = survivors[Random.Range(0, survivors.Length)].Split('|');
-            return CreateAndAdd(
-                data[0], 
-                float.Parse(data[1]), 
-                float.Parse(data[2]), 
-                float.Parse(data[3]), 
-                float.Parse(data[4]),
-                CharacterSubtype.Survivor
-            );
+            if (useLLM && LLMManager.Instance != null && characterPromptTemplate != null)
+            {
+                Debug.Log("[CharacterCreator] <color=cyan>[LLM]</color> Generating survivor via AI...");
+                string userPrompt = characterPromptTemplate.BuildUserPrompt("Survivor", "desperate survivor found in the wasteland");
+                
+                LLMManager.Instance.QuickChat(
+                    LLMManager.Provider.OpenRouter,
+                    userPrompt,
+                    onSuccess: (response) => {
+                        if (LLMJsonParser.TryParseCharacter(response, out var data))
+                        {
+                            CharacterSubtype subtype = CharacterSubtype.Survivor;
+                            System.Enum.TryParse(data.subtype, true, out subtype);
+                            var character = CreateAndAdd(data.name, data.hunger, data.thirst, data.sanity, data.health, subtype);
+                            Debug.Log($"[CharacterCreator] <color=cyan>[LLM]</color> Created: {data.name}");
+                            onComplete?.Invoke(character);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("[CharacterCreator] <color=yellow>[LLM]</color> Failed to parse, using fallback.");
+                            var fallback = GenerateFallbackSurvivor();
+                            onComplete?.Invoke(fallback);
+                        }
+                    },
+                    onError: (err) => {
+                        Debug.LogError($"[CharacterCreator] <color=red>[LLM ERROR]</color> {err}");
+                        var fallback = GenerateFallbackSurvivor();
+                        onComplete?.Invoke(fallback);
+                    },
+                    systemPrompt: characterPromptTemplate.SystemPrompt
+                );
+            }
+            else
+            {
+                Debug.Log("[CharacterCreator] <color=orange>[STATIC]</color> LLM disabled, using fallback data.");
+                var character = GenerateFallbackSurvivor();
+                onComplete?.Invoke(character);
+            }
         }
 
-        public CharacterData GenerateRandomEnemy()
+        private CharacterData GenerateFallbackSurvivor()
         {
-            string[] enemies = new[] {
-                "Raider Scavenger|60|50|30|100",
-                "Feral Dog|40|40|10|50",
-                "Bunker Guard (Corrupted)|100|100|50|150",
-                "The Watcher|200|200|200|300"
-            };
-            
+            string[] survivors = { "Marcus|85|90|60|100", "Elena|95|85|75|90", "Old Tom|70|65|80|60" };
+            var data = survivors[Random.Range(0, survivors.Length)].Split('|');
+            return CreateAndAdd(data[0], float.Parse(data[1]), float.Parse(data[2]), float.Parse(data[3]), float.Parse(data[4]), CharacterSubtype.Survivor);
+        }
+
+        public void GenerateRandomEnemy(System.Action<CharacterData> onComplete = null)
+        {
+            if (useLLM && LLMManager.Instance != null && characterPromptTemplate != null)
+            {
+                Debug.Log("[CharacterCreator] <color=cyan>[LLM]</color> Generating enemy via AI...");
+                string userPrompt = characterPromptTemplate.BuildUserPrompt("Hostile", "dangerous enemy in the wasteland");
+                
+                LLMManager.Instance.QuickChat(
+                    LLMManager.Provider.OpenRouter,
+                    userPrompt,
+                    onSuccess: (response) => {
+                        if (LLMJsonParser.TryParseCharacter(response, out var data))
+                        {
+                            var character = CreateAndAdd(data.name, data.hunger, data.thirst, data.sanity, data.health, CharacterSubtype.Enemy);
+                            Debug.Log($"[CharacterCreator] <color=cyan>[LLM]</color> Created enemy: {data.name}");
+                            onComplete?.Invoke(character);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("[CharacterCreator] <color=yellow>[LLM]</color> Failed to parse, using fallback.");
+                            var fallback = GenerateFallbackEnemy();
+                            onComplete?.Invoke(fallback);
+                        }
+                    },
+                    onError: (err) => {
+                        Debug.LogError($"[CharacterCreator] <color=red>[LLM ERROR]</color> {err}");
+                        var fallback = GenerateFallbackEnemy();
+                        onComplete?.Invoke(fallback);
+                    },
+                    systemPrompt: characterPromptTemplate.SystemPrompt
+                );
+            }
+            else
+            {
+                Debug.Log("[CharacterCreator] <color=orange>[STATIC]</color> LLM disabled, using fallback data.");
+                var character = GenerateFallbackEnemy();
+                onComplete?.Invoke(character);
+            }
+        }
+
+        private CharacterData GenerateFallbackEnemy()
+        {
+            string[] enemies = { "Raider Scavenger|60|50|30|100", "Feral Dog|40|40|10|50" };
             var data = enemies[Random.Range(0, enemies.Length)].Split('|');
-            return CreateAndAdd(
-                data[0], 
-                float.Parse(data[1]), 
-                float.Parse(data[2]), 
-                float.Parse(data[3]), 
-                float.Parse(data[4]),
-                CharacterSubtype.Enemy
-            );
+            return CreateAndAdd(data[0], float.Parse(data[1]), float.Parse(data[2]), float.Parse(data[3]), float.Parse(data[4]), CharacterSubtype.Enemy);
         }
 
         public CharacterData GetSessionCharacter(string name)

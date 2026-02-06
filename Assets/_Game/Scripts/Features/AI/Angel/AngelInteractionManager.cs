@@ -128,15 +128,27 @@ namespace TheBunkerGames
             // Build context for the AI
             string context = BuildAngelContext(playerMessage);
 
-            // Send to Neocortex if available
-            var integrator = NeocortexIntegrator.FindFirstObjectByType<NeocortexIntegrator>();
-            if (integrator != null)
+            // Send to LLMManager
+            if (LLMManager.Instance != null)
             {
-                integrator.SendNeocortexMessage(context);
+                LLMManager.Instance.QuickChat(
+                    LLMManager.Provider.OpenRouter,
+                    context,
+                    onSuccess: (res) => {
+                        var mockResponse = logicController.GenerateMockResponse(currentMood, responsesData);
+                        mockResponse.Message = res; // Inject AI text
+                        ProcessAngelResponse(mockResponse);
+                    },
+                    onError: (err) => {
+                        Debug.LogError($"[Angel] AI Request failed: {err}");
+                        var fallback = logicController.GenerateMockResponse(currentMood, responsesData);
+                        ProcessAngelResponse(fallback);
+                    }
+                );
             }
             else
             {
-                // Fallback: generate a mock response based on mood using Logic Controller
+                // Fallback: generate a mock response
                 var mockResponse = logicController.GenerateMockResponse(currentMood, responsesData);
                 ProcessAngelResponse(mockResponse);
             }

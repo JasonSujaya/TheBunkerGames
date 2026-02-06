@@ -299,6 +299,74 @@ MonoBehaviour:
   customItemName: Test Item
   customItemType: 3
   customDescription: A.N.G.E.L. generated this item
+--- !u!1 &419311371
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 419311372}
+  - component: {fileID: 419311374}
+  - component: {fileID: 419311373}
+  m_Layer: 0
+  m_Name: CharacterManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &419311372
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 419311371}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2134911001}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &419311373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 419311371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21fe9dd01a73e4eff959773325901ece, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.CharacterCreator
+  characterManager: {fileID: 0}
+  customName: New Entity
+  customSubtype: 0
+  customHealth: 100
+  customHunger: 100
+  customThirst: 100
+  customSanity: 100
+--- !u!114 &419311374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 419311371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd443f533f1504fefa028d81d6f4df1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.CharacterManager
+  characterDatabase: {fileID: 11400000, guid: c8bd19466c9ca472e914c5166676ba5e, type: 2}
+  allCharacters: []
+  debugCharacterProfile: {fileID: 0}
+  debugSubtype: 0
 --- !u!1 &1018762006
 GameObject:
   m_ObjectHideFlags: 0
@@ -409,7 +477,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 362d892679ad2489e999856c2ef417ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.PlaceManager
-  placeDatabase: {fileID: 0}
+  placeDatabase: {fileID: 11400000, guid: a1fd3d190147c4d4c8f9bb8cdcc4a3ab, type: 2}
   discoveredPlaces: []
   debugPlaceProfile: {fileID: 0}
   debugPlaceId: OldPharmacy
@@ -581,7 +649,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2134911001}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1666803779
 MonoBehaviour:
@@ -595,9 +663,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d9312ac7e1524e3b91aef241db8249d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.FamilyManager
-  characterDatabase: {fileID: 11400000, guid: c8bd19466c9ca472e914c5166676ba5e, type: 2}
-  familyMembers: []
-  debugCharacterProfile: {fileID: 0}
 --- !u!1 &1864913992
 GameObject:
   m_ObjectHideFlags: 0
@@ -705,7 +770,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 190765077}
-  - {fileID: 1666803778}
+  - {fileID: 419311372}
   - {fileID: 1165594560}
   - {fileID: 61385604}
   - {fileID: 69753610}
@@ -718,3 +783,4 @@ SceneRoots:
   - {fileID: 2047560552}
   - {fileID: 2134911001}
   - {fileID: 1263657062}
+  - {fileID: 1666803778}
