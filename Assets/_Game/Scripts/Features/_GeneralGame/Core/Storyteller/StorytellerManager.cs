@@ -12,7 +12,9 @@ namespace TheBunkerGames
 
         [Header("Configuration")]
         [Header("Configuration")]
+        [Header("Configuration")]
         [SerializeField] private StoryScenarioSO currentScenario;
+        [SerializeField] private Storyteller.UI.StorytellerUI ui;
 
         public static event System.Action<StoryEventSO> OnStoryEventTriggered;
 
@@ -29,16 +31,15 @@ namespace TheBunkerGames
             Instance = this;
         }
 
-        private void Start()
+        private void OnEnable()
         {
-            // Subscribe to Game Events
             if (GameManager.Instance != null)
             {
                 GameManager.OnDayStart += HandleDayStart;
             }
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
             if (GameManager.Instance != null)
             {
@@ -70,6 +71,11 @@ namespace TheBunkerGames
         {
             Debug.Log($"[Storyteller] Triggering Event: {storyEvent.Title}");
             OnStoryEventTriggered?.Invoke(storyEvent);
+            
+            if (ui != null)
+            {
+                ui.UpdateUI(storyEvent);
+            }
             
             // Execute Immediate Effects
             if (storyEvent.ImmediateEffects != null)

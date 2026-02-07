@@ -5,6 +5,9 @@ namespace TheBunkerGames
 {
     public class StorytellerUI : MonoBehaviour
     {
+        [Header("References")]
+        [SerializeField] private StorytellerManager manager;
+
         [Header("UI References")]
         [SerializeField] private TextMeshProUGUI titleText;
         [SerializeField] private TextMeshProUGUI descriptionText;
@@ -27,7 +30,7 @@ namespace TheBunkerGames
             StorytellerManager.OnStoryEventTriggered -= UpdateUI;
         }
 
-        private void UpdateUI(StoryEventSO storyEvent)
+        public void UpdateUI(StoryEventSO storyEvent)
         {
             if (storyEvent != null)
             {
