@@ -94,6 +94,17 @@ namespace TheBunkerGames
     }
 
     // -------------------------------------------------------------------------
+    // Game Theme Types
+    // -------------------------------------------------------------------------
+    public enum GameThemeType
+    {
+        GovernmentShutdown,
+        ZombieApocalypse,
+        NaturalDisaster,
+        Pandemic
+    }
+
+    // -------------------------------------------------------------------------
     // Pre-Scripted Event Categories (government fallout narrative beats)
     // -------------------------------------------------------------------------
     public enum ScriptedEventCategory
