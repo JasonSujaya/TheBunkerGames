@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b42ea5e9162742d19f7ab96c029e066, type: 3}
+  m_Name: Scenario_MyFirstCollapse
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.StoryScenarioSO
+  ScenarioName: The First Collapse
+  Description: A 7-day hackathon survival scenario.
+  TotalDays: 7
+  Timeline:
+  - DayNumber: 1
+    Event: {fileID: 11400000, guid: 1b948bf46e5f64619af118ab48b435f7, type: 2}
+  - DayNumber: 3
+    Event: {fileID: 11400000, guid: 0e239a2b7d6da4432a7684527b6cfc9f, type: 2}
+  - DayNumber: 7
+    Event: {fileID: 11400000, guid: 8cca9e01bcae248e1b19abc2a9d61f12, type: 2}

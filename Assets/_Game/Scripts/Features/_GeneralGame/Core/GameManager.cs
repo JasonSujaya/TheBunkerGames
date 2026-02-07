@@ -67,6 +67,7 @@ namespace TheBunkerGames
         public FamilyManager Family;
         public PlaceManager Places;
         public QuestManager Quests;
+        public StorytellerManager Storyteller;
         
         public StatusReviewManager StatusReview;
         public AngelInteractionManager AngelInteraction;
@@ -130,6 +131,7 @@ namespace TheBunkerGames
             if (Family == null) Family = FindFirstObjectByType<FamilyManager>();
             if (Places == null) Places = FindFirstObjectByType<PlaceManager>();
             if (Quests == null) Quests = FindFirstObjectByType<QuestManager>();
+            if (Storyteller == null) Storyteller = FindFirstObjectByType<StorytellerManager>();
             
             if (StatusReview == null) StatusReview = FindFirstObjectByType<StatusReviewManager>();
             if (AngelInteraction == null) AngelInteraction = FindFirstObjectByType<AngelInteractionManager>();
