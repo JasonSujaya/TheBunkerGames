@@ -6,7 +6,7 @@ namespace TheBunkerGames
     /// Drives the game loop through the 5 phases.
     /// Provides manual AdvancePhase() for button clicks and optional auto-advance.
     /// </summary>
-    public class GameFlowController : MonoBehaviour
+    public class GamePhaseDebugHelper : MonoBehaviour
     {
         [Header("Flow Settings")]
         [SerializeField] private bool autoAdvance = false;
