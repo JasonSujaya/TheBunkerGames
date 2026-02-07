@@ -29,9 +29,6 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // State
         // -------------------------------------------------------------------------
-        // -------------------------------------------------------------------------
-        // State
-        // -------------------------------------------------------------------------
         [Title("Game State")]
         [ReadOnly]
         public GameState CurrentState = GameState.StatusReview;
@@ -108,3 +105,4 @@ namespace TheBunkerGames
         public void GoToPreviousDay() => FlowController?.PreviousDay();
 
     }
+}
