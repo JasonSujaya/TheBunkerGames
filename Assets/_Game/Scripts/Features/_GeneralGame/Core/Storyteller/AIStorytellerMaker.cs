@@ -518,6 +518,9 @@ namespace TheBunkerGames
                 Debug.LogWarning("[AIStorytellerMaker] StorytellerManager not found. Event generated but not processed.");
             }
 
+            // Execute pre-scripted event effects (separate from the AI story)
+            ExecutePreScriptedEventEffects();
+
             onComplete?.Invoke(storyEvent);
         }
 
@@ -532,6 +535,38 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Helpers
         // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Executes the effects defined on any pre-scripted events for the current day.
+        /// These fire in addition to the AI-generated story effects.
+        /// </summary>
+        private void ExecutePreScriptedEventEffects()
+        {
+            if (preScriptedSchedule == null || !preScriptedSchedule.HasEventsForDay(currentDay))
+                return;
+
+            var scheduled = preScriptedSchedule.GetEventsForDay(currentDay);
+            int executedCount = 0;
+
+            for (int i = 0; i < scheduled.Count; i++)
+            {
+                var entry = scheduled[i];
+                if (entry.Effects == null || entry.Effects.Count == 0)
+                    continue;
+
+                if (enableDebugLogs)
+                    Debug.Log($"[AIStorytellerMaker] EXECUTING PRE-SCRIPTED EVENT: [{entry.Category}] \"{entry.Title}\" → {entry.Effects.Count} effect(s)");
+
+                if (LLMEffectExecutor.Instance != null)
+                {
+                    LLMEffectExecutor.Instance.ExecuteEffects(entry.Effects);
+                    executedCount++;
+                }
+            }
+
+            if (enableDebugLogs && executedCount > 0)
+                Debug.Log($"[AIStorytellerMaker] Executed effects from {executedCount} pre-scripted event(s) for Day {currentDay}");
+        }
 
         /// <summary>
         /// Refreshes the inspector display of what's scheduled for the current day.
