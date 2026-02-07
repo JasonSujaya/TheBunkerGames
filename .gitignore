@@ -77,3 +77,7 @@ HotReloadData.meta
 /Documentation
 /Assets/z_LocalAssets
 Assets/z_LocalAssets.meta
+
+# AI Configuration (API Keys)
+Assets/_Game/Resources/AI/AIConfigSO.asset
+Assets/_Game/Resources/AI/AIConfigSO.asset.meta

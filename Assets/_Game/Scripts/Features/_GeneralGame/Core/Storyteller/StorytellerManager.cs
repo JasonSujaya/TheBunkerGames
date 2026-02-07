@@ -1,20 +1,45 @@
 using UnityEngine;
-using System.Collections.Generic;
+using System;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
 
 namespace TheBunkerGames
 {
+    /// <summary>
+    /// Manages story events using LLM-generated JSON data.
+    /// Simplified to work directly with LLMStoryEventData instead of ScriptableObjects.
+    /// </summary>
     public class StorytellerManager : MonoBehaviour
     {
         public static StorytellerManager Instance { get; private set; }
 
-        [Header("Configuration")]
-        [SerializeField] private StoryScenarioSO currentScenario;
+        // -------------------------------------------------------------------------
+        // Configuration
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("References")]
+        #endif
+        [Header("UI Reference")]
         [SerializeField] private StorytellerUI ui;
 
-        public static event System.Action<StoryEventSO> OnStoryEventTriggered;
+        #if ODIN_INSPECTOR
+        [Title("Current Event")]
+        [ReadOnly]
+        #endif
+        [SerializeField] private string currentEventTitle;
+        [SerializeField, TextArea(3, 5)] private string currentEventDescription;
+
+        // -------------------------------------------------------------------------
+        // Events
+        // -------------------------------------------------------------------------
+        public static event Action<LLMStoryEventData> OnStoryEventReceived;
+        public static event Action<LLMStoryChoice> OnChoiceMade;
+
+        // -------------------------------------------------------------------------
+        // State
+        // -------------------------------------------------------------------------
+        public LLMStoryEventData CurrentEvent { get; private set; }
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -29,107 +54,116 @@ namespace TheBunkerGames
             Instance = this;
         }
 
-        private void OnEnable()
-        {
-            if (GameManager.Instance != null)
-            {
-                GameManager.OnDayStart += HandleDayStart;
-            }
-        }
-
-        private void OnDisable()
-        {
-            if (GameManager.Instance != null)
-            {
-                GameManager.OnDayStart -= HandleDayStart;
-            }
-        }
-
         // -------------------------------------------------------------------------
-        // Event Handling
+        // Public Methods
         // -------------------------------------------------------------------------
-        private void HandleDayStart()
+        /// <summary>
+        /// Process a story event from JSON string (from LLM response).
+        /// </summary>
+        public void ProcessEventFromJson(string json)
         {
-            if (currentScenario == null || GameManager.Instance == null) return;
-
-            int day = GameManager.Instance.CurrentDay;
-            var storyEvent = currentScenario.GetEventForDay(day);
-            if (storyEvent != null)
+            var storyEvent = LLMStoryEventData.FromJson(json);
+            if (storyEvent == null)
             {
-                TriggerEvent(storyEvent);
+                Debug.LogError("[StorytellerManager] Failed to parse story event JSON");
+                return;
             }
-            else
-            {
-                Debug.Log($"[Storyteller] Day {day}: No fixed event scheduled.");
-                // TODO: Trigger Random Event or AI Generation here
-            }
+            ProcessEvent(storyEvent);
         }
 
-        public void TriggerEvent(StoryEventSO storyEvent)
+        /// <summary>
+        /// Process a story event directly.
+        /// </summary>
+        public void ProcessEvent(LLMStoryEventData storyEvent)
         {
-            Debug.Log($"[Storyteller] Triggering Event: {storyEvent.Title}");
-            OnStoryEventTriggered?.Invoke(storyEvent);
-            
+            if (storyEvent == null) return;
+
+            CurrentEvent = storyEvent;
+            currentEventTitle = storyEvent.Title;
+            currentEventDescription = storyEvent.Description;
+
+            Debug.Log($"[Storyteller] Processing Event: {storyEvent.Title}");
+            OnStoryEventReceived?.Invoke(storyEvent);
+
+            // Update UI
             if (ui != null)
             {
-                ui.UpdateUI(storyEvent);
-            }
-            
-            // Execute Immediate Effects
-            if (storyEvent.ImmediateEffects != null)
-            {
-                foreach (var effect in storyEvent.ImmediateEffects)
-                {
-                    effect.Execute();
-                }
+                ui.ShowEvent(storyEvent);
             }
 
-            // TODO: Display UI for Event and Choices
-            // For now, auto-select first choice if exists (simulation mode)
-            // or just log it.
+            // Execute immediate effects
+            ExecuteEffects(storyEvent.Effects);
+        }
+
+        /// <summary>
+        /// Player selects a choice.
+        /// </summary>
+        public void MakeChoice(int choiceIndex)
+        {
+            if (CurrentEvent == null || CurrentEvent.Choices == null)
+            {
+                Debug.LogWarning("[Storyteller] No current event or choices available");
+                return;
+            }
+
+            if (choiceIndex < 0 || choiceIndex >= CurrentEvent.Choices.Count)
+            {
+                Debug.LogWarning($"[Storyteller] Invalid choice index: {choiceIndex}");
+                return;
+            }
+
+            var choice = CurrentEvent.Choices[choiceIndex];
+            Debug.Log($"[Storyteller] Choice made: {choice.Text}");
+            
+            OnChoiceMade?.Invoke(choice);
+            ExecuteEffects(choice.Effects);
+        }
+
+        // -------------------------------------------------------------------------
+        // Private Methods
+        // -------------------------------------------------------------------------
+        private void ExecuteEffects(System.Collections.Generic.List<LLMStoryEffectData> effects)
+        {
+            if (effects == null || effects.Count == 0) return;
+
+            if (LLMEffectExecutor.Instance == null)
+            {
+                Debug.LogWarning("[Storyteller] LLMEffectExecutor not found - effects not executed");
+                return;
+            }
+
+            LLMEffectExecutor.Instance.ExecuteEffects(effects);
         }
 
         // -------------------------------------------------------------------------
         // Debug
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Button]
-        public void TestTriggerEvent(StoryEventSO evt)
+        [Title("Debug")]
+        [Button("Test Sample Event", ButtonSizes.Large)]
+        [GUIColor(0, 1, 0)]
+        private void Debug_TestSampleEvent()
         {
-            if (evt != null) TriggerEvent(evt);
+            if (!Application.isPlaying)
+            {
+                Debug.LogWarning("Enter Play Mode to test.");
+                return;
+            }
+
+            var sampleEvent = LLMStoryEventData.CreateSample();
+            Debug.Log($"[Storyteller] Testing sample event:\n{sampleEvent.ToJson(true)}");
+            ProcessEvent(sampleEvent);
         }
 
-        [Button("Show Today's Event", ButtonSizes.Large)]
-        [GUIColor(1f, 0.8f, 0.2f)]
-        private void Debug_ShowTodayEvent()
+        [Button("Clear Current Event")]
+        private void Debug_ClearEvent()
         {
-            if (GameManager.Instance == null)
-            {
-                Debug.LogWarning("GameManager not found.");
-                return;
-            }
-            
-            if (currentScenario == null)
-            {
-                Debug.LogWarning("No Scenario assigned.");
-                return;
-            }
-
-            int day = GameManager.Instance.CurrentDay;
-            var evt = currentScenario.GetEventForDay(day);
-            
-            if (evt != null)
-            {
-                // FORCE UI UPDATE by calling TriggerEvent
-                TriggerEvent(evt);
-            }
-            else
-            {
-                Debug.Log($"[Storyteller] Day {day}: Event doesn't exist.");
-                // Clear UI if no event
-                if (ui != null) ui.UpdateUI(null);
-            }
+            CurrentEvent = null;
+            currentEventTitle = "";
+            currentEventDescription = "";
+            if (ui != null) ui.Hide();
         }
         #endif
     }
 }
+

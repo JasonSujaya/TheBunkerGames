@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
@@ -9,70 +10,49 @@ namespace TheBunkerGames
 {
     /// <summary>
     /// Lightweight data class for LLM-generated story effects.
-    /// The LLM outputs simple string commands with intensity (1-10).
-    /// Unity interprets these and triggers the actual game effects.
+    /// JSON-serializable for LLM input/output.
     /// </summary>
     [Serializable]
     public class LLMStoryEffectData
     {
         // -------------------------------------------------------------------------
-        // Effect Types the LLM Can Use
-        // -------------------------------------------------------------------------
-        public static readonly string[] AvailableEffects = new[]
-        {
-            // Health Effects
-            "AddHP",
-            "ReduceHP",
-            "AddSanity",
-            "ReduceSanity",
-            "AddHunger",
-            "ReduceHunger",
-            "AddThirst",
-            "ReduceThirst",
-            
-            // Resource Effects
-            "AddFood",
-            "ReduceFood",
-            "AddWater",
-            "ReduceWater",
-            "AddSupplies",
-            "ReduceSupplies",
-            
-            // Character Effects
-            "InjureCharacter",
-            "HealCharacter",
-            "KillCharacter",
-            
-            // Special Effects
-            "TriggerEvent",
-            "UnlockArea",
-            "SpawnItem"
-        };
-
-        // -------------------------------------------------------------------------
-        // Data Fields
+        // Data Fields (JSON keys)
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [ValueDropdown("AvailableEffects")]
+        [ValueDropdown("GetAvailableEffects")]
         #endif
+        [JsonProperty("effectType")]
         [SerializeField] private string effectType;
         
         #if ODIN_INSPECTOR
         [InfoBox("1 = Minor effect, 10 = Extreme effect")]
         #endif
+        [JsonProperty("intensity")]
         [SerializeField, Range(1, 10)] private int intensity = 5;
         
-        #if ODIN_INSPECTOR
-        [Tooltip("Optional target (character name, item ID, etc.)")]
-        #endif
+        [JsonProperty("target")]
         [SerializeField] private string target;
 
         // -------------------------------------------------------------------------
         // Properties
         // -------------------------------------------------------------------------
-        public string EffectType => effectType;
-        public int Intensity => intensity;
-        public string Target => target;
+        [JsonIgnore] public string EffectType => effectType;
+        [JsonIgnore] public int Intensity => intensity;
+        [JsonIgnore] public string Target => target;
+
+        // -------------------------------------------------------------------------
+        // Available Effects (for dropdown)
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        private static string[] GetAvailableEffects() => new[]
+        {
+            "AddHP", "ReduceHP", "AddSanity", "ReduceSanity",
+            "AddHunger", "ReduceHunger", "AddThirst", "ReduceThirst",
+            "AddFood", "ReduceFood", "AddWater", "ReduceWater", "AddSupplies", "ReduceSupplies",
+            "InjureCharacter", "HealCharacter", "KillCharacter",
+            "TriggerEvent", "UnlockArea", "SpawnItem"
+        };
+        #endif
 
         // -------------------------------------------------------------------------
         // Constructors
@@ -90,11 +70,32 @@ namespace TheBunkerGames
             : this(effectType.ToString(), intensity, target) { }
 
         // -------------------------------------------------------------------------
-        // LLM Parsing Helper
+        // JSON Helpers
+        // -------------------------------------------------------------------------
+        public static LLMStoryEffectData FromJson(string json)
+        {
+            if (string.IsNullOrEmpty(json)) return null;
+            try
+            {
+                return JsonConvert.DeserializeObject<LLMStoryEffectData>(json);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[LLMStoryEffectData] JSON parse error: {ex.Message}");
+                return null;
+            }
+        }
+
+        public string ToJson() => JsonConvert.SerializeObject(this);
+
+        // -------------------------------------------------------------------------
+        // Legacy String Parsing (for backward compatibility)
         // -------------------------------------------------------------------------
         /// <summary>
-        /// Parse a simple LLM output format: "EffectType:Intensity" or "EffectType:Intensity:Target"
-        /// Example: "ReduceHP:7" or "InjureCharacter:5:Marcus"
+        /// Parse legacy format: "EffectType:Intensity" or "EffectType:Intensity:Target"
+        /// </summary>
+        /// <summary>
+        /// Parse legacy format: "EffectType:Intensity" or "EffectType:Intensity:Target"
         /// </summary>
         public static LLMStoryEffectData Parse(string llmOutput)
         {
@@ -105,36 +106,30 @@ namespace TheBunkerGames
             
             string effectType = parts[0].Trim();
             if (!int.TryParse(parts[1].Trim(), out int intensity))
-            {
-                intensity = 5; // Default to medium
-            }
+                intensity = 5;
             
             string target = parts.Length > 2 ? parts[2].Trim() : "";
-            
             return new LLMStoryEffectData(effectType, intensity, target);
         }
 
         /// <summary>
-        /// Parse multiple effects from LLM output (newline or comma separated).
-        /// Example: "ReduceHP:7, AddSanity:3" or "ReduceHP:7\nAddSanity:3"
+        /// Parse multiple effects from comma-separated string format.
+        /// Example: "ReduceHP:7:Mother, AddSanity:3"
         /// </summary>
         public static List<LLMStoryEffectData> ParseMultiple(string llmOutput)
         {
             var results = new List<LLMStoryEffectData>();
             if (string.IsNullOrEmpty(llmOutput)) return results;
-            
-            // Split by newlines or commas
-            var lines = llmOutput.Split(new[] { '\n', ',' }, StringSplitOptions.RemoveEmptyEntries);
-            
-            foreach (var line in lines)
+
+            var effectStrings = llmOutput.Split(',');
+            foreach (var effectStr in effectStrings)
             {
-                var effect = Parse(line.Trim());
+                var effect = Parse(effectStr.Trim());
                 if (effect != null)
                 {
                     results.Add(effect);
                 }
             }
-            
             return results;
         }
 

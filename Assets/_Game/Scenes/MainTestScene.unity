@@ -951,10 +951,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82b9045b5dd884c83949f6e38cec36d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.StorytellerUI
-  manager: {fileID: 0}
+  manager: {fileID: 2063215668}
   titleText: {fileID: 1144650965}
   descriptionText: {fileID: 1968091058}
   contentParent: {fileID: 800286617}
+  autoToggleVisibility: 1
 --- !u!114 &800286620
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2437,6 +2438,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2063215669}
   - component: {fileID: 2063215668}
+  - component: {fileID: 2063215670}
   m_Layer: 0
   m_Name: Storyteller
   m_TagString: Untagged
@@ -2473,6 +2475,32 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2063215670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2063215667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b2be9cde1d014e4a9f2e63295ccd6fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.LLMEffectExecutor
+  minHealthChange: 5
+  maxHealthChange: 50
+  minSanityChange: 3
+  maxSanityChange: 30
+  minHungerChange: 5
+  maxHungerChange: 40
+  minThirstChange: 5
+  maxThirstChange: 40
+  minResourceChange: 1
+  maxResourceChange: 10
+  testEffectType: 1
+  testIntensity: 5
+  testTarget: Marcus
+  testLLMOutput: ReduceHP:7, AddSanity:3
 --- !u!1 &2134911000
 GameObject:
   m_ObjectHideFlags: 0

@@ -3,11 +3,12 @@ using TMPro;
 
 namespace TheBunkerGames
 {
+    /// <summary>
+    /// UI component for displaying story events.
+    /// Works with LLMStoryEventData from the simplified storyteller system.
+    /// </summary>
     public class StorytellerUI : MonoBehaviour
     {
-        [Header("References")]
-        [SerializeField] private StorytellerManager manager;
-
         [Header("UI References")]
         [SerializeField] private TextMeshProUGUI titleText;
         [SerializeField] private TextMeshProUGUI descriptionText;
@@ -23,43 +24,51 @@ namespace TheBunkerGames
 
         private void OnEnable()
         {
-            StorytellerManager.OnStoryEventTriggered += UpdateUI;
+            StorytellerManager.OnStoryEventReceived += ShowEvent;
         }
 
         private void OnDisable()
         {
-            StorytellerManager.OnStoryEventTriggered -= UpdateUI;
+            StorytellerManager.OnStoryEventReceived -= ShowEvent;
         }
 
-        public void UpdateUI(StoryEventSO storyEvent)
+        // -------------------------------------------------------------------------
+        // Public Methods
+        // -------------------------------------------------------------------------
+        /// <summary>
+        /// Show a story event in the UI.
+        /// </summary>
+        public void ShowEvent(LLMStoryEventData storyEvent)
         {
             if (storyEvent != null)
             {
                 if (titleText != null)
-                {
                     titleText.text = storyEvent.Title;
-                }
                 else
-                {
                     Debug.LogWarning("[StorytellerUI] TitleText is missing!");
-                }
 
                 if (descriptionText != null)
-                {
                     descriptionText.text = storyEvent.Description;
-                }
                 else
-                {
                     Debug.LogWarning("[StorytellerUI] DescriptionText is missing!");
-                }
 
-                if (contentParent != null && autoToggleVisibility) contentParent.SetActive(true);
+                if (contentParent != null && autoToggleVisibility) 
+                    contentParent.SetActive(true);
             }
             else
             {
-                ClearText();
-                if (contentParent != null && autoToggleVisibility) contentParent.SetActive(false);
+                Hide();
             }
+        }
+
+        /// <summary>
+        /// Hide the story UI.
+        /// </summary>
+        public void Hide()
+        {
+            ClearText();
+            if (contentParent != null && autoToggleVisibility) 
+                contentParent.SetActive(false);
         }
 
         private void ClearText()
@@ -76,7 +85,6 @@ namespace TheBunkerGames
             // 1. Ensure Panel
             if (contentParent == null)
             {
-                // Check for existing "Panel" child
                 var panelTransform = transform.Find("Panel");
                 if (panelTransform == null)
                 {
@@ -158,3 +166,4 @@ namespace TheBunkerGames
 #endif
     }
 }
+
