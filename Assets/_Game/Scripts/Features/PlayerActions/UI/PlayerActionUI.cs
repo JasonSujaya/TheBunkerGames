@@ -388,6 +388,17 @@ namespace TheBunkerGames
             {
                 detailInputField.text = panel.PlayerInput;
                 detailInputField.interactable = !panel.IsSaved;
+                // Visual feedback: darken input bg when locked
+                var inputBgImg = detailInputField.GetComponent<Image>();
+                if (inputBgImg != null)
+                    inputBgImg.color = panel.IsSaved
+                        ? new Color(0.08f, 0.08f, 0.1f, 1f)   // dark locked look
+                        : new Color(0.15f, 0.15f, 0.2f, 1f);   // normal editable
+                // Dim the text when saved
+                if (detailInputField.textComponent != null)
+                    detailInputField.textComponent.color = panel.IsSaved
+                        ? new Color(0.5f, 0.5f, 0.5f, 1f)     // gray locked text
+                        : Color.white;                          // normal white text
             }
             AttachInputListener();
 
@@ -395,13 +406,13 @@ namespace TheBunkerGames
             if (saveButton != null)
                 saveButton.interactable = !panel.IsSaved;
             if (saveButtonText != null)
-                saveButtonText.text = panel.IsSaved ? "Saved" : "Save";
+                saveButtonText.text = panel.IsSaved ? "SAVED \u2713" : "SAVE RESPONSE";
 
             // Status
             if (detailStatusText != null)
             {
                 if (panel.IsSaved)
-                    detailStatusText.text = "Response saved and locked.";
+                    detailStatusText.text = "\u{1f512} Response saved and locked. Cannot be edited.";
                 else
                     detailStatusText.text = "Type your response and save when ready.";
             }
@@ -486,10 +497,10 @@ namespace TheBunkerGames
             if (confirmationPopup != null)
             {
                 confirmationPopup.Show(
-                    "Are you sure you want to save your response?\nYou won't be able to edit it after saving.",
+                    "Are you sure you want to save your response?\nOnce saved, it cannot be edited until the next day.",
                     OnSaveConfirmed,
                     null,
-                    "Save",
+                    "Confirm Save",
                     "Cancel");
             }
             else
@@ -511,15 +522,22 @@ namespace TheBunkerGames
             panel.SaveInput();
             savedCategories[category] = true;
 
-            // Update detail panel visuals
+            // Update detail panel visuals — fully lock input
             if (detailInputField != null)
+            {
                 detailInputField.interactable = false;
+                var inputBgImg = detailInputField.GetComponent<Image>();
+                if (inputBgImg != null)
+                    inputBgImg.color = new Color(0.08f, 0.08f, 0.1f, 1f);
+                if (detailInputField.textComponent != null)
+                    detailInputField.textComponent.color = new Color(0.5f, 0.5f, 0.5f, 1f);
+            }
             if (saveButton != null)
                 saveButton.interactable = false;
             if (saveButtonText != null)
-                saveButtonText.text = "Saved";
+                saveButtonText.text = "SAVED \u2713";
             if (detailStatusText != null)
-                detailStatusText.text = "Response saved and locked.";
+                detailStatusText.text = "\u{1f512} Response saved and locked. Cannot be edited.";
 
             // Update list item
             var listItem = GetListItem(category);
@@ -805,7 +823,7 @@ namespace TheBunkerGames
             submitAll.gameObject.SetActive(false);
 
             // ===================================================================
-            // DETAIL PANEL
+            // DETAIL PANEL (with ScrollRect for overflow)
             // ===================================================================
             var detail = MakeUI("DetailPanel", rp);
             detail.anchorMin = new Vector2(0.1f, 0.12f);
@@ -816,58 +834,127 @@ namespace TheBunkerGames
             var detailBg = detail.gameObject.AddComponent<Image>();
             detailBg.color = new Color(0.08f, 0.08f, 0.14f, 1f);
 
-            var detailVL = detail.gameObject.AddComponent<VerticalLayoutGroup>();
-            detailVL.spacing = 10;
-            detailVL.padding = new RectOffset(25, 25, 15, 15);
-            detailVL.childForceExpandWidth = true;
-            detailVL.childForceExpandHeight = false;
-            detailVL.childControlHeight = false;
-            detailVL.childControlWidth = true;
-
-            // Back button row
+            // Back button sits OUTSIDE the scroll area, pinned to top
             var backRow = MakeUI("BackRow", detail);
-            PrefH(backRow.gameObject, 35);
+            backRow.anchorMin = new Vector2(0, 1);
+            backRow.anchorMax = new Vector2(1, 1);
+            backRow.pivot = new Vector2(0.5f, 1);
+            backRow.sizeDelta = new Vector2(0, 40);
+            backRow.anchoredPosition = Vector2.zero;
             var backHL = backRow.gameObject.AddComponent<HorizontalLayoutGroup>();
+            backHL.padding = new RectOffset(15, 15, 5, 5);
             backHL.childForceExpandWidth = false;
             backHL.childForceExpandHeight = true;
 
             var backBtn = MakeButton("BackButton", backRow, "< Back");
             var backLE = backBtn.gameObject.AddComponent<LayoutElement>();
-            backLE.preferredWidth = 120;
+            backLE.preferredWidth = 100;
+            backLE.preferredHeight = 30;
             var backBtnImg = backBtn.GetComponent<Image>();
             if (backBtnImg != null) backBtnImg.color = new Color(0.25f, 0.25f, 0.35f, 1f);
 
+            // Save/status row sits OUTSIDE the scroll area, pinned to bottom
+            var bottomBar = MakeUI("BottomBar", detail);
+            bottomBar.anchorMin = new Vector2(0, 0);
+            bottomBar.anchorMax = new Vector2(1, 0);
+            bottomBar.pivot = new Vector2(0.5f, 0);
+            bottomBar.sizeDelta = new Vector2(0, 70);
+            bottomBar.anchoredPosition = Vector2.zero;
+            var bottomBg = bottomBar.gameObject.AddComponent<Image>();
+            bottomBg.color = new Color(0.06f, 0.06f, 0.1f, 1f);
+
+            var bottomVL = bottomBar.gameObject.AddComponent<VerticalLayoutGroup>();
+            bottomVL.spacing = 4;
+            bottomVL.padding = new RectOffset(25, 25, 6, 6);
+            bottomVL.childForceExpandWidth = true;
+            bottomVL.childForceExpandHeight = false;
+            bottomVL.childControlHeight = false;
+            bottomVL.childControlWidth = true;
+
+            // Save button — large, bright green, very visible
+            var saveBtnRT = MakeButton("SaveButton", bottomBar, "SAVE RESPONSE");
+            PrefH(saveBtnRT.gameObject, 42);
+            var saveBtnImg = saveBtnRT.GetComponent<Image>();
+            if (saveBtnImg != null) saveBtnImg.color = new Color(0.15f, 0.6f, 0.2f, 1f);
+            var saveBtnColors = saveBtnRT.GetComponent<Button>().colors;
+            saveBtnColors.highlightedColor = new Color(0.2f, 0.7f, 0.25f, 1f);
+            saveBtnColors.pressedColor = new Color(0.1f, 0.45f, 0.15f, 1f);
+            saveBtnColors.disabledColor = new Color(0.15f, 0.2f, 0.15f, 0.5f);
+            saveBtnRT.GetComponent<Button>().colors = saveBtnColors;
+
+            // Status text below save button
+            var dStatus = MakeTMP("DetailStatusText", bottomBar, "", 12, TextAlignmentOptions.Center);
+            dStatus.color = new Color(0.6f, 0.6f, 0.6f);
+            PrefH(dStatus.gameObject, 16);
+
+            // ScrollRect viewport sits between back button (top) and bottom bar
+            var scrollViewport = MakeUI("ScrollViewport", detail);
+            scrollViewport.anchorMin = new Vector2(0, 0);
+            scrollViewport.anchorMax = new Vector2(1, 1);
+            scrollViewport.offsetMin = new Vector2(0, 70); // above bottom bar
+            scrollViewport.offsetMax = new Vector2(0, -40); // below back row
+            scrollViewport.gameObject.AddComponent<Image>().color = new Color(0, 0, 0, 0); // transparent mask
+            var mask = scrollViewport.gameObject.AddComponent<Mask>();
+            mask.showMaskGraphic = false;
+
+            var scrollRect = detail.gameObject.AddComponent<ScrollRect>();
+            scrollRect.viewport = scrollViewport;
+            scrollRect.horizontal = false;
+            scrollRect.vertical = true;
+            scrollRect.movementType = ScrollRect.MovementType.Clamped;
+            scrollRect.scrollSensitivity = 25;
+
+            // Scroll content — vertical layout
+            var scrollContent = MakeUI("ScrollContent", scrollViewport);
+            scrollContent.anchorMin = new Vector2(0, 1);
+            scrollContent.anchorMax = new Vector2(1, 1);
+            scrollContent.pivot = new Vector2(0.5f, 1);
+            scrollContent.sizeDelta = new Vector2(0, 0); // will be auto-sized
+
+            var contentSF = scrollContent.gameObject.AddComponent<ContentSizeFitter>();
+            contentSF.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            var contentVL = scrollContent.gameObject.AddComponent<VerticalLayoutGroup>();
+            contentVL.spacing = 8;
+            contentVL.padding = new RectOffset(25, 25, 10, 10);
+            contentVL.childForceExpandWidth = true;
+            contentVL.childForceExpandHeight = false;
+            contentVL.childControlHeight = false;
+            contentVL.childControlWidth = true;
+
+            scrollRect.content = scrollContent;
+
             // Category label
-            var dCatLabel = MakeTMP("DetailCategoryLabel", detail, "CATEGORY", 24, TextAlignmentOptions.Left);
+            var dCatLabel = MakeTMP("DetailCategoryLabel", scrollContent, "CATEGORY", 22, TextAlignmentOptions.Left);
             dCatLabel.color = new Color(1f, 0.85f, 0.3f);
             dCatLabel.fontStyle = FontStyles.Bold;
-            PrefH(dCatLabel.gameObject, 35);
+            PrefH(dCatLabel.gameObject, 30);
 
             // Challenge title
-            var dTitle = MakeTMP("DetailChallengeTitle", detail, "Challenge Title", 20, TextAlignmentOptions.Left);
+            var dTitle = MakeTMP("DetailChallengeTitle", scrollContent, "Challenge Title", 18, TextAlignmentOptions.Left);
             dTitle.fontStyle = FontStyles.Bold;
-            PrefH(dTitle.gameObject, 30);
+            PrefH(dTitle.gameObject, 26);
 
             // Challenge description
-            var dDesc = MakeTMP("DetailChallengeDescription", detail, "Challenge description...", 15, TextAlignmentOptions.TopLeft);
-            PrefH(dDesc.gameObject, 80);
+            var dDesc = MakeTMP("DetailChallengeDescription", scrollContent, "Challenge description...", 14, TextAlignmentOptions.TopLeft);
+            PrefH(dDesc.gameObject, 60);
 
             // Separator
-            var sep = MakeUI("Separator", detail);
+            var sep = MakeUI("Separator", scrollContent);
             PrefH(sep.gameObject, 2);
             var sepImg = sep.gameObject.AddComponent<Image>();
             sepImg.color = new Color(0.3f, 0.3f, 0.4f, 0.5f);
 
             // Input field label
-            var inputLabel = MakeTMP("InputLabel", detail, "Your Response:", 14, TextAlignmentOptions.Left);
+            var inputLabel = MakeTMP("InputLabel", scrollContent, "Your Response:", 14, TextAlignmentOptions.Left);
             inputLabel.color = new Color(0.7f, 0.7f, 0.7f);
             PrefH(inputLabel.gameObject, 20);
 
             // Input field
             var inputGO = new GameObject("DetailInputField");
-            inputGO.transform.SetParent(detail, false);
+            inputGO.transform.SetParent(scrollContent, false);
             var inputRT = inputGO.AddComponent<RectTransform>();
-            inputRT.sizeDelta = new Vector2(0, 120);
+            inputRT.sizeDelta = new Vector2(0, 100);
             var inputBg = inputGO.AddComponent<Image>();
             inputBg.color = new Color(0.15f, 0.15f, 0.2f, 1f);
             var dInputField = inputGO.AddComponent<TMP_InputField>();
@@ -875,9 +962,9 @@ namespace TheBunkerGames
 
             var textArea = MakeUI("Text Area", inputRT);
             Stretch(textArea, 8);
-            var inputTxt = MakeTMP("Text", textArea, "", 15, TextAlignmentOptions.TopLeft);
+            var inputTxt = MakeTMP("Text", textArea, "", 14, TextAlignmentOptions.TopLeft);
             Stretch(inputTxt.rectTransform);
-            var ph = MakeTMP("Placeholder", textArea, "Type your response...", 15, TextAlignmentOptions.TopLeft);
+            var ph = MakeTMP("Placeholder", textArea, "Type your response...", 14, TextAlignmentOptions.TopLeft);
             ph.fontStyle = FontStyles.Italic;
             ph.color = new Color(1, 1, 1, 0.3f);
             Stretch(ph.rectTransform);
@@ -885,26 +972,15 @@ namespace TheBunkerGames
             dInputField.textViewport = textArea;
             dInputField.textComponent = inputTxt;
             dInputField.placeholder = ph;
-            PrefH(inputGO, 120);
+            PrefH(inputGO, 100);
 
             // Item toggle container
-            var dItemC = MakeUI("DetailItemToggleContainer", detail);
+            var dItemC = MakeUI("DetailItemToggleContainer", scrollContent);
             PrefH(dItemC.gameObject, 40);
             var dItemHL = dItemC.gameObject.AddComponent<HorizontalLayoutGroup>();
             dItemHL.spacing = 5;
             dItemHL.childForceExpandWidth = false;
             dItemHL.childForceExpandHeight = true;
-
-            // Save button
-            var saveBtnRT = MakeButton("SaveButton", detail, "Save");
-            PrefH(saveBtnRT.gameObject, 45);
-            var saveBtnImg = saveBtnRT.GetComponent<Image>();
-            if (saveBtnImg != null) saveBtnImg.color = new Color(0.2f, 0.55f, 0.2f, 1f);
-
-            // Status text
-            var dStatus = MakeTMP("DetailStatusText", detail, "", 13, TextAlignmentOptions.Center);
-            dStatus.color = new Color(0.7f, 0.7f, 0.7f);
-            PrefH(dStatus.gameObject, 20);
 
             // ===================================================================
             // CONFIRMATION POPUP
