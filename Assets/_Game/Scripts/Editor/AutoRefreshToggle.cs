@@ -11,12 +11,23 @@ namespace TheBunkerGames.Editor
         [MenuItem(MENU_PATH)]
         private static void ToggleAutoRefresh()
         {
-            bool isEnabled = EditorPrefs.GetBool(PREF_KEY, true);
-            bool newState = !isEnabled;
+            // 1. Get current state
+            bool wasEnabled = EditorPrefs.GetBool(PREF_KEY, true);
             
+            // 2. Toggle to new state
+            bool newState = !wasEnabled;
             EditorPrefs.SetBool(PREF_KEY, newState);
             
-            Debug.Log($"[AutoRefreshToggle] Auto Refresh is now {(newState ? "ENABLED" : "DISABLED")}.");
+            // 3. Verify
+            bool isNowEnabled = EditorPrefs.GetBool(PREF_KEY, true);
+            
+            // 4. Log result
+            string status = isNowEnabled ? "<color=green>ENABLED</color>" : "<color=red>DISABLED</color>";
+            string instruction = isNowEnabled 
+                ? "Unity will now automatically compile changes." 
+                : "You must now manually press Cmd+R (Mac) or Ctrl+R (Win) to compile changes.";
+                
+            Debug.Log($"[AutoRefreshToggle] Unity Auto Refresh is now {status}. ({instruction})");
         }
 
         [MenuItem(MENU_PATH, true)]
