@@ -84,6 +84,16 @@ namespace TheBunkerGames
     }
 
     // -------------------------------------------------------------------------
+    // Player Action Categories (daily player decisions)
+    // -------------------------------------------------------------------------
+    public enum PlayerActionCategory
+    {
+        Exploration,
+        Dilemma,
+        FamilyRequest
+    }
+
+    // -------------------------------------------------------------------------
     // Pre-Scripted Event Categories (government fallout narrative beats)
     // -------------------------------------------------------------------------
     public enum ScriptedEventCategory
