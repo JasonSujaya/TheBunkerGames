@@ -17,6 +17,7 @@ namespace TheBunkerGames
         // Configuration
         // -------------------------------------------------------------------------
         [SerializeField] private GameManager gameManager;
+        [SerializeField] private bool autoStartGame = true;
 
         // -------------------------------------------------------------------------
         // Logic
@@ -24,6 +25,14 @@ namespace TheBunkerGames
         public void Initialize(GameManager manager)
         {
             gameManager = manager;
+        }
+
+        private void Start()
+        {
+            if (autoStartGame)
+            {
+                StartNewGame();
+            }
         }
 
         public void StartNewGame()
