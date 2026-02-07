@@ -7,5 +7,6 @@ namespace TheBunkerGames
     public class FamilyListSO : ScriptableObject
     {
         public List<CharacterDefinitionSO> DefaultFamilyMembers;
+        public List<InventorySlotData> StartingItems;
     }
 }

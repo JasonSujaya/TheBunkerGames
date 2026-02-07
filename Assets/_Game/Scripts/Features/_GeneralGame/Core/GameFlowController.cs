@@ -38,11 +38,29 @@ namespace TheBunkerGames
             
             Debug.Log($"[Sim] GAME START | Day: {gameManager.CurrentDay} | Family: {gameManager.SessionData.FamilyCount} | Health: {gameManager.SessionData.AverageHealth}%");
             
-            // Spawn Default Family
+            // Spawn Default Family & Items
             if (gameManager.Family != null)
             {
                 gameManager.Family.SpawnDefaultFamily();
                 gameManager.SessionData.UpdateSync(gameManager.Family);
+
+                // Add Starting Items from profile
+                var profile = gameManager.Family.DefaultFamilyProfile;
+                if (profile != null && gameManager.Inventory != null)
+                {
+                    gameManager.Inventory.ClearInventory();
+                    if (profile.StartingItems != null)
+                    {
+                        foreach (var itemSlot in profile.StartingItems)
+                        {
+                            if (!string.IsNullOrEmpty(itemSlot.ItemId) && itemSlot.Quantity > 0)
+                            {
+                                gameManager.Inventory.AddItem(itemSlot.ItemId, itemSlot.Quantity);
+                            }
+                        }
+                    }
+                    Debug.Log($"[Sim] Added starting items from {profile.name}");
+                }
             }
 
             GameManager.FireDayStart();
