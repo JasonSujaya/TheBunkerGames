@@ -42,6 +42,7 @@ namespace TheBunkerGames
         #endif
         [Header("State")]
         [SerializeField] private int currentDay = 1;
+        [SerializeField] private int eventsGeneratedToday = 0;
         [SerializeField, TextArea(2, 4)] private string lastPlayerAction = "";
         [SerializeField, TextArea(3, 6)] private string lastGeneratedEvent = "";
 
@@ -54,6 +55,7 @@ namespace TheBunkerGames
         #endif
         [SerializeField] private List<StoryBeat> storyHistory = new List<StoryBeat>();
         private bool isGenerating;
+        private HashSet<string> usedEventTitles = new HashSet<string>();
 
         // -------------------------------------------------------------------------
         // Events
@@ -79,14 +81,21 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
 
         /// <summary>
-        /// Generate a story event based on what the player just did.
-        /// The AI considers current game state, family status, day number, and history.
+        /// Generate a story event for the current day based on a player action.
+        /// The AI considers current game state, family status, day number, and past story.
         /// </summary>
         public void GenerateStoryEvent(string playerAction, Action<LLMStoryEventData> onComplete = null)
         {
             if (isGenerating)
             {
                 Debug.LogWarning("[AIStorytellerMaker] Already generating a story event. Please wait.");
+                return;
+            }
+
+            if (currentDay > totalDays)
+            {
+                Debug.LogWarning($"[AIStorytellerMaker] All {totalDays} days completed! Story is finished. Use ResetHistory() to start over.");
+                onComplete?.Invoke(null);
                 return;
             }
 
@@ -100,19 +109,11 @@ namespace TheBunkerGames
             isGenerating = true;
             lastPlayerAction = playerAction;
 
-            // Sync day from GameSessionData if available
-            SyncCurrentDay();
-
             string systemPrompt = BuildSystemPrompt();
             string userPrompt = BuildUserPrompt(playerAction);
 
-            Debug.Log($"[AIStorytellerMaker] Generating story for Day {currentDay}. Player action: {playerAction}");
-
             if (enableDebugLogs)
-            {
-                Debug.Log($"[AIStorytellerMaker] <color=cyan>===== SYSTEM PROMPT =====</color>\n{systemPrompt}");
-                Debug.Log($"[AIStorytellerMaker] <color=yellow>===== USER PROMPT =====</color>\n{userPrompt}");
-            }
+                Debug.Log($"[AIStorytellerMaker] Generating Day {currentDay} | Action: {playerAction}");
 
             LLMManager.Instance.QuickChat(
                 userPrompt,
@@ -124,11 +125,52 @@ namespace TheBunkerGames
         }
 
         /// <summary>
+        /// Advance to the next day and immediately generate a story event for it.
+        /// Call this when the player clicks "Next Day".
+        /// </summary>
+        public void GenerateNextDay(string playerAction, Action<LLMStoryEventData> onComplete = null)
+        {
+            if (currentDay >= totalDays)
+            {
+                Debug.LogWarning($"[AIStorytellerMaker] Already on final day ({totalDays}). Cannot advance further.");
+                onComplete?.Invoke(null);
+                return;
+            }
+
+            AdvanceDay();
+            GenerateStoryEvent(playerAction, onComplete);
+        }
+
+        /// <summary>
         /// Set the current day manually (useful for testing or overriding GameSessionData).
         /// </summary>
         public void SetDay(int day)
         {
             currentDay = Mathf.Clamp(day, 1, totalDays);
+            eventsGeneratedToday = 0;
+        }
+
+        /// <summary>
+        /// Advance to the next day manually.
+        /// </summary>
+        public void AdvanceDay()
+        {
+            if (currentDay >= totalDays)
+            {
+                Debug.LogWarning($"[AIStorytellerMaker] Already on final day ({totalDays}). Cannot advance further.");
+                return;
+            }
+
+            currentDay++;
+            eventsGeneratedToday = 0;
+
+            // Also advance GameSessionData if available
+            if (GameManager.Instance != null && GameManager.Instance.SessionData != null)
+            {
+                GameManager.Instance.SessionData.CurrentDay = currentDay;
+            }
+
+            Debug.Log($"[AIStorytellerMaker] Advanced to Day {currentDay}");
         }
 
         /// <summary>
@@ -137,7 +179,9 @@ namespace TheBunkerGames
         public void ResetHistory()
         {
             storyHistory.Clear();
+            usedEventTitles.Clear();
             currentDay = 1;
+            eventsGeneratedToday = 0;
             lastPlayerAction = "";
             lastGeneratedEvent = "";
             if (storyLog != null)
@@ -223,6 +267,20 @@ namespace TheBunkerGames
             sb.AppendLine("- Each choice must have at least 1 effect.");
             sb.AppendLine("- The \"effects\" array at the top level contains immediate consequences.");
             sb.AppendLine("- Do NOT include any text outside the JSON object. No markdown, no explanation.");
+            sb.AppendLine("- IMPORTANT: Each event MUST have a UNIQUE title. Never reuse a title from a previous event.");
+            sb.AppendLine("- Be creative and varied. Each event should feel different from the last.");
+            sb.AppendLine("- Vary the types of effects used. Don't always target the same character.");
+
+            // Add used titles so AI avoids repeats
+            if (usedEventTitles.Count > 0)
+            {
+                sb.AppendLine();
+                sb.AppendLine("TITLES ALREADY USED (do NOT reuse any of these):");
+                foreach (var title in usedEventTitles)
+                {
+                    sb.AppendLine($"- \"{title}\"");
+                }
+            }
 
             return sb.ToString();
         }
@@ -231,7 +289,7 @@ namespace TheBunkerGames
         {
             var sb = new StringBuilder();
 
-            sb.AppendLine($"=== DAY {currentDay} of {totalDays} ===");
+            sb.AppendLine($"=== DAY {currentDay} of {totalDays} (Event {eventsGeneratedToday + 1} of {eventsPerDay}) ===");
             sb.AppendLine();
 
             // Current family status
@@ -258,15 +316,19 @@ namespace TheBunkerGames
             }
             sb.AppendLine();
 
-            // Story history summary (last few events for context)
+            // Past story context - send full narrative so AI stays consistent
             if (storyHistory.Count > 0)
             {
-                sb.AppendLine("RECENT EVENTS:");
-                int start = Mathf.Max(0, storyHistory.Count - 3);
-                for (int i = start; i < storyHistory.Count; i++)
+                sb.AppendLine("STORY SO FAR:");
+                int prevDay = -1;
+                foreach (var beat in storyHistory)
                 {
-                    var beat = storyHistory[i];
-                    sb.AppendLine($"- Day {beat.Day}: \"{beat.EventTitle}\" (Player chose: {beat.PlayerAction})");
+                    if (beat.Day != prevDay)
+                    {
+                        sb.AppendLine($"--- Day {beat.Day} ---");
+                        prevDay = beat.Day;
+                    }
+                    sb.AppendLine($"  \"{beat.EventTitle}\": {beat.EventDescription}");
                 }
                 sb.AppendLine();
             }
@@ -274,7 +336,22 @@ namespace TheBunkerGames
             // Player action
             sb.AppendLine($"PLAYER ACTION: {playerAction}");
             sb.AppendLine();
-            sb.AppendLine("Generate a story event that reacts to this action. Consider the family's current state and what has happened before.");
+
+            // Add randomized flavor to prevent identical outputs
+            string[] flavorPrompts = new string[]
+            {
+                "Generate a surprising story event that reacts to this action. Introduce an unexpected twist.",
+                "Generate a story event with emotional weight. Show how this action affects the family's morale.",
+                "Generate a tense story event. Something goes wrong or an opportunity appears.",
+                "Generate a story event that reveals something new about the bunker or the world outside.",
+                "Generate a story event that creates conflict between family members about what to do next.",
+                "Generate a story event where the action has unintended consequences.",
+                "Generate a story event that forces a moral dilemma upon the family.",
+                "Generate a story event that changes the family's situation significantly."
+            };
+            string flavor = flavorPrompts[UnityEngine.Random.Range(0, flavorPrompts.Length)];
+            sb.AppendLine(flavor);
+            sb.AppendLine("Consider the family's current state and what has happened before. Make this event UNIQUE.");
 
             return sb.ToString();
         }
@@ -294,87 +371,48 @@ namespace TheBunkerGames
                 return;
             }
 
-            // Log raw LLM output
-            if (enableDebugLogs)
-            {
-                Debug.Log($"[AIStorytellerMaker] <color=green>===== RAW LLM RESPONSE =====</color>\n{response}");
-            }
-
-            // Extract JSON from response (handles markdown code blocks etc.)
+            // Extract and parse JSON
             string json = LLMJsonParser.ExtractJson(response);
             if (string.IsNullOrEmpty(json))
             {
-                Debug.LogError($"[AIStorytellerMaker] <color=red>Could not extract JSON from LLM response:</color>\n{response}");
+                Debug.LogError("[AIStorytellerMaker] Could not extract JSON from LLM response.");
                 OnGenerationFailed?.Invoke("Could not extract JSON from response.");
                 onComplete?.Invoke(null);
                 return;
             }
 
-            if (enableDebugLogs)
-            {
-                Debug.Log($"[AIStorytellerMaker] <color=green>===== EXTRACTED JSON =====</color>\n{json}");
-            }
-
-            // Parse into story event
             var storyEvent = LLMStoryEventData.FromJson(json);
             if (storyEvent == null)
             {
-                Debug.LogError($"[AIStorytellerMaker] <color=red>Failed to parse story event from JSON:</color>\n{json}");
+                Debug.LogError("[AIStorytellerMaker] Failed to parse story event from JSON.");
                 OnGenerationFailed?.Invoke("Failed to parse story event JSON.");
                 onComplete?.Invoke(null);
                 return;
             }
 
-            // Log detailed parsed breakdown
             if (enableDebugLogs)
-            {
-                var breakdown = new StringBuilder();
-                breakdown.AppendLine($"[AIStorytellerMaker] <color=green>===== PARSED EVENT =====</color>");
-                breakdown.AppendLine($"  Title: {storyEvent.Title}");
-                breakdown.AppendLine($"  Description: {storyEvent.Description}");
-                breakdown.AppendLine($"  Immediate Effects ({storyEvent.Effects?.Count ?? 0}):");
-                if (storyEvent.Effects != null)
-                {
-                    foreach (var fx in storyEvent.Effects)
-                        breakdown.AppendLine($"    - {fx.EffectType} | intensity={fx.Intensity} | target=\"{fx.Target}\"");
-                }
-                breakdown.AppendLine($"  Choices ({storyEvent.Choices?.Count ?? 0}):");
-                if (storyEvent.Choices != null)
-                {
-                    for (int i = 0; i < storyEvent.Choices.Count; i++)
-                    {
-                        var choice = storyEvent.Choices[i];
-                        breakdown.AppendLine($"    [{i}] \"{choice.Text}\"");
-                        if (choice.Effects != null)
-                        {
-                            foreach (var cfx in choice.Effects)
-                                breakdown.AppendLine($"         -> {cfx.EffectType} | intensity={cfx.Intensity} | target=\"{cfx.Target}\"");
-                        }
-                    }
-                }
-                Debug.Log(breakdown.ToString());
-            }
+                Debug.Log($"[AIStorytellerMaker] Day {currentDay} → \"{storyEvent.Title}\" | {storyEvent.Effects?.Count ?? 0} effects, {storyEvent.Choices?.Count ?? 0} choices");
 
             lastGeneratedEvent = storyEvent.ToJson(true);
 
-            // Record in story history (runtime memory)
+            // Track title for uniqueness
+            if (!string.IsNullOrEmpty(storyEvent.Title))
+                usedEventTitles.Add(storyEvent.Title);
+
+            // Record in story history (runtime memory - used as context for future LLM calls)
             storyHistory.Add(new StoryBeat
             {
                 Day = currentDay,
                 EventTitle = storyEvent.Title,
+                EventDescription = storyEvent.Description,
                 PlayerAction = playerAction
             });
 
             // Record in StoryLogSO (persists in editor)
             if (storyLog != null)
-            {
                 storyLog.RecordEvent(currentDay, playerAction, storyEvent);
-                Debug.Log($"[AIStorytellerMaker] Saved to StoryLog SO → Day {currentDay}: \"{storyEvent.Title}\"");
-            }
-            else
-            {
-                Debug.LogWarning("[AIStorytellerMaker] No StoryLogSO assigned! Events won't persist. Assign one in the inspector.");
-            }
+
+            eventsGeneratedToday++;
 
             // Fire event
             OnStoryGenerated?.Invoke(storyEvent);
@@ -395,7 +433,7 @@ namespace TheBunkerGames
         private void HandleLLMError(string error, Action<LLMStoryEventData> onComplete)
         {
             isGenerating = false;
-            Debug.LogError($"[AIStorytellerMaker] <color=red>===== LLM ERROR =====</color>\n{error}");
+            Debug.LogError($"[AIStorytellerMaker] LLM Error: {error}");
             OnGenerationFailed?.Invoke(error);
             onComplete?.Invoke(null);
         }
@@ -403,13 +441,6 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Helpers
         // -------------------------------------------------------------------------
-        private void SyncCurrentDay()
-        {
-            if (GameManager.Instance != null && GameManager.Instance.SessionData != null)
-            {
-                currentDay = GameManager.Instance.SessionData.CurrentDay;
-            }
-        }
 
         /// <summary>
         /// Gets a comma-separated list of actual character names from FamilyManager.
@@ -473,6 +504,7 @@ namespace TheBunkerGames
             #endif
             public string EventTitle;
 
+            public string EventDescription;
             public string PlayerAction;
 
             public override string ToString() => $"Day {Day}: {EventTitle}";
@@ -501,37 +533,29 @@ namespace TheBunkerGames
             GenerateStoryEvent(testPlayerAction, (result) =>
             {
                 if (result != null)
-                    Debug.Log($"[AIStorytellerMaker] Test complete! Event: {result.Title}");
+                    Debug.Log($"[AIStorytellerMaker] Test complete! Day {currentDay}, Event: {result.Title}");
                 else
                     Debug.LogWarning("[AIStorytellerMaker] Test failed - no event generated.");
             });
         }
 
-        [Button("Generate with Custom Action")]
-        [GUIColor(0.8f, 0.8f, 1f)]
-        private void Debug_GenerateCustom()
+        [Button("Next Day + Generate", ButtonSizes.Large)]
+        [GUIColor(1f, 0.6f, 0.2f)]
+        private void Debug_NextDay()
         {
             if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode."); return; }
+            if (isGenerating) { Debug.LogWarning("Already generating."); return; }
 
             string action = testPlayerAction;
-            if (string.IsNullOrEmpty(action)) action = "Look around the bunker";
-            GenerateStoryEvent(action);
-        }
+            if (string.IsNullOrEmpty(action)) action = "Start the new day";
 
-        [Button("Show System Prompt")]
-        [GUIColor(1f, 0.9f, 0.5f)]
-        private void Debug_ShowSystemPrompt()
-        {
-            SyncCurrentDay();
-            Debug.Log($"[AIStorytellerMaker] System Prompt:\n{BuildSystemPrompt()}");
-        }
-
-        [Button("Show User Prompt")]
-        [GUIColor(1f, 0.9f, 0.5f)]
-        private void Debug_ShowUserPrompt()
-        {
-            SyncCurrentDay();
-            Debug.Log($"[AIStorytellerMaker] User Prompt:\n{BuildUserPrompt(testPlayerAction)}");
+            GenerateNextDay(action, (result) =>
+            {
+                if (result != null)
+                    Debug.Log($"[AIStorytellerMaker] Next day complete! Day {currentDay}, Event: {result.Title}");
+                else
+                    Debug.LogWarning("[AIStorytellerMaker] Next day failed.");
+            });
         }
 
         [Button("Reset History")]
@@ -540,19 +564,6 @@ namespace TheBunkerGames
         {
             ResetHistory();
         }
-
-        [Title("Quick Day Test")]
-        [Button("Day 1 - Settle In")]
-        private void Debug_Day1() { if (!Application.isPlaying) return; currentDay = 1; GenerateStoryEvent("Explore the bunker and check supplies"); }
-
-        [Button("Day 3 - Scavenge")]
-        private void Debug_Day3() { if (!Application.isPlaying) return; currentDay = 3; GenerateStoryEvent("Send Father to scavenge the nearby buildings"); }
-
-        [Button("Day 5 - Defend")]
-        private void Debug_Day5() { if (!Application.isPlaying) return; currentDay = 5; GenerateStoryEvent("Barricade the entrance, raiders are approaching"); }
-
-        [Button("Day 7 - Final")]
-        private void Debug_Day7() { if (!Application.isPlaying) return; currentDay = 7; GenerateStoryEvent("Make a final stand and wait for rescue"); }
         #endif
     }
 }
