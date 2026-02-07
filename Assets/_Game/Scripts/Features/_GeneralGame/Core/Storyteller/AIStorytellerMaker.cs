@@ -9,7 +9,7 @@ using Sirenix.OdinInspector;
 namespace TheBunkerGames
 {
     /// <summary>
-    /// Generates AI-driven story events for a 7-day bunker survival game.
+    /// Generates AI-driven story events for a bunker survival game.
     /// Sends player actions + game state to an LLM (Mistral/OpenRouter) and
     /// feeds the resulting JSON into StorytellerManager → LLMEffectExecutor.
     /// </summary>
@@ -24,20 +24,25 @@ namespace TheBunkerGames
         [Title("Story Generation")]
         #endif
         [Header("Settings")]
-        [SerializeField] private int totalDays = 7;
+        [SerializeField] private int totalDays = 30;
         [SerializeField] private int eventsPerDay = 2;
         [SerializeField] private bool useJsonMode = true;
         [SerializeField] private bool enableDebugLogs = true;
 
         #if ODIN_INSPECTOR
-        [Title("Story Log Asset")]
-        [InfoBox("Assign a StoryLogSO asset. All generated events are saved here, organized by day. Persists between play sessions.", InfoMessageType.Info)]
+        [Title("Data Sources")]
+        [InfoBox("Assign a StoryLogSO asset. All generated events are saved here, organized by day.", InfoMessageType.Info)]
         [Required("Create a StoryLogSO via Create > TheBunkerGames > Story Log")]
         #endif
         [SerializeField] private StoryLogSO storyLog;
 
         #if ODIN_INSPECTOR
-        [Title("Story History")]
+        [InfoBox("Optional: Pre-scripted events scheduled for specific days. The AI will incorporate these into its story.", InfoMessageType.Info)]
+        #endif
+        [SerializeField] private PreScriptedEventScheduleSO preScriptedSchedule;
+
+        #if ODIN_INSPECTOR
+        [Title("Current Day State")]
         [ReadOnly]
         #endif
         [Header("State")]
@@ -45,6 +50,14 @@ namespace TheBunkerGames
         [SerializeField] private int eventsGeneratedToday = 0;
         [SerializeField, TextArea(2, 4)] private string lastPlayerAction = "";
         [SerializeField, TextArea(3, 6)] private string lastGeneratedEvent = "";
+
+        #if ODIN_INSPECTOR
+        [Title("Today's Scheduled Events")]
+        [InfoBox("Shows pre-scripted events scheduled for the current day. These get passed to the AI as context.")]
+        [ReadOnly]
+        [ListDrawerSettings(IsReadOnly = true)]
+        #endif
+        [SerializeField] private List<string> todayScheduledEvents = new List<string>();
 
         // -------------------------------------------------------------------------
         // Story Memory - tracks what happened so the AI stays consistent
@@ -108,6 +121,7 @@ namespace TheBunkerGames
 
             isGenerating = true;
             lastPlayerAction = playerAction;
+            RefreshTodayScheduleDisplay();
 
             string systemPrompt = BuildSystemPrompt();
             string userPrompt = BuildUserPrompt(playerAction);
@@ -170,6 +184,7 @@ namespace TheBunkerGames
                 GameManager.Instance.SessionData.CurrentDay = currentDay;
             }
 
+            RefreshTodayScheduleDisplay();
             Debug.Log($"[AIStorytellerMaker] Advanced to Day {currentDay}");
         }
 
@@ -196,32 +211,36 @@ namespace TheBunkerGames
         {
             var sb = new StringBuilder();
 
-            sb.AppendLine("You are the story engine for a post-apocalyptic bunker survival game.");
-            sb.AppendLine($"The game lasts {totalDays} days. A family must survive in their underground bunker.");
+            sb.AppendLine("You are the story engine for a government fallout bunker survival game.");
+            sb.AppendLine($"The game lasts {totalDays} days. A family must survive in their underground bunker after a government-triggered catastrophe.");
             sb.AppendLine();
             sb.AppendLine("SETTING:");
-            sb.AppendLine("- The world above has been devastated. The family is sheltering in a bunker.");
-            sb.AppendLine("- Resources are scarce: food, water, medicine, and tools are limited.");
-            sb.AppendLine("- Threats include raiders, radiation, illness, structural damage, and psychological stress.");
-            sb.AppendLine("- The family must make tough decisions to survive all 7 days.");
+            sb.AppendLine("- A government fallout has devastated the country. Martial law, failed evacuations, collapsed infrastructure.");
+            sb.AppendLine("- The family is sheltering in an underground bunker. Resources are scarce: food, water, medicine, tools.");
+            sb.AppendLine("- Threats include government patrols, raiders, contamination, disease, structural damage, and psychological stress.");
+            sb.AppendLine("- Occasional government broadcasts provide unreliable information.");
+            sb.AppendLine($"- The family must survive all {totalDays} days until rescue or evacuation.");
             sb.AppendLine();
             sb.AppendLine("YOUR ROLE:");
-            sb.AppendLine("- Generate a story event based on the player's action and current game state.");
+            sb.AppendLine("- Generate a story event based on the player's action, scheduled events, and current game state.");
             sb.AppendLine("- Events should have consequences (effects) and present the player with meaningful choices.");
-            sb.AppendLine("- Escalate tension as days progress. Early days are about settling in, later days get dangerous.");
+            sb.AppendLine("- Escalate tension as days progress.");
+            sb.AppendLine("- If SCHEDULED EVENTS are provided, you MUST weave them into your story.");
             sb.AppendLine("- Be creative but consistent with prior events.");
             sb.AppendLine();
 
-            // Day-based pacing guidance
+            // Day-based pacing guidance (scaled for 30 days)
             sb.AppendLine("PACING:");
-            if (currentDay <= 2)
-                sb.AppendLine("- Days 1-2: Introduction. Minor issues, resource discovery, settling in. Low danger.");
-            else if (currentDay <= 4)
-                sb.AppendLine("- Days 3-4: Rising tension. Resources running low, first real threats appear. Medium danger.");
-            else if (currentDay <= 6)
-                sb.AppendLine("- Days 5-6: Crisis. Major threats, hard choices, potential casualties. High danger.");
+            if (currentDay <= 5)
+                sb.AppendLine("- Days 1-5: Settling in. Minor issues, resource discovery, learning the bunker. Low danger.");
+            else if (currentDay <= 12)
+                sb.AppendLine("- Days 6-12: Rising tension. Supplies dwindling, first outside threats, government broadcasts.");
+            else if (currentDay <= 20)
+                sb.AppendLine("- Days 13-20: Crisis. Major shortages, raids, disease outbreaks, hard moral choices.");
+            else if (currentDay <= 27)
+                sb.AppendLine("- Days 21-27: Desperation. Resources critical, casualties likely, hope fading. High danger.");
             else
-                sb.AppendLine("- Day 7: Climax. Final day, everything comes to a head. Maximum stakes.");
+                sb.AppendLine($"- Days 28-{totalDays}: Endgame. Final push for survival, evacuation rumors, maximum stakes.");
             sb.AppendLine();
 
             // Character names the AI must use
@@ -333,6 +352,19 @@ namespace TheBunkerGames
                 sb.AppendLine();
             }
 
+            // Pre-scripted events for today (designer-authored narrative beats)
+            if (preScriptedSchedule != null && preScriptedSchedule.HasEventsForDay(currentDay))
+            {
+                var scheduled = preScriptedSchedule.GetEventsForDay(currentDay);
+                sb.AppendLine("SCHEDULED EVENTS FOR TODAY (you MUST incorporate these into your story):");
+                for (int i = 0; i < scheduled.Count; i++)
+                {
+                    sb.AppendLine($"- [{scheduled[i].Category}] \"{scheduled[i].Title}\": {scheduled[i].Description}");
+                }
+                sb.AppendLine("Weave these scheduled events into your response. They are mandatory narrative beats.");
+                sb.AppendLine();
+            }
+
             // Player action
             sb.AppendLine($"PLAYER ACTION: {playerAction}");
             sb.AppendLine();
@@ -441,6 +473,20 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Helpers
         // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Refreshes the inspector display of what's scheduled for the current day.
+        /// </summary>
+        private void RefreshTodayScheduleDisplay()
+        {
+            todayScheduledEvents.Clear();
+            if (preScriptedSchedule != null)
+            {
+                var events = preScriptedSchedule.GetEventsForDay(currentDay);
+                for (int i = 0; i < events.Count; i++)
+                    todayScheduledEvents.Add($"[{events[i].Category}] {events[i].Title}");
+            }
+        }
 
         /// <summary>
         /// Gets a comma-separated list of actual character names from FamilyManager.
