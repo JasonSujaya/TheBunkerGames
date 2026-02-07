@@ -45,6 +45,7 @@ namespace TheBunkerGames
         [SerializeField] private GameObject rootPanel;
         [SerializeField] private TMP_Text headerText;
         [SerializeField] private TMP_Text dayLabel;
+        [SerializeField] private Button closeButton;
 
         // -------------------------------------------------------------------------
         // Inbox List
@@ -125,6 +126,8 @@ namespace TheBunkerGames
 
             if (continueButton != null)
                 continueButton.onClick.AddListener(OnContinueClicked);
+            if (closeButton != null)
+                closeButton.onClick.AddListener(OnCloseClicked);
             if (backButton != null)
                 backButton.onClick.AddListener(OnBackClicked);
             if (saveButton != null)
@@ -459,6 +462,11 @@ namespace TheBunkerGames
             ShowDetail(category);
         }
 
+        private void OnCloseClicked()
+        {
+            HideAll();
+        }
+
         private void OnBackClicked()
         {
             // Sync current input back to panel before leaving
@@ -775,14 +783,36 @@ namespace TheBunkerGames
             header.anchorMax = new Vector2(1, 1);
             header.offsetMin = header.offsetMax = Vector2.zero;
 
-            var hText = MakeTMP("HeaderText", header, "DAILY ACTIONS", 28, TextAlignmentOptions.Center);
-            Stretch(hText.rectTransform);
+            var hdrHL = header.gameObject.AddComponent<HorizontalLayoutGroup>();
+            hdrHL.padding = new RectOffset(15, 15, 8, 8);
+            hdrHL.spacing = 10;
+            hdrHL.childForceExpandWidth = false;
+            hdrHL.childForceExpandHeight = true;
+            hdrHL.childControlWidth = false;
+            hdrHL.childControlHeight = true;
+            hdrHL.childAlignment = TextAnchor.MiddleCenter;
 
-            var dLabel = MakeTMP("DayLabel", header, "Day 1", 20, TextAlignmentOptions.TopRight);
-            dLabel.rectTransform.anchorMin = new Vector2(0.8f, 0);
-            dLabel.rectTransform.anchorMax = Vector2.one;
-            dLabel.rectTransform.offsetMin = Vector2.zero;
-            dLabel.rectTransform.offsetMax = new Vector2(-10, 0);
+            // Close button (X) — left side
+            var closeBtnRT = MakeButton("CloseButton", header, "X");
+            var closeBtnLE = closeBtnRT.gameObject.AddComponent<LayoutElement>();
+            closeBtnLE.preferredWidth = 40;
+            closeBtnLE.preferredHeight = 40;
+            var closeBtnBg = closeBtnRT.GetComponent<Image>();
+            if (closeBtnBg != null) closeBtnBg.color = new Color(0.4f, 0.15f, 0.15f, 1f);
+            var closeBtnColors = closeBtnRT.GetComponent<Button>().colors;
+            closeBtnColors.highlightedColor = new Color(0.6f, 0.2f, 0.2f, 1f);
+            closeBtnColors.pressedColor = new Color(0.3f, 0.1f, 0.1f, 1f);
+            closeBtnRT.GetComponent<Button>().colors = closeBtnColors;
+
+            // Header title — takes remaining space
+            var hText = MakeTMP("HeaderText", header, "DAILY ACTIONS", 28, TextAlignmentOptions.Center);
+            var hTextLE = hText.gameObject.AddComponent<LayoutElement>();
+            hTextLE.flexibleWidth = 1;
+
+            // Day label — right side
+            var dLabel = MakeTMP("DayLabel", header, "Day 1", 20, TextAlignmentOptions.Right);
+            var dLabelLE = dLabel.gameObject.AddComponent<LayoutElement>();
+            dLabelLE.preferredWidth = 100;
 
             // ===================================================================
             // INBOX LIST CONTAINER
@@ -891,8 +921,8 @@ namespace TheBunkerGames
             var contentArea = MakeUI("ContentArea", detail);
             contentArea.anchorMin = new Vector2(0, 0);
             contentArea.anchorMax = new Vector2(1, 1);
-            contentArea.offsetMin = new Vector2(0, 70);  // above bottom bar
-            contentArea.offsetMax = new Vector2(0, -40);  // below back row
+            contentArea.offsetMin = new Vector2(0, 72);  // above bottom bar
+            contentArea.offsetMax = new Vector2(0, -45); // below back row (with gap)
 
             var contentVL = contentArea.gameObject.AddComponent<VerticalLayoutGroup>();
             contentVL.spacing = 8;
@@ -1059,6 +1089,7 @@ namespace TheBunkerGames
             rootPanel = rp.gameObject;
             headerText = hText;
             dayLabel = dLabel;
+            closeButton = closeBtnRT.GetComponent<Button>();
 
             inboxContainer = inbox.gameObject;
             explorationListItem = expLI;
