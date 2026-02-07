@@ -26,6 +26,7 @@ namespace TheBunkerGames
         [Title("Settings")]
         #endif
         [SerializeField] private InventoryManager inventoryManager;
+        [SerializeField] private ItemManager itemManager;
         
         #if ODIN_INSPECTOR
         [Title("LLM Settings")]
@@ -62,6 +63,10 @@ namespace TheBunkerGames
             {
                 inventoryManager = InventoryManager.Instance;
             }
+            if (itemManager == null)
+            {
+                itemManager = ItemManager.Instance;
+            }
         }
 
         private void OnDestroy()
@@ -85,6 +90,12 @@ namespace TheBunkerGames
 
             // Add to session list (NOT to persistent database)
             sessionItems.Add(newItem);
+
+            // Register with ItemManager if available
+            if (itemManager != null)
+            {
+                itemManager.RegisterItem(newItem);
+            }
 
             Debug.Log($"[AIItemCreator] Created session item: {itemName} (Total session items: {sessionItems.Count})");
             return newItem;
