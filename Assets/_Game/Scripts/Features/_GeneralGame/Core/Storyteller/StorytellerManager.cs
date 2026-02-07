@@ -90,6 +90,35 @@ namespace TheBunkerGames
         {
             if (evt != null) TriggerEvent(evt);
         }
+
+        [Button("Show Today's Event", ButtonSizes.Large)]
+        [GUIColor(1f, 0.8f, 0.2f)]
+        private void Debug_ShowTodayEvent()
+        {
+            if (GameManager.Instance == null)
+            {
+                Debug.LogWarning("GameManager not found.");
+                return;
+            }
+            
+            if (currentScenario == null)
+            {
+                Debug.LogWarning("No Scenario assigned.");
+                return;
+            }
+
+            int day = GameManager.Instance.CurrentDay;
+            var evt = currentScenario.GetEventForDay(day);
+            
+            if (evt != null)
+            {
+                Debug.Log($"[Storyteller] Day {day}: {evt.Title} - {evt.Description}");
+            }
+            else
+            {
+                Debug.Log($"[Storyteller] Day {day}: Event doesn't exist.");
+            }
+        }
         #endif
     }
 }
