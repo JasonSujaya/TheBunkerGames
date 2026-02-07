@@ -12,9 +12,9 @@ using Sirenix.OdinInspector;
 namespace TheBunkerGames
 {
     /// <summary>
-    /// Canvas controller for the Player Action system.
-    /// Shows/hides category panels based on active daily actions,
-    /// routes results to the correct panels, and manages overall flow.
+    /// Inbox-style canvas controller for the Player Action system.
+    /// Shows a task list of active categories. Click a row to open the detail view,
+    /// type a response, and save it. Once all are saved, submit all to the LLM.
     /// </summary>
     public class PlayerActionUI : MonoBehaviour
     {
@@ -24,25 +24,75 @@ namespace TheBunkerGames
         public static PlayerActionUI Instance { get; private set; }
 
         // -------------------------------------------------------------------------
-        // Configuration
+        // Category Data Panels (hidden, hold per-category state)
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Title("Panel References")]
-        [InfoBox("Assign one panel per category. Inactive categories will be hidden automatically.")]
+        [Title("Category Data Panels")]
+        [InfoBox("These hold per-category state. They are NOT visible in-game.")]
         #endif
-        [Header("Category Panels")]
+        [Header("Category Panels (Data Holders)")]
         [SerializeField] private PlayerActionCategoryPanel explorationPanel;
         [SerializeField] private PlayerActionCategoryPanel dilemmaPanel;
         [SerializeField] private PlayerActionCategoryPanel familyRequestPanel;
 
+        // -------------------------------------------------------------------------
+        // Root & Header
+        // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Title("UI Elements")]
+        [Title("Root & Header")]
         #endif
         [Header("Root & Header")]
         [SerializeField] private GameObject rootPanel;
         [SerializeField] private TMP_Text headerText;
         [SerializeField] private TMP_Text dayLabel;
 
+        // -------------------------------------------------------------------------
+        // Inbox List
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Inbox List")]
+        #endif
+        [Header("Inbox List")]
+        [SerializeField] private GameObject inboxContainer;
+        [SerializeField] private PlayerActionListItem explorationListItem;
+        [SerializeField] private PlayerActionListItem dilemmaListItem;
+        [SerializeField] private PlayerActionListItem familyRequestListItem;
+        [SerializeField] private Button submitAllButton;
+        [SerializeField] private TMP_Text submitAllButtonText;
+
+        // -------------------------------------------------------------------------
+        // Detail Panel
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Detail Panel")]
+        #endif
+        [Header("Detail Panel")]
+        [SerializeField] private GameObject detailPanel;
+        [SerializeField] private Button backButton;
+        [SerializeField] private TMP_Text detailCategoryLabel;
+        [SerializeField] private TMP_Text detailChallengeTitle;
+        [SerializeField] private TMP_Text detailChallengeDescription;
+        [SerializeField] private TMP_InputField detailInputField;
+        [SerializeField] private Transform detailItemToggleContainer;
+        [SerializeField] private Button saveButton;
+        [SerializeField] private TMP_Text saveButtonText;
+        [SerializeField] private TMP_Text detailStatusText;
+
+        // -------------------------------------------------------------------------
+        // Confirmation Popup
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Confirmation Popup")]
+        #endif
+        [Header("Confirmation Popup")]
+        [SerializeField] private ConfirmationPopup confirmationPopup;
+
+        // -------------------------------------------------------------------------
+        // Completion Panel
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Completion")]
+        #endif
         [Header("Summary / Completion")]
         [SerializeField] private GameObject completionPanel;
         [SerializeField] private TMP_Text completionText;
@@ -55,8 +105,11 @@ namespace TheBunkerGames
         // Runtime State
         // -------------------------------------------------------------------------
         private DailyActionState currentState;
+        private PlayerActionCategory? currentlyViewingCategory;
+        private Dictionary<PlayerActionCategory, bool> savedCategories = new Dictionary<PlayerActionCategory, bool>();
         private int resultsReceived;
         private int totalActive;
+        private bool isInputListenerActive;
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -72,6 +125,12 @@ namespace TheBunkerGames
 
             if (continueButton != null)
                 continueButton.onClick.AddListener(OnContinueClicked);
+            if (backButton != null)
+                backButton.onClick.AddListener(OnBackClicked);
+            if (saveButton != null)
+                saveButton.onClick.AddListener(OnSaveClicked);
+            if (submitAllButton != null)
+                submitAllButton.onClick.AddListener(OnSubmitAllClicked);
 
             HideAll();
         }
@@ -94,6 +153,14 @@ namespace TheBunkerGames
         {
             if (continueButton != null)
                 continueButton.onClick.RemoveListener(OnContinueClicked);
+            if (backButton != null)
+                backButton.onClick.RemoveListener(OnBackClicked);
+            if (saveButton != null)
+                saveButton.onClick.RemoveListener(OnSaveClicked);
+            if (submitAllButton != null)
+                submitAllButton.onClick.RemoveListener(OnSubmitAllClicked);
+
+            DetachInputListener();
         }
 
         // -------------------------------------------------------------------------
@@ -103,12 +170,37 @@ namespace TheBunkerGames
         {
             currentState = state;
             resultsReceived = 0;
-            totalActive = state.GetActiveCategories().Count;
+            savedCategories.Clear();
+            currentlyViewingCategory = null;
+
+            var active = state.GetActiveCategories();
+            totalActive = active.Count;
 
             if (enableDebugLogs)
-                Debug.Log($"[PlayerActionUI] Showing panels for Day {state.Day} ({totalActive} active categories)");
+                Debug.Log($"[PlayerActionUI] Showing inbox for Day {state.Day} ({totalActive} active categories)");
 
-            ShowPanels(state);
+            // Setup category data panels
+            SetupCategoryPanels(state);
+
+            // Setup list items
+            SetupListItems(state);
+
+            // Show inbox view
+            ShowInbox();
+
+            // Show root
+            if (rootPanel != null)
+                rootPanel.SetActive(true);
+
+            // Header
+            if (headerText != null)
+                headerText.text = "DAILY ACTIONS";
+            if (dayLabel != null)
+                dayLabel.text = $"Day {state.Day}";
+
+            // Hide completion
+            if (completionPanel != null)
+                completionPanel.SetActive(false);
         }
 
         private void HandleCategoryResult(PlayerActionResult result)
@@ -120,12 +212,15 @@ namespace TheBunkerGames
             if (enableDebugLogs)
                 Debug.Log($"[PlayerActionUI] Result received for [{result.Category}] ({resultsReceived}/{totalActive})");
 
-            // Route result to correct panel
+            // Update list item
+            var listItem = GetListItem(result.Category);
+            if (listItem != null)
+                listItem.SetComplete();
+
+            // Route result to category panel for storage
             var panel = GetPanel(result.Category);
             if (panel != null)
-            {
                 panel.ShowResult(result);
-            }
         }
 
         private void HandleAllActionsComplete()
@@ -137,25 +232,10 @@ namespace TheBunkerGames
         }
 
         // -------------------------------------------------------------------------
-        // Panel Management
+        // Setup
         // -------------------------------------------------------------------------
-        private void ShowPanels(DailyActionState state)
+        private void SetupCategoryPanels(DailyActionState state)
         {
-            // Show root
-            if (rootPanel != null)
-                rootPanel.SetActive(true);
-
-            // Header
-            if (headerText != null)
-                headerText.text = "Daily Actions";
-            if (dayLabel != null)
-                dayLabel.text = $"Day {state.Day}";
-
-            // Hide completion
-            if (completionPanel != null)
-                completionPanel.SetActive(false);
-
-            // Exploration (always active)
             if (explorationPanel != null)
             {
                 if (state.ExplorationActive && state.ExplorationChallenge != null)
@@ -164,7 +244,6 @@ namespace TheBunkerGames
                     explorationPanel.Hide();
             }
 
-            // Dilemma
             if (dilemmaPanel != null)
             {
                 if (state.DilemmaActive && state.DilemmaChallenge != null)
@@ -173,7 +252,6 @@ namespace TheBunkerGames
                     dilemmaPanel.Hide();
             }
 
-            // Family Request
             if (familyRequestPanel != null)
             {
                 if (state.FamilyRequestActive && state.FamilyRequestChallenge != null)
@@ -183,8 +261,342 @@ namespace TheBunkerGames
             }
         }
 
+        private void SetupListItems(DailyActionState state)
+        {
+            // Exploration (always active)
+            if (explorationListItem != null)
+            {
+                if (state.ExplorationActive && state.ExplorationChallenge != null)
+                {
+                    explorationListItem.Initialize(
+                        PlayerActionCategory.Exploration,
+                        "EXPLORATION",
+                        state.ExplorationChallenge.Title,
+                        OnListItemClicked);
+                }
+                else
+                {
+                    explorationListItem.Hide();
+                }
+            }
+
+            // Dilemma
+            if (dilemmaListItem != null)
+            {
+                if (state.DilemmaActive && state.DilemmaChallenge != null)
+                {
+                    dilemmaListItem.Initialize(
+                        PlayerActionCategory.Dilemma,
+                        "DILEMMA",
+                        state.DilemmaChallenge.Title,
+                        OnListItemClicked);
+                }
+                else
+                {
+                    dilemmaListItem.Hide();
+                }
+            }
+
+            // Family Request
+            if (familyRequestListItem != null)
+            {
+                if (state.FamilyRequestActive && state.FamilyRequestChallenge != null)
+                {
+                    string displayName = string.IsNullOrEmpty(state.FamilyRequestTarget)
+                        ? "FAMILY REQUEST"
+                        : $"FAMILY ({state.FamilyRequestTarget})";
+                    familyRequestListItem.Initialize(
+                        PlayerActionCategory.FamilyRequest,
+                        displayName,
+                        state.FamilyRequestChallenge.Title,
+                        OnListItemClicked);
+                }
+                else
+                {
+                    familyRequestListItem.Hide();
+                }
+            }
+        }
+
+        // -------------------------------------------------------------------------
+        // View Switching
+        // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Show the inbox task list view.
+        /// </summary>
+        private void ShowInbox()
+        {
+            if (inboxContainer != null)
+                inboxContainer.SetActive(true);
+            if (detailPanel != null)
+                detailPanel.SetActive(false);
+
+            DetachInputListener();
+            currentlyViewingCategory = null;
+
+            // Deselect all list items
+            if (explorationListItem != null) explorationListItem.SetSelected(false);
+            if (dilemmaListItem != null) dilemmaListItem.SetSelected(false);
+            if (familyRequestListItem != null) familyRequestListItem.SetSelected(false);
+
+            // Update submit all button visibility
+            CheckAllSaved();
+        }
+
+        /// <summary>
+        /// Show the detail view for a specific category.
+        /// </summary>
+        private void ShowDetail(PlayerActionCategory category)
+        {
+            var panel = GetPanel(category);
+            if (panel == null) return;
+
+            currentlyViewingCategory = category;
+
+            // Switch views
+            if (inboxContainer != null)
+                inboxContainer.SetActive(false);
+            if (detailPanel != null)
+                detailPanel.SetActive(true);
+
+            // Highlight list item
+            var listItem = GetListItem(category);
+            if (explorationListItem != null) explorationListItem.SetSelected(false);
+            if (dilemmaListItem != null) dilemmaListItem.SetSelected(false);
+            if (familyRequestListItem != null) familyRequestListItem.SetSelected(false);
+            if (listItem != null) listItem.SetSelected(true);
+
+            // Populate detail panel from category data
+            if (detailCategoryLabel != null)
+                detailCategoryLabel.text = panel.GetCategoryDisplayName();
+
+            if (detailChallengeTitle != null)
+                detailChallengeTitle.text = panel.CurrentChallenge != null ? panel.CurrentChallenge.Title : "No Challenge";
+
+            if (detailChallengeDescription != null)
+            {
+                string desc = panel.CurrentChallenge != null
+                    ? panel.CurrentChallenge.GetDescription(panel.FamilyTarget)
+                    : "";
+                detailChallengeDescription.text = desc;
+            }
+
+            // Load input text (detach listener first to avoid feedback loop)
+            DetachInputListener();
+            if (detailInputField != null)
+            {
+                detailInputField.text = panel.PlayerInput;
+                detailInputField.interactable = !panel.IsSaved;
+            }
+            AttachInputListener();
+
+            // Save button state
+            if (saveButton != null)
+                saveButton.interactable = !panel.IsSaved;
+            if (saveButtonText != null)
+                saveButtonText.text = panel.IsSaved ? "Saved" : "Save";
+
+            // Status
+            if (detailStatusText != null)
+            {
+                if (panel.IsSaved)
+                    detailStatusText.text = "Response saved and locked.";
+                else
+                    detailStatusText.text = "Type your response and save when ready.";
+            }
+
+            if (enableDebugLogs)
+                Debug.Log($"[PlayerActionUI] Showing detail for [{category}]");
+        }
+
+        // -------------------------------------------------------------------------
+        // Input Field Listener Management
+        // -------------------------------------------------------------------------
+        private void AttachInputListener()
+        {
+            if (detailInputField != null && !isInputListenerActive)
+            {
+                detailInputField.onValueChanged.AddListener(OnDetailInputChanged);
+                isInputListenerActive = true;
+            }
+        }
+
+        private void DetachInputListener()
+        {
+            if (detailInputField != null && isInputListenerActive)
+            {
+                detailInputField.onValueChanged.RemoveListener(OnDetailInputChanged);
+                isInputListenerActive = false;
+            }
+        }
+
+        private void OnDetailInputChanged(string newValue)
+        {
+            if (!currentlyViewingCategory.HasValue) return;
+
+            var panel = GetPanel(currentlyViewingCategory.Value);
+            if (panel != null)
+                panel.SetInputText(newValue);
+        }
+
+        // -------------------------------------------------------------------------
+        // User Actions
+        // -------------------------------------------------------------------------
+        private void OnListItemClicked(PlayerActionCategory category)
+        {
+            ShowDetail(category);
+        }
+
+        private void OnBackClicked()
+        {
+            // Sync current input back to panel before leaving
+            if (currentlyViewingCategory.HasValue && detailInputField != null)
+            {
+                var panel = GetPanel(currentlyViewingCategory.Value);
+                if (panel != null && !panel.IsSaved)
+                    panel.SetInputText(detailInputField.text);
+            }
+
+            ShowInbox();
+        }
+
+        private void OnSaveClicked()
+        {
+            if (!currentlyViewingCategory.HasValue) return;
+
+            var panel = GetPanel(currentlyViewingCategory.Value);
+            if (panel == null || panel.IsSaved) return;
+
+            // Sync latest input
+            if (detailInputField != null)
+                panel.SetInputText(detailInputField.text);
+
+            // Validate
+            if (!panel.ValidateInput())
+            {
+                if (detailStatusText != null)
+                    detailStatusText.text = panel.Category == PlayerActionCategory.Dilemma
+                        ? "You must respond to the dilemma!"
+                        : "Describe your approach!";
+                return;
+            }
+
+            // Show confirmation popup
+            if (confirmationPopup != null)
+            {
+                confirmationPopup.Show(
+                    "Are you sure you want to save your response?\nYou won't be able to edit it after saving.",
+                    OnSaveConfirmed,
+                    null,
+                    "Save",
+                    "Cancel");
+            }
+            else
+            {
+                // No popup — just save directly
+                OnSaveConfirmed();
+            }
+        }
+
+        private void OnSaveConfirmed()
+        {
+            if (!currentlyViewingCategory.HasValue) return;
+
+            var category = currentlyViewingCategory.Value;
+            var panel = GetPanel(category);
+            if (panel == null) return;
+
+            // Save and lock
+            panel.SaveInput();
+            savedCategories[category] = true;
+
+            // Update detail panel visuals
+            if (detailInputField != null)
+                detailInputField.interactable = false;
+            if (saveButton != null)
+                saveButton.interactable = false;
+            if (saveButtonText != null)
+                saveButtonText.text = "Saved";
+            if (detailStatusText != null)
+                detailStatusText.text = "Response saved and locked.";
+
+            // Update list item
+            var listItem = GetListItem(category);
+            if (listItem != null)
+                listItem.SetSaved(true);
+
+            if (enableDebugLogs)
+                Debug.Log($"[PlayerActionUI] [{category}] saved.");
+
+            // Return to inbox
+            ShowInbox();
+        }
+
+        private void CheckAllSaved()
+        {
+            if (currentState == null)
+            {
+                if (submitAllButton != null)
+                    submitAllButton.gameObject.SetActive(false);
+                return;
+            }
+
+            var active = currentState.GetActiveCategories();
+            bool allSaved = true;
+            foreach (var cat in active)
+            {
+                if (!savedCategories.ContainsKey(cat) || !savedCategories[cat])
+                {
+                    allSaved = false;
+                    break;
+                }
+            }
+
+            if (submitAllButton != null)
+                submitAllButton.gameObject.SetActive(allSaved && active.Count > 0);
+
+            if (allSaved && active.Count > 0 && enableDebugLogs)
+                Debug.Log("[PlayerActionUI] All categories saved! Submit All button shown.");
+        }
+
+        private void OnSubmitAllClicked()
+        {
+            if (PlayerActionManager.Instance == null) return;
+
+            if (enableDebugLogs)
+                Debug.Log("[PlayerActionUI] Submitting all saved actions to LLM...");
+
+            // Update list items to show processing
+            if (currentState != null)
+            {
+                foreach (var cat in currentState.GetActiveCategories())
+                {
+                    var listItem = GetListItem(cat);
+                    if (listItem != null)
+                        listItem.SetProcessing();
+                }
+            }
+
+            // Hide submit button
+            if (submitAllButton != null)
+                submitAllButton.gameObject.SetActive(false);
+
+            // Submit all via manager
+            PlayerActionManager.Instance.SubmitAllActions();
+        }
+
+        // -------------------------------------------------------------------------
+        // Completion
+        // -------------------------------------------------------------------------
         private void ShowCompletionSummary()
         {
+            // Hide inbox and detail
+            if (inboxContainer != null)
+                inboxContainer.SetActive(false);
+            if (detailPanel != null)
+                detailPanel.SetActive(false);
+
             if (completionPanel != null)
                 completionPanel.SetActive(true);
 
@@ -213,6 +625,10 @@ namespace TheBunkerGames
             }
         }
 
+        // -------------------------------------------------------------------------
+        // Public API
+        // -------------------------------------------------------------------------
+
         /// <summary>
         /// Hide all panels and the root.
         /// </summary>
@@ -220,22 +636,17 @@ namespace TheBunkerGames
         {
             if (rootPanel != null)
                 rootPanel.SetActive(false);
-
-            if (explorationPanel != null)
-                explorationPanel.Hide();
-            if (dilemmaPanel != null)
-                dilemmaPanel.Hide();
-            if (familyRequestPanel != null)
-                familyRequestPanel.Hide();
-
+            if (inboxContainer != null)
+                inboxContainer.SetActive(false);
+            if (detailPanel != null)
+                detailPanel.SetActive(false);
             if (completionPanel != null)
                 completionPanel.SetActive(false);
+
+            DetachInputListener();
+            currentlyViewingCategory = null;
         }
 
-        /// <summary>
-        /// Show the UI and prepare for a new day.
-        /// Typically called by PlayerActionManager via event, but can be called manually.
-        /// </summary>
         public void Show()
         {
             if (rootPanel != null)
@@ -256,6 +667,17 @@ namespace TheBunkerGames
             }
         }
 
+        private PlayerActionListItem GetListItem(PlayerActionCategory category)
+        {
+            switch (category)
+            {
+                case PlayerActionCategory.Exploration: return explorationListItem;
+                case PlayerActionCategory.Dilemma: return dilemmaListItem;
+                case PlayerActionCategory.FamilyRequest: return familyRequestListItem;
+                default: return null;
+            }
+        }
+
         private void OnContinueClicked()
         {
             if (enableDebugLogs)
@@ -267,6 +689,8 @@ namespace TheBunkerGames
             if (explorationPanel != null) explorationPanel.ResetPanel();
             if (dilemmaPanel != null) dilemmaPanel.ResetPanel();
             if (familyRequestPanel != null) familyRequestPanel.ResetPanel();
+
+            savedCategories.Clear();
         }
 
         // -------------------------------------------------------------------------
@@ -274,17 +698,11 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Title("Debug")]
-        [Button("Show All Panels (Test)", ButtonSizes.Medium)]
-        private void Debug_ShowAllPanels()
+        [Button("Show Inbox (Test)", ButtonSizes.Medium)]
+        private void Debug_ShowInbox()
         {
-            if (rootPanel != null)
-                rootPanel.SetActive(true);
-            if (explorationPanel != null)
-                explorationPanel.gameObject.SetActive(true);
-            if (dilemmaPanel != null)
-                dilemmaPanel.gameObject.SetActive(true);
-            if (familyRequestPanel != null)
-                familyRequestPanel.gameObject.SetActive(true);
+            if (rootPanel != null) rootPanel.SetActive(true);
+            ShowInbox();
         }
 
         [Button("Hide All", ButtonSizes.Medium)]
@@ -327,13 +745,13 @@ namespace TheBunkerGames
             for (int i = transform.childCount - 1; i >= 0; i--)
                 DestroyImmediate(transform.GetChild(i).gameObject);
 
-            // Root panel
+            // ----- Root Panel -----
             var rp = MakeUI("RootPanel", transform);
             Stretch(rp);
             var rpBg = rp.gameObject.AddComponent<Image>();
-            rpBg.color = new Color(0.05f, 0.05f, 0.1f, 0.9f);
+            rpBg.color = new Color(0.05f, 0.05f, 0.1f, 0.92f);
 
-            // Header area
+            // ----- Header -----
             var header = MakeUI("Header", rp);
             header.anchorMin = new Vector2(0, 0.92f);
             header.anchorMax = new Vector2(1, 1);
@@ -348,23 +766,209 @@ namespace TheBunkerGames
             dLabel.rectTransform.offsetMin = Vector2.zero;
             dLabel.rectTransform.offsetMax = new Vector2(-10, 0);
 
-            // Content area
-            var content = MakeUI("ContentArea", rp);
-            content.anchorMin = new Vector2(0.02f, 0.12f);
-            content.anchorMax = new Vector2(0.98f, 0.9f);
-            content.offsetMin = content.offsetMax = Vector2.zero;
-            var hlg = content.gameObject.AddComponent<HorizontalLayoutGroup>();
-            hlg.spacing = 15;
-            hlg.childForceExpandWidth = true;
-            hlg.childForceExpandHeight = true;
-            hlg.padding = new RectOffset(10, 10, 10, 10);
+            // ===================================================================
+            // INBOX LIST CONTAINER
+            // ===================================================================
+            var inbox = MakeUI("InboxContainer", rp);
+            inbox.anchorMin = new Vector2(0.1f, 0.12f);
+            inbox.anchorMax = new Vector2(0.9f, 0.9f);
+            inbox.offsetMin = inbox.offsetMax = Vector2.zero;
 
-            // 3 category panels
-            var expPanel = BuildCategoryPanel("ExplorationPanel", content, PlayerActionCategory.Exploration);
-            var dilPanel = BuildCategoryPanel("DilemmaPanel", content, PlayerActionCategory.Dilemma);
-            var famPanel = BuildCategoryPanel("FamilyPanel", content, PlayerActionCategory.FamilyRequest);
+            var inboxVL = inbox.gameObject.AddComponent<VerticalLayoutGroup>();
+            inboxVL.spacing = 8;
+            inboxVL.padding = new RectOffset(20, 20, 20, 20);
+            inboxVL.childForceExpandWidth = true;
+            inboxVL.childForceExpandHeight = false;
+            inboxVL.childControlHeight = false;
+            inboxVL.childControlWidth = true;
 
-            // Completion panel
+            // Info label
+            var infoLabel = MakeTMP("InboxInfo", inbox, "Click a task to view details and write your response.", 14, TextAlignmentOptions.Center);
+            infoLabel.color = new Color(0.6f, 0.6f, 0.6f);
+            PrefH(infoLabel.gameObject, 25);
+
+            // 3 list items
+            var expLI = BuildListItem("ExplorationListItem", inbox, PlayerActionCategory.Exploration, "EXPLORATION");
+            var dilLI = BuildListItem("DilemmaListItem", inbox, PlayerActionCategory.Dilemma, "DILEMMA");
+            var famLI = BuildListItem("FamilyRequestListItem", inbox, PlayerActionCategory.FamilyRequest, "FAMILY REQUEST");
+
+            // Spacer
+            var spacer = MakeUI("Spacer", inbox);
+            var spacerLE = spacer.gameObject.AddComponent<LayoutElement>();
+            spacerLE.flexibleHeight = 1;
+
+            // Submit All button (hidden by default)
+            var submitAll = MakeButton("SubmitAllButton", inbox, "Submit All Actions");
+            PrefH(submitAll.gameObject, 50);
+            var submitBtnImg = submitAll.GetComponent<Image>();
+            if (submitBtnImg != null) submitBtnImg.color = new Color(0.15f, 0.4f, 0.7f, 1f);
+            submitAll.gameObject.SetActive(false);
+
+            // ===================================================================
+            // DETAIL PANEL
+            // ===================================================================
+            var detail = MakeUI("DetailPanel", rp);
+            detail.anchorMin = new Vector2(0.1f, 0.12f);
+            detail.anchorMax = new Vector2(0.9f, 0.9f);
+            detail.offsetMin = detail.offsetMax = Vector2.zero;
+            detail.gameObject.SetActive(false);
+
+            var detailBg = detail.gameObject.AddComponent<Image>();
+            detailBg.color = new Color(0.08f, 0.08f, 0.14f, 1f);
+
+            var detailVL = detail.gameObject.AddComponent<VerticalLayoutGroup>();
+            detailVL.spacing = 10;
+            detailVL.padding = new RectOffset(25, 25, 15, 15);
+            detailVL.childForceExpandWidth = true;
+            detailVL.childForceExpandHeight = false;
+            detailVL.childControlHeight = false;
+            detailVL.childControlWidth = true;
+
+            // Back button row
+            var backRow = MakeUI("BackRow", detail);
+            PrefH(backRow.gameObject, 35);
+            var backHL = backRow.gameObject.AddComponent<HorizontalLayoutGroup>();
+            backHL.childForceExpandWidth = false;
+            backHL.childForceExpandHeight = true;
+
+            var backBtn = MakeButton("BackButton", backRow, "< Back");
+            var backLE = backBtn.gameObject.AddComponent<LayoutElement>();
+            backLE.preferredWidth = 120;
+            var backBtnImg = backBtn.GetComponent<Image>();
+            if (backBtnImg != null) backBtnImg.color = new Color(0.25f, 0.25f, 0.35f, 1f);
+
+            // Category label
+            var dCatLabel = MakeTMP("DetailCategoryLabel", detail, "CATEGORY", 24, TextAlignmentOptions.Left);
+            dCatLabel.color = new Color(1f, 0.85f, 0.3f);
+            dCatLabel.fontStyle = FontStyles.Bold;
+            PrefH(dCatLabel.gameObject, 35);
+
+            // Challenge title
+            var dTitle = MakeTMP("DetailChallengeTitle", detail, "Challenge Title", 20, TextAlignmentOptions.Left);
+            dTitle.fontStyle = FontStyles.Bold;
+            PrefH(dTitle.gameObject, 30);
+
+            // Challenge description
+            var dDesc = MakeTMP("DetailChallengeDescription", detail, "Challenge description...", 15, TextAlignmentOptions.TopLeft);
+            PrefH(dDesc.gameObject, 80);
+
+            // Separator
+            var sep = MakeUI("Separator", detail);
+            PrefH(sep.gameObject, 2);
+            var sepImg = sep.gameObject.AddComponent<Image>();
+            sepImg.color = new Color(0.3f, 0.3f, 0.4f, 0.5f);
+
+            // Input field label
+            var inputLabel = MakeTMP("InputLabel", detail, "Your Response:", 14, TextAlignmentOptions.Left);
+            inputLabel.color = new Color(0.7f, 0.7f, 0.7f);
+            PrefH(inputLabel.gameObject, 20);
+
+            // Input field
+            var inputGO = new GameObject("DetailInputField");
+            inputGO.transform.SetParent(detail, false);
+            var inputRT = inputGO.AddComponent<RectTransform>();
+            inputRT.sizeDelta = new Vector2(0, 120);
+            var inputBg = inputGO.AddComponent<Image>();
+            inputBg.color = new Color(0.15f, 0.15f, 0.2f, 1f);
+            var dInputField = inputGO.AddComponent<TMP_InputField>();
+            dInputField.lineType = TMP_InputField.LineType.MultiLineNewline;
+
+            var textArea = MakeUI("Text Area", inputRT);
+            Stretch(textArea, 8);
+            var inputTxt = MakeTMP("Text", textArea, "", 15, TextAlignmentOptions.TopLeft);
+            Stretch(inputTxt.rectTransform);
+            var ph = MakeTMP("Placeholder", textArea, "Type your response...", 15, TextAlignmentOptions.TopLeft);
+            ph.fontStyle = FontStyles.Italic;
+            ph.color = new Color(1, 1, 1, 0.3f);
+            Stretch(ph.rectTransform);
+
+            dInputField.textViewport = textArea;
+            dInputField.textComponent = inputTxt;
+            dInputField.placeholder = ph;
+            PrefH(inputGO, 120);
+
+            // Item toggle container
+            var dItemC = MakeUI("DetailItemToggleContainer", detail);
+            PrefH(dItemC.gameObject, 40);
+            var dItemHL = dItemC.gameObject.AddComponent<HorizontalLayoutGroup>();
+            dItemHL.spacing = 5;
+            dItemHL.childForceExpandWidth = false;
+            dItemHL.childForceExpandHeight = true;
+
+            // Save button
+            var saveBtnRT = MakeButton("SaveButton", detail, "Save");
+            PrefH(saveBtnRT.gameObject, 45);
+            var saveBtnImg = saveBtnRT.GetComponent<Image>();
+            if (saveBtnImg != null) saveBtnImg.color = new Color(0.2f, 0.55f, 0.2f, 1f);
+
+            // Status text
+            var dStatus = MakeTMP("DetailStatusText", detail, "", 13, TextAlignmentOptions.Center);
+            dStatus.color = new Color(0.7f, 0.7f, 0.7f);
+            PrefH(dStatus.gameObject, 20);
+
+            // ===================================================================
+            // CONFIRMATION POPUP
+            // ===================================================================
+            var popupRoot = MakeUI("ConfirmationPopup", rp);
+            Stretch(popupRoot);
+            popupRoot.gameObject.SetActive(false);
+
+            // Overlay
+            var overlay = MakeUI("Overlay", popupRoot);
+            Stretch(overlay);
+            var overlayImg = overlay.gameObject.AddComponent<Image>();
+            overlayImg.color = new Color(0, 0, 0, 0.6f);
+            overlayImg.raycastTarget = true;
+
+            // Card
+            var card = MakeUI("Card", popupRoot);
+            card.anchorMin = new Vector2(0.25f, 0.3f);
+            card.anchorMax = new Vector2(0.75f, 0.65f);
+            card.offsetMin = card.offsetMax = Vector2.zero;
+            var cardBg = card.gameObject.AddComponent<Image>();
+            cardBg.color = new Color(0.12f, 0.12f, 0.18f, 1f);
+
+            var cardVL = card.gameObject.AddComponent<VerticalLayoutGroup>();
+            cardVL.spacing = 15;
+            cardVL.padding = new RectOffset(30, 30, 25, 20);
+            cardVL.childForceExpandWidth = true;
+            cardVL.childForceExpandHeight = false;
+            cardVL.childControlHeight = false;
+            cardVL.childControlWidth = true;
+
+            var msgText = MakeTMP("MessageText", card, "Are you sure you want to save?", 18, TextAlignmentOptions.Center);
+            PrefH(msgText.gameObject, 80);
+
+            var btnRow = MakeUI("ButtonRow", card);
+            PrefH(btnRow.gameObject, 45);
+            var btnHL = btnRow.gameObject.AddComponent<HorizontalLayoutGroup>();
+            btnHL.spacing = 20;
+            btnHL.childForceExpandWidth = true;
+            btnHL.childForceExpandHeight = true;
+
+            var cancBtn = MakeButton("CancelButton", btnRow, "Cancel");
+            var cancBtnImg = cancBtn.GetComponent<Image>();
+            if (cancBtnImg != null) cancBtnImg.color = new Color(0.35f, 0.2f, 0.2f, 1f);
+
+            var confBtn = MakeButton("ConfirmButton", btnRow, "Save");
+            var confBtnImg = confBtn.GetComponent<Image>();
+            if (confBtnImg != null) confBtnImg.color = new Color(0.2f, 0.55f, 0.2f, 1f);
+
+            // Wire ConfirmationPopup component
+            var popupComp = popupRoot.gameObject.AddComponent<ConfirmationPopup>();
+            var popupSO = new SerializedObject(popupComp);
+            popupSO.FindProperty("popupRoot").objectReferenceValue = popupRoot.gameObject;
+            popupSO.FindProperty("overlayBackground").objectReferenceValue = overlayImg;
+            popupSO.FindProperty("messageText").objectReferenceValue = msgText;
+            popupSO.FindProperty("confirmButton").objectReferenceValue = confBtn.GetComponent<Button>();
+            popupSO.FindProperty("confirmButtonText").objectReferenceValue = confBtn.GetComponentInChildren<TMP_Text>();
+            popupSO.FindProperty("cancelButton").objectReferenceValue = cancBtn.GetComponent<Button>();
+            popupSO.FindProperty("cancelButtonText").objectReferenceValue = cancBtn.GetComponentInChildren<TMP_Text>();
+            popupSO.ApplyModifiedPropertiesWithoutUndo();
+
+            // ===================================================================
+            // COMPLETION PANEL
+            // ===================================================================
             var comp = MakeUI("CompletionPanel", rp);
             comp.anchorMin = new Vector2(0.15f, 0.15f);
             comp.anchorMax = new Vector2(0.85f, 0.85f);
@@ -383,19 +987,50 @@ namespace TheBunkerGames
             contBtn.anchorMax = new Vector2(0.7f, 0.15f);
             contBtn.offsetMin = contBtn.offsetMax = Vector2.zero;
 
-            // Wire all references
-            explorationPanel = expPanel;
-            dilemmaPanel = dilPanel;
-            familyRequestPanel = famPanel;
+            // ===================================================================
+            // CATEGORY DATA HOLDERS (invisible)
+            // ===================================================================
+            var expData = BuildDataPanel("ExplorationData", rp, PlayerActionCategory.Exploration);
+            var dilData = BuildDataPanel("DilemmaData", rp, PlayerActionCategory.Dilemma);
+            var famData = BuildDataPanel("FamilyRequestData", rp, PlayerActionCategory.FamilyRequest);
+
+            // ===================================================================
+            // WIRE ALL REFERENCES
+            // ===================================================================
+            explorationPanel = expData;
+            dilemmaPanel = dilData;
+            familyRequestPanel = famData;
+
             rootPanel = rp.gameObject;
             headerText = hText;
             dayLabel = dLabel;
+
+            inboxContainer = inbox.gameObject;
+            explorationListItem = expLI;
+            dilemmaListItem = dilLI;
+            familyRequestListItem = famLI;
+            submitAllButton = submitAll.GetComponent<Button>();
+            submitAllButtonText = submitAll.GetComponentInChildren<TMP_Text>();
+
+            detailPanel = detail.gameObject;
+            backButton = backBtn.GetComponent<Button>();
+            detailCategoryLabel = dCatLabel;
+            detailChallengeTitle = dTitle;
+            detailChallengeDescription = dDesc;
+            detailInputField = dInputField;
+            detailItemToggleContainer = dItemC;
+            saveButton = saveBtnRT.GetComponent<Button>();
+            saveButtonText = saveBtnRT.GetComponentInChildren<TMP_Text>();
+            detailStatusText = dStatus;
+
+            confirmationPopup = popupComp;
+
             completionPanel = comp.gameObject;
             completionText = cText;
             continueButton = contBtn.GetComponent<Button>();
 
             EditorUtility.SetDirty(this);
-            Debug.Log("[PlayerActionUI] Auto Setup complete! All UI built and wired.");
+            Debug.Log("[PlayerActionUI] Auto Setup complete! Inbox-style UI built and wired.");
             #else
             Debug.LogWarning("[PlayerActionUI] AutoSetup only works in the Editor.");
             #endif
@@ -403,125 +1038,72 @@ namespace TheBunkerGames
 
         #if UNITY_EDITOR
         // -------------------------------------------------------------------------
-        // Panel builder (used by AutoSetup)
+        // List Item builder (used by AutoSetup)
         // -------------------------------------------------------------------------
-        private PlayerActionCategoryPanel BuildCategoryPanel(string name, RectTransform parent, PlayerActionCategory cat)
+        private PlayerActionListItem BuildListItem(string name, RectTransform parent, PlayerActionCategory cat, string displayName)
         {
-            var panel = MakeUI(name, parent);
-            var bg = panel.gameObject.AddComponent<Image>();
-            bg.color = new Color(0.12f, 0.12f, 0.18f, 1f);
+            var row = MakeUI(name, parent);
+            var rowBg = row.gameObject.AddComponent<Image>();
+            rowBg.color = new Color(0.12f, 0.12f, 0.18f, 1f);
 
-            var vl = panel.gameObject.AddComponent<VerticalLayoutGroup>();
-            vl.spacing = 8;
-            vl.padding = new RectOffset(10, 10, 10, 10);
-            vl.childForceExpandWidth = true;
-            vl.childForceExpandHeight = false;
-            vl.childControlHeight = false;
-            vl.childControlWidth = true;
+            var btn = row.gameObject.AddComponent<Button>();
+            var btnColors = btn.colors;
+            btnColors.highlightedColor = new Color(0.18f, 0.18f, 0.28f, 1f);
+            btnColors.pressedColor = new Color(0.1f, 0.1f, 0.15f, 1f);
+            btn.colors = btnColors;
 
-            var catLabel = MakeTMP("CategoryLabel", panel, cat.ToString().ToUpper(), 22, TextAlignmentOptions.Center);
-            catLabel.color = new Color(1f, 0.85f, 0.3f);
-            PrefH(catLabel.gameObject, 35);
+            var hlg = row.gameObject.AddComponent<HorizontalLayoutGroup>();
+            hlg.spacing = 15;
+            hlg.padding = new RectOffset(20, 20, 10, 10);
+            hlg.childForceExpandWidth = false;
+            hlg.childForceExpandHeight = true;
+            hlg.childControlWidth = false;
+            hlg.childControlHeight = true;
+            PrefH(row.gameObject, 60);
 
-            var titleText = MakeTMP("ChallengeTitle", panel, "Challenge Title", 18, TextAlignmentOptions.Center);
-            titleText.fontStyle = FontStyles.Bold;
-            PrefH(titleText.gameObject, 30);
+            // Category label
+            var catLabel = MakeTMP("CategoryLabel", row, displayName, 16, TextAlignmentOptions.Left);
+            catLabel.fontStyle = FontStyles.Bold;
+            var catLE = catLabel.gameObject.AddComponent<LayoutElement>();
+            catLE.preferredWidth = 200;
 
-            var descText = MakeTMP("ChallengeDescription", panel, "Challenge description...", 14, TextAlignmentOptions.TopLeft);
-            PrefH(descText.gameObject, 80);
+            // Challenge title (flexible)
+            var titleText = MakeTMP("ChallengeTitle", row, "Challenge title...", 14, TextAlignmentOptions.Left);
+            titleText.color = new Color(0.8f, 0.8f, 0.8f);
+            var titleLE = titleText.gameObject.AddComponent<LayoutElement>();
+            titleLE.flexibleWidth = 1;
 
-            // Input field
-            var inputGO = new GameObject("PlayerInput");
-            inputGO.transform.SetParent(panel, false);
-            var inputRT = inputGO.AddComponent<RectTransform>();
-            inputRT.sizeDelta = new Vector2(0, 80);
-            var inputBg = inputGO.AddComponent<Image>();
-            inputBg.color = new Color(0.2f, 0.2f, 0.25f, 1f);
-            var inputField = inputGO.AddComponent<TMP_InputField>();
-            inputField.lineType = TMP_InputField.LineType.MultiLineNewline;
+            // Status label
+            var statusLabel = MakeTMP("StatusLabel", row, "Draft", 14, TextAlignmentOptions.Right);
+            statusLabel.color = new Color(0.5f, 0.5f, 0.5f);
+            var statusLE = statusLabel.gameObject.AddComponent<LayoutElement>();
+            statusLE.preferredWidth = 100;
 
-            var textArea = MakeUI("Text Area", inputRT);
-            Stretch(textArea, 5);
-            var inputTxt = MakeTMP("Text", textArea, "", 14, TextAlignmentOptions.TopLeft);
-            Stretch(inputTxt.rectTransform);
-            var ph = MakeTMP("Placeholder", textArea, "Type your response...", 14, TextAlignmentOptions.TopLeft);
-            ph.fontStyle = FontStyles.Italic;
-            ph.color = new Color(1, 1, 1, 0.3f);
-            Stretch(ph.rectTransform);
-
-            inputField.textViewport = textArea;
-            inputField.textComponent = inputTxt;
-            inputField.placeholder = ph;
-            PrefH(inputGO, 80);
-
-            // Item container
-            var itemC = MakeUI("ItemToggleContainer", panel);
-            PrefH(itemC.gameObject, 40);
-            var ihl = itemC.gameObject.AddComponent<HorizontalLayoutGroup>();
-            ihl.spacing = 5;
-            ihl.childForceExpandWidth = false;
-            ihl.childForceExpandHeight = true;
-
-            // Submit button
-            var subBtn = MakeButton("SubmitButton", panel, "Submit");
-            PrefH(subBtn.gameObject, 40);
-
-            // Status text
-            var statusTxt = MakeTMP("StatusText", panel, "", 12, TextAlignmentOptions.Center);
-            statusTxt.color = new Color(0.7f, 0.7f, 0.7f);
-            PrefH(statusTxt.gameObject, 20);
-
-            // Loading indicator
-            var loadGO = new GameObject("LoadingIndicator");
-            loadGO.transform.SetParent(panel, false);
-            loadGO.AddComponent<RectTransform>().sizeDelta = new Vector2(0, 20);
-            var lt = MakeTMP("LoadingText", loadGO.GetComponent<RectTransform>(), "Processing...", 14, TextAlignmentOptions.Center);
-            lt.color = new Color(1f, 0.9f, 0.3f);
-            Stretch(lt.rectTransform);
-            PrefH(loadGO, 20);
-            loadGO.SetActive(false);
-
-            // Result panel
-            var resPanel = MakeUI("ResultPanel", panel);
-            var resBg = resPanel.gameObject.AddComponent<Image>();
-            resBg.color = new Color(0.08f, 0.15f, 0.08f, 1f);
-            var rvl = resPanel.gameObject.AddComponent<VerticalLayoutGroup>();
-            rvl.spacing = 4;
-            rvl.padding = new RectOffset(8, 8, 8, 8);
-            rvl.childForceExpandWidth = true;
-            rvl.childForceExpandHeight = false;
-            rvl.childControlHeight = false;
-            rvl.childControlWidth = true;
-            PrefH(resPanel.gameObject, 120);
-
-            var resTitle = MakeTMP("ResultTitle", resPanel, "Result Title", 16, TextAlignmentOptions.Center);
-            resTitle.fontStyle = FontStyles.Bold;
-            resTitle.color = new Color(0.4f, 1f, 0.4f);
-            PrefH(resTitle.gameObject, 25);
-            var resDesc = MakeTMP("ResultDescription", resPanel, "", 13, TextAlignmentOptions.TopLeft);
-            PrefH(resDesc.gameObject, 50);
-            var resEffects = MakeTMP("ResultEffects", resPanel, "", 11, TextAlignmentOptions.TopLeft);
-            resEffects.color = new Color(1f, 0.7f, 0.3f);
-            PrefH(resEffects.gameObject, 35);
-            resPanel.gameObject.SetActive(false);
-
-            // Add component and wire via SerializedObject
-            var comp = panel.gameObject.AddComponent<PlayerActionCategoryPanel>();
-            var so = new SerializedObject(comp);
-            so.FindProperty("category").enumValueIndex = (int)cat;
+            // Add and wire PlayerActionListItem
+            var listItem = row.gameObject.AddComponent<PlayerActionListItem>();
+            var so = new SerializedObject(listItem);
             so.FindProperty("categoryLabel").objectReferenceValue = catLabel;
             so.FindProperty("challengeTitleText").objectReferenceValue = titleText;
-            so.FindProperty("challengeDescriptionText").objectReferenceValue = descText;
-            so.FindProperty("playerInputField").objectReferenceValue = inputField;
-            so.FindProperty("submitButton").objectReferenceValue = subBtn.GetComponent<Button>();
-            so.FindProperty("submitButtonText").objectReferenceValue = subBtn.GetComponentInChildren<TMP_Text>();
-            so.FindProperty("itemToggleContainer").objectReferenceValue = itemC;
-            so.FindProperty("resultPanel").objectReferenceValue = resPanel.gameObject;
-            so.FindProperty("resultTitleText").objectReferenceValue = resTitle;
-            so.FindProperty("resultDescriptionText").objectReferenceValue = resDesc;
-            so.FindProperty("resultEffectsText").objectReferenceValue = resEffects;
-            so.FindProperty("loadingIndicator").objectReferenceValue = loadGO;
-            so.FindProperty("statusText").objectReferenceValue = statusTxt;
+            so.FindProperty("statusLabel").objectReferenceValue = statusLabel;
+            so.FindProperty("backgroundImage").objectReferenceValue = rowBg;
+            so.FindProperty("selectButton").objectReferenceValue = btn;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            return listItem;
+        }
+
+        // -------------------------------------------------------------------------
+        // Data Panel builder (used by AutoSetup) — invisible state holder
+        // -------------------------------------------------------------------------
+        private PlayerActionCategoryPanel BuildDataPanel(string name, RectTransform parent, PlayerActionCategory cat)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            go.SetActive(false); // Hidden data holder
+
+            var comp = go.AddComponent<PlayerActionCategoryPanel>();
+            var so = new SerializedObject(comp);
+            so.FindProperty("category").enumValueIndex = (int)cat;
             so.ApplyModifiedPropertiesWithoutUndo();
 
             return comp;
@@ -545,21 +1127,6 @@ namespace TheBunkerGames
         }
 
         private TextMeshProUGUI MakeTMP(string n, RectTransform p, string text, int size, TextAlignmentOptions align)
-        {
-            var go = new GameObject(n);
-            go.transform.SetParent(p, false);
-            go.AddComponent<RectTransform>();
-            var t = go.AddComponent<TextMeshProUGUI>();
-            t.text = text;
-            t.fontSize = size;
-            t.alignment = align;
-            t.color = Color.white;
-            t.enableWordWrapping = true;
-            t.overflowMode = TextOverflowModes.Ellipsis;
-            return t;
-        }
-
-        private TextMeshProUGUI MakeTMP(string n, Transform p, string text, int size, TextAlignmentOptions align)
         {
             var go = new GameObject(n);
             go.transform.SetParent(p, false);
