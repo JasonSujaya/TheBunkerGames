@@ -99,14 +99,6 @@ namespace TheBunkerGames
                 }
             }
 
-            // A.N.G.E.L.
-            var angel = AngelInteractionManager.Instance;
-            if (angel != null)
-            {
-                saveData.AngelMood = angel.CurrentMood.ToString();
-                saveData.AngelProcessingLevel = angel.ProcessingLevel;
-            }
-
             // Quests
             var questManager = QuestManager.Instance;
             if (questManager != null)

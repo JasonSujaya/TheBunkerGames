@@ -44,17 +44,8 @@ namespace TheBunkerGames
                 case GameState.StatusReview:
                     StatusReviewManager.Instance?.CompleteStatusReview();
                     break;
-                case GameState.AngelInteraction:
-                    AngelInteractionManager.Instance?.CompleteInteraction();
-                    break;
                 case GameState.CityExploration:
                     CityExplorationManager.Instance?.CompleteExplorationPhase();
-                    break;
-                case GameState.DailyChoice:
-                    DailyChoiceManager.Instance?.CompleteChoicePhase();
-                    break;
-                case GameState.NightCycle:
-                    NightCycleManager.Instance?.CompleteNightCycle();
                     break;
             }
         }

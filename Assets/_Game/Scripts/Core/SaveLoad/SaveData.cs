@@ -20,10 +20,6 @@ namespace TheBunkerGames
         // Inventory
         public List<InventorySlotSaveData> InventoryItems;
 
-        // A.N.G.E.L.
-        public string AngelMood;
-        public float AngelProcessingLevel;
-
         // Quests
         public List<QuestSaveData> Quests;
     }

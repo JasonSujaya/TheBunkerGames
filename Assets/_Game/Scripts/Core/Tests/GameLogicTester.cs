@@ -30,11 +30,7 @@ namespace TheBunkerGames.Tests
             // Add a single character
             familyManager.AddCharacter("SoloSurvivor", 10f, 10f, 10f, 10f);
             
-            // Kill them manually or via 0 stats? 
-            // Better to force state since we are testing GameManager reaction, not NightCycle logic (tested elsewhere)
-            
-            // Actually, GameManager.EndGame is usually called by NightCycleManager.
-            // But let's verify that EndGame(false) sets state correctly.
+            // Verify that EndGame(false) sets state correctly.
             
             gameManager.EndGame(survived: false);
 
