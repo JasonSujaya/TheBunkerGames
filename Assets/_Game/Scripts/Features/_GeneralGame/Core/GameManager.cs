@@ -45,6 +45,13 @@ namespace TheBunkerGames
         [Title("Systems")]
         [Required] public GameFlowController FlowController;
         [Required] public SurvivalManager Survival;
+        [Required] public InventoryManager Inventory;
+        [Required] public CharacterManager Characters;
+        [Required] public FamilyManager Family;
+        [Required] public PlaceManager Places;
+        [Required] public QuestManager Quests;
+        
+        [Title("Phases")]
         [Required] public StatusReviewManager StatusReview;
         [Required] public AngelInteractionManager AngelInteraction;
         [Required] public CityExplorationManager CityExploration;
@@ -97,6 +104,12 @@ namespace TheBunkerGames
         {
             // Find external managers in the scene (do not create them)
             if (Survival == null) Survival = FindFirstObjectByType<SurvivalManager>();
+            if (Inventory == null) Inventory = FindFirstObjectByType<InventoryManager>();
+            if (Characters == null) Characters = FindFirstObjectByType<CharacterManager>();
+            if (Family == null) Family = FindFirstObjectByType<FamilyManager>();
+            if (Places == null) Places = FindFirstObjectByType<PlaceManager>();
+            if (Quests == null) Quests = FindFirstObjectByType<QuestManager>();
+            
             if (StatusReview == null) StatusReview = FindFirstObjectByType<StatusReviewManager>();
             if (AngelInteraction == null) AngelInteraction = FindFirstObjectByType<AngelInteractionManager>();
             if (CityExploration == null) CityExploration = FindFirstObjectByType<CityExplorationManager>();
