@@ -34,8 +34,24 @@ namespace TheBunkerGames
         {
             if (storyEvent != null)
             {
-                if (titleText != null) titleText.text = storyEvent.Title;
-                if (descriptionText != null) descriptionText.text = storyEvent.Description;
+                if (titleText != null)
+                {
+                    titleText.text = storyEvent.Title;
+                }
+                else
+                {
+                    Debug.LogWarning("[StorytellerUI] TitleText is missing!");
+                }
+
+                if (descriptionText != null)
+                {
+                    descriptionText.text = storyEvent.Description;
+                }
+                else
+                {
+                    Debug.LogWarning("[StorytellerUI] DescriptionText is missing!");
+                }
+
                 if (contentParent != null) contentParent.SetActive(true);
             }
             else
@@ -92,6 +108,7 @@ namespace TheBunkerGames
                     txt.fontSize = 24;
                     txt.alignment = TextAlignmentOptions.Center;
                     txt.fontStyle = FontStyles.Bold;
+                    txt.color = Color.white;
                     
                     var r = txt.rectTransform;
                     r.anchorMin = new Vector2(0, 0.85f);
@@ -119,6 +136,7 @@ namespace TheBunkerGames
                     txt.text = "Event Description...";
                     txt.fontSize = 18;
                     txt.alignment = TextAlignmentOptions.TopLeft;
+                    txt.color = Color.white;
                     
                     var r = txt.rectTransform;
                     r.anchorMin = new Vector2(0.05f, 0.05f);
