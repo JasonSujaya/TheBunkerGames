@@ -109,6 +109,27 @@ namespace TheBunkerGames
             return new LLMStoryEffectData(effectType, intensity, target);
         }
 
+        /// <summary>
+        /// Parse multiple effects from comma-separated string format.
+        /// Example: "ReduceHP:7:Mother, AddSanity:3"
+        /// </summary>
+        public static List<LLMStoryEffectData> ParseMultiple(string llmOutput)
+        {
+            var results = new List<LLMStoryEffectData>();
+            if (string.IsNullOrEmpty(llmOutput)) return results;
+
+            var effectStrings = llmOutput.Split(',');
+            foreach (var effectStr in effectStrings)
+            {
+                var effect = Parse(effectStr.Trim());
+                if (effect != null)
+                {
+                    results.Add(effect);
+                }
+            }
+            return results;
+        }
+
         public override string ToString()
         {
             return string.IsNullOrEmpty(target) 

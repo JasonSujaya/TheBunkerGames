@@ -136,31 +136,41 @@ namespace TheBunkerGames
         }
 
         /// <summary>
-        /// Execute effects directly from LLM JSON output.
-        /// Expects either a full LLMStoryEventData JSON or a JSON array of effects.
+        /// Execute effects from LLM output. Supports:
+        /// 1. Full JSON (LLMStoryEventData)
+        /// 2. Single effect JSON
+        /// 3. Legacy string format: "ReduceHP:7:Mother, AddSanity:3"
         /// </summary>
         public void ExecuteFromLLMOutput(string llmOutput)
         {
             if (string.IsNullOrEmpty(llmOutput)) return;
 
-            // Try parsing as full event first
+            // Try parsing as full event JSON first
             var storyEvent = LLMStoryEventData.FromJson(llmOutput);
-            if (storyEvent != null && storyEvent.Effects != null)
+            if (storyEvent != null && storyEvent.Effects != null && storyEvent.Effects.Count > 0)
             {
                 ExecuteEffects(storyEvent.Effects);
                 return;
             }
 
-            // Fall back to parsing as single effect (legacy format)
+            // Try parsing as single effect JSON
             var singleEffect = LLMStoryEffectData.FromJson(llmOutput);
             if (singleEffect != null)
             {
                 ExecuteEffect(singleEffect);
+                return;
             }
-            else
+
+            // Fall back to legacy string format: "ReduceHP:7:Mother, AddSanity:3"
+            var legacyEffects = LLMStoryEffectData.ParseMultiple(llmOutput);
+            if (legacyEffects != null && legacyEffects.Count > 0)
             {
-                Debug.LogWarning($"[LLMEffectExecutor] Could not parse LLM output: {llmOutput}");
+                Debug.Log($"[LLMEffectExecutor] Parsed {legacyEffects.Count} effect(s) from legacy string format");
+                ExecuteEffects(legacyEffects);
+                return;
             }
+
+            Debug.LogWarning($"[LLMEffectExecutor] Could not parse LLM output: {llmOutput}");
         }
 
         // -------------------------------------------------------------------------
