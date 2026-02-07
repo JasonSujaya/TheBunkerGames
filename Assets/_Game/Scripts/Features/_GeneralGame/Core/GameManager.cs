@@ -8,8 +8,7 @@ namespace TheBunkerGames
 {
     /// <summary>
     /// Singleton manager holding master game state.
-    /// Orchestrates the 5-phase Core Loop:
-    /// StatusReview -> AngelInteraction -> CityExploration -> DailyChoice -> NightCycle
+    /// Orchestrates the Core Loop: StatusReview -> CityExploration
     /// </summary>
     public class GameManager : MonoBehaviour
     {
@@ -70,10 +69,7 @@ namespace TheBunkerGames
         public StorytellerManager Storyteller;
         
         public StatusReviewManager StatusReview;
-        public AngelInteractionManager AngelInteraction;
         public CityExplorationManager CityExploration;
-        public DailyChoiceManager DailyChoice;
-        public NightCycleManager NightCycle;
 
         // -------------------------------------------------------------------------
         // Static Event Triggers (Called by GameFlowController)
@@ -134,10 +130,7 @@ namespace TheBunkerGames
             if (Storyteller == null) Storyteller = FindFirstObjectByType<StorytellerManager>();
             
             if (StatusReview == null) StatusReview = FindFirstObjectByType<StatusReviewManager>();
-            if (AngelInteraction == null) AngelInteraction = FindFirstObjectByType<AngelInteractionManager>();
             if (CityExploration == null) CityExploration = FindFirstObjectByType<CityExplorationManager>();
-            if (DailyChoice == null) DailyChoice = FindFirstObjectByType<DailyChoiceManager>();
-            if (NightCycle == null) NightCycle = FindFirstObjectByType<NightCycleManager>();
 
             Debug.Log("[GameManager] External managers updated.");
         }

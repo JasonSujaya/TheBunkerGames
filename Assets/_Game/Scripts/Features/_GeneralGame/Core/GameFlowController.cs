@@ -94,10 +94,6 @@ namespace TheBunkerGames
                 {
                     GameManager.FireDayStart();
                 }
-                else if (newState == GameState.NightCycle)
-                {
-                    GameManager.FireNightStart();
-                }
             }
 
             public void AdvanceDay()

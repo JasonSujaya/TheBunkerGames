@@ -29,6 +29,23 @@ namespace TheBunkerGames
     }
 
     /// <summary>
+    /// A resource grant: item ID + quantity. Used by exploration loot and resource rewards.
+    /// </summary>
+    [Serializable]
+    public class ResourceGrantData
+    {
+        public string ItemId;
+        public int Quantity;
+
+        public ResourceGrantData() { }
+        public ResourceGrantData(string itemId, int quantity)
+        {
+            ItemId = itemId;
+            Quantity = quantity;
+        }
+    }
+
+    /// <summary>
     /// The outcome of a single expedition.
     /// Contains loot, stat changes, injury status, and a narrative log.
     /// </summary>

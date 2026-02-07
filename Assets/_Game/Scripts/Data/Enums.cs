@@ -3,15 +3,12 @@ using UnityEngine;
 namespace TheBunkerGames
 {
     // -------------------------------------------------------------------------
-    // Game State Machine States (matches the 5-phase Core Loop)
+    // Game State Machine States
     // -------------------------------------------------------------------------
     public enum GameState
     {
         StatusReview,
-        AngelInteraction,
-        CityExploration,
-        DailyChoice,
-        NightCycle
+        CityExploration
     }
 
     // -------------------------------------------------------------------------
@@ -35,30 +32,6 @@ namespace TheBunkerGames
         Medium,
         High,
         Deadly
-    }
-
-    // -------------------------------------------------------------------------
-    // Choice Outcome Types
-    // -------------------------------------------------------------------------
-    public enum ChoiceOutcome
-    {
-        Positive,
-        Negative,
-        Mixed,
-        Catastrophic
-    }
-
-    // -------------------------------------------------------------------------
-    // Angel Mood (affects cooperation level)
-    // -------------------------------------------------------------------------
-    public enum AngelMood
-    {
-        Cooperative,
-        Neutral,
-        Mocking,
-        Cold,
-        Hostile,
-        Glitching
     }
 
     // -------------------------------------------------------------------------

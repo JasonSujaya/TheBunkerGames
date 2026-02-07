@@ -9,7 +9,6 @@ namespace TheBunkerGames
 {
     /// <summary>
     /// Manages UI shader effects globally.
-    /// Scales glitch intensity based on A.N.G.E.L.'s Processing Level.
     /// Provides methods for dramatic momentary glitch bursts.
     /// </summary>
     public class UIGlitchController : MonoBehaviour
@@ -88,14 +87,8 @@ namespace TheBunkerGames
                 return;
             }
 
-            // Sync with A.N.G.E.L.'s processing level
-            var angel = AngelInteractionManager.Instance;
-            if (angel != null)
-            {
-                // Normalize processing level (0-100) to (0-1)
-                float normalizedProcessing = angel.ProcessingLevel / 100f;
-                currentBaseIntensity = processingToIntensityCurve.Evaluate(normalizedProcessing);
-            }
+            // Default: no base glitch intensity (use TriggerBurst for momentary effects)
+            currentBaseIntensity = 0f;
         }
 
         private void ApplyToMaterial()

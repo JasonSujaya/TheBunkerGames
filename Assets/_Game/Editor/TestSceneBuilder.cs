@@ -54,21 +54,9 @@ namespace TheBunkerGames.Editor
             statusReviewObj.transform.SetParent(phaseControllers.transform);
             statusReviewObj.AddComponent<StatusReviewManager>();
 
-            var angelObj = new GameObject("AngelLogicController");
-            angelObj.transform.SetParent(phaseControllers.transform);
-            // angelObj.AddComponent<AngelLogicController>(); // Pure logic class - cannot be added as component
-
             var explorationObj = new GameObject("CityExplorationManager");
             explorationObj.transform.SetParent(phaseControllers.transform);
             explorationObj.AddComponent<CityExplorationManager>();
-
-            var choiceObj = new GameObject("DailyChoiceManager");
-            choiceObj.transform.SetParent(phaseControllers.transform);
-            choiceObj.AddComponent<DailyChoiceManager>();
-
-            var nightObj = new GameObject("NightLogicController");
-            nightObj.transform.SetParent(phaseControllers.transform);
-            // nightObj.AddComponent<NightLogicController>(); // Pure logic class - cannot be added as component
 
             // ---------------------------------------------------------------
             // [Game Setup] — Spawns initial family on Start
@@ -95,7 +83,7 @@ namespace TheBunkerGames.Editor
             Debug.Log("  --- GAME SYSTEMS ---");
             Debug.Log("    GameManager, FamilyManager, InventoryManager, QuestManager, SaveLoadManager, LLMManager");
             Debug.Log("  --- PHASE CONTROLLERS ---");
-            Debug.Log("    StatusReviewController, AngelInteractionController, CityExplorationController, DailyChoiceController, NightCycleController");
+            Debug.Log("    StatusReviewManager, CityExplorationManager");
             Debug.Log("  --- GAME SETUP ---");
             Debug.Log("    GameSetup (spawns family), GameFlowController (advances phases)");
             Debug.Log("[TestSceneBuilder] Hit Play to test. Use Odin Inspector buttons on each component to test individual systems.");
