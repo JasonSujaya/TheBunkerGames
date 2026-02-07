@@ -29,21 +29,12 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // State
         // -------------------------------------------------------------------------
-        [Title("Game State")]
-        [ShowInInspector, ReadOnly]
+        // -------------------------------------------------------------------------
+        // State
+        // -------------------------------------------------------------------------
         public GameSessionData SessionData = new GameSessionData();
 
-        [Serializable]
-        public struct GameSessionData
-        {
-            public GameState CurrentState;
-            public int CurrentDay;
-            public int FamilyCount;
-            public float AverageHealth;
-            public bool IsGameOver;
-        }
-
-        // Backward compatibility properties (optional, removing for strictness as requested)
+        // Backward compatibility properties
         public GameState CurrentState 
         { 
             get => SessionData.CurrentState; 
@@ -65,21 +56,19 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // References (Auto-Wired)
         // -------------------------------------------------------------------------
-        [Title("Systems")]
-        [Required] public GameFlowController FlowController;
-        [Required] public SurvivalManager Survival;
-        [Required] public InventoryManager Inventory;
-        [Required] public CharacterManager Characters;
-        [Required] public FamilyManager Family;
-        [Required] public PlaceManager Places;
-        [Required] public QuestManager Quests;
+        public GameFlowController FlowController;
+        public SurvivalManager Survival;
+        public InventoryManager Inventory;
+        public CharacterManager Characters;
+        public FamilyManager Family;
+        public PlaceManager Places;
+        public QuestManager Quests;
         
-        [Title("Phases")]
-        [Required] public StatusReviewManager StatusReview;
-        [Required] public AngelInteractionManager AngelInteraction;
-        [Required] public CityExplorationManager CityExploration;
-        [Required] public DailyChoiceManager DailyChoice;
-        [Required] public NightCycleManager NightCycle;
+        public StatusReviewManager StatusReview;
+        public AngelInteractionManager AngelInteraction;
+        public CityExplorationManager CityExploration;
+        public DailyChoiceManager DailyChoice;
+        public NightCycleManager NightCycle;
 
         // -------------------------------------------------------------------------
         // Static Event Triggers (Called by GameFlowController)

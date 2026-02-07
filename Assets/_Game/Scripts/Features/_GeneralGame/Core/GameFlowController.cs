@@ -31,7 +31,7 @@ namespace TheBunkerGames
             if (gameManager == null) return;
             
             // Reset Session Data
-            gameManager.SessionData = new GameManager.GameSessionData
+            gameManager.SessionData = new GameSessionData
             {
                 CurrentDay = 1,
                 CurrentState = GameState.StatusReview,
