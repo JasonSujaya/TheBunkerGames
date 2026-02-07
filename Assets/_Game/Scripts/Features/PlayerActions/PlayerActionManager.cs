@@ -32,6 +32,9 @@ namespace TheBunkerGames
         /// <summary>Fired when ALL active categories have been completed for the day.</summary>
         public static event Action OnAllActionsComplete;
 
+        /// <summary>Fired when a single category's input has been saved (but not yet submitted to LLM).</summary>
+        public static event Action<PlayerActionCategory> OnCategorySaved;
+
         // -------------------------------------------------------------------------
         // Configuration
         // -------------------------------------------------------------------------
@@ -284,6 +287,43 @@ namespace TheBunkerGames
                     SubmitAction(cat, input, items);
                 }
             }
+        }
+
+        /// <summary>
+        /// Save a category's input without submitting to LLM.
+        /// Stores the input in the daily state for later batch submission via SubmitAllActions().
+        /// </summary>
+        public void SaveAction(PlayerActionCategory category, string playerInput, List<string> selectedItems)
+        {
+            if (currentDayState == null)
+            {
+                Debug.LogWarning("[PlayerActionManager] No daily state prepared! Cannot save action.");
+                return;
+            }
+
+            switch (category)
+            {
+                case PlayerActionCategory.Exploration:
+                    currentDayState.ExplorationInput = playerInput;
+                    currentDayState.ExplorationItems = selectedItems ?? new List<string>();
+                    break;
+                case PlayerActionCategory.Dilemma:
+                    currentDayState.DilemmaInput = playerInput;
+                    currentDayState.DilemmaItems = selectedItems ?? new List<string>();
+                    break;
+                case PlayerActionCategory.FamilyRequest:
+                    currentDayState.FamilyRequestInput = playerInput;
+                    currentDayState.FamilyRequestItems = selectedItems ?? new List<string>();
+                    break;
+            }
+
+            // Update the inspector input fields
+            SetInput(category, playerInput);
+
+            if (enableDebugLogs)
+                Debug.Log($"[PlayerActionManager] Saved [{category}]: \"{playerInput}\" with {selectedItems?.Count ?? 0} item(s)");
+
+            OnCategorySaved?.Invoke(category);
         }
 
         // -------------------------------------------------------------------------

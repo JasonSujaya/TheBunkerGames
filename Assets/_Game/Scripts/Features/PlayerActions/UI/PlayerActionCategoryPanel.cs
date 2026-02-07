@@ -9,9 +9,9 @@ using Sirenix.OdinInspector;
 namespace TheBunkerGames
 {
     /// <summary>
-    /// UI panel for a single player action category.
-    /// Displays the challenge, accepts player text input,
-    /// allows item selection, and shows the LLM result.
+    /// Data holder and UI bridge for a single player action category.
+    /// Stores the challenge, player input, selected items, and saved/submitted state.
+    /// In the inbox UI, this acts as the data backing for the shared detail panel.
     /// </summary>
     public class PlayerActionCategoryPanel : MonoBehaviour
     {
@@ -66,6 +66,7 @@ namespace TheBunkerGames
         private PlayerActionChallenge currentChallenge;
         private string familyTarget;
         private List<string> selectedItems = new List<string>();
+        private bool isSaved;
         private bool isSubmitted;
         private bool hasResult;
 
@@ -73,9 +74,12 @@ namespace TheBunkerGames
         // Public Properties
         // -------------------------------------------------------------------------
         public PlayerActionCategory Category => category;
+        public bool IsSaved => isSaved;
         public bool IsSubmitted => isSubmitted;
         public bool HasResult => hasResult;
         public string PlayerInput => playerInputText ?? "";
+        public PlayerActionChallenge CurrentChallenge => currentChallenge;
+        public string FamilyTarget => familyTarget;
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -135,6 +139,18 @@ namespace TheBunkerGames
                 PlayerActionManager.Instance.SetInput(category, playerInputText ?? "");
         }
 
+        /// <summary>
+        /// Set the input text programmatically (e.g., from the shared detail panel).
+        /// </summary>
+        public void SetInputText(string text)
+        {
+            playerInputText = text ?? "";
+            if (playerInputField != null)
+                playerInputField.text = playerInputText;
+            if (PlayerActionManager.Instance != null)
+                PlayerActionManager.Instance.SetInput(category, playerInputText);
+        }
+
         // -------------------------------------------------------------------------
         // Public API
         // -------------------------------------------------------------------------
@@ -146,6 +162,7 @@ namespace TheBunkerGames
         {
             currentChallenge = challenge;
             familyTarget = target;
+            isSaved = false;
             isSubmitted = false;
             hasResult = false;
             selectedItems.Clear();
@@ -185,11 +202,11 @@ namespace TheBunkerGames
                 playerInputField.interactable = true;
             }
 
-            // Reset submit button
+            // Reset button
             if (submitButton != null)
                 submitButton.interactable = true;
             if (submitButtonText != null)
-                submitButtonText.text = "Submit";
+                submitButtonText.text = "Save";
 
             // Status
             SetStatus("Type your response...");
@@ -200,6 +217,79 @@ namespace TheBunkerGames
             PopulateItemToggles();
 
             gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Get the category display name.
+        /// </summary>
+        public string GetCategoryDisplayName()
+        {
+            switch (category)
+            {
+                case PlayerActionCategory.Exploration: return "EXPLORATION";
+                case PlayerActionCategory.Dilemma: return "DILEMMA";
+                case PlayerActionCategory.FamilyRequest:
+                    return string.IsNullOrEmpty(familyTarget)
+                        ? "FAMILY REQUEST"
+                        : $"FAMILY REQUEST ({familyTarget})";
+                default: return category.ToString().ToUpper();
+            }
+        }
+
+        // -------------------------------------------------------------------------
+        // Validation
+        // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Validate the current input. Returns true if valid.
+        /// Sets status text with error message if invalid.
+        /// </summary>
+        public bool ValidateInput()
+        {
+            string input = (playerInputText ?? "").Trim();
+
+            if (category == PlayerActionCategory.Dilemma && string.IsNullOrEmpty(input))
+            {
+                SetStatus("You must respond to the dilemma!");
+                return false;
+            }
+
+            if (category == PlayerActionCategory.Exploration && string.IsNullOrEmpty(input))
+            {
+                SetStatus("Describe your approach!");
+                return false;
+            }
+
+            return true;
+        }
+
+        // -------------------------------------------------------------------------
+        // Save (locks input, does NOT submit to LLM)
+        // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Save the current input. Locks the input field and marks as saved.
+        /// Does NOT submit to LLM — that happens via PlayerActionManager.SubmitAllActions().
+        /// </summary>
+        public void SaveInput()
+        {
+            if (isSaved) return;
+
+            isSaved = true;
+
+            // Lock input
+            if (playerInputField != null)
+                playerInputField.interactable = false;
+            if (submitButton != null)
+                submitButton.interactable = false;
+            if (submitButtonText != null)
+                submitButtonText.text = "Saved";
+
+            SetStatus("Response saved and locked.");
+
+            // Sync to manager
+            if (PlayerActionManager.Instance != null)
+                PlayerActionManager.Instance.SaveAction(category, (playerInputText ?? "").Trim(), GetSelectedItems());
         }
 
         /// <summary>
@@ -262,6 +352,7 @@ namespace TheBunkerGames
         /// </summary>
         public void ResetPanel()
         {
+            isSaved = false;
             isSubmitted = false;
             hasResult = false;
             selectedItems.Clear();
@@ -275,7 +366,7 @@ namespace TheBunkerGames
             if (submitButton != null)
                 submitButton.interactable = true;
             if (submitButtonText != null)
-                submitButtonText.text = "Submit";
+                submitButtonText.text = "Save";
 
             HideResult();
             HideLoading();
@@ -349,49 +440,21 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Internal
         // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Legacy submit handler — kept for backward compatibility.
+        /// Now triggers save flow through the parent UI instead of direct LLM submission.
+        /// </summary>
         private void OnSubmitClicked()
         {
-            if (isSubmitted) return;
+            if (isSaved || isSubmitted) return;
 
-            string input = playerInputText ?? "";
+            if (!ValidateInput()) return;
 
-            // Dilemma requires input
-            if (category == PlayerActionCategory.Dilemma && string.IsNullOrEmpty(input.Trim()))
-            {
-                SetStatus("You must respond to the dilemma!");
-                return;
-            }
-
-            // Exploration requires input
-            if (category == PlayerActionCategory.Exploration && string.IsNullOrEmpty(input.Trim()))
-            {
-                SetStatus("Describe your approach!");
-                return;
-            }
-
-            isSubmitted = true;
-
-            // Lock UI
-            if (playerInputField != null)
-                playerInputField.interactable = false;
-            if (submitButton != null)
-                submitButton.interactable = false;
-            if (submitButtonText != null)
-                submitButtonText.text = "Submitted";
-
-            ShowLoading();
-            SetStatus("Processing...");
-
-            // Send to manager
-            if (PlayerActionManager.Instance != null)
-            {
-                PlayerActionManager.Instance.SubmitAction(category, input.Trim(), GetSelectedItems());
-            }
-            else
-            {
-                Debug.LogError("[PlayerActionCategoryPanel] PlayerActionManager not found!");
-                SetStatus("Error: Manager not found.");
-            }
+            // In the new inbox flow, the parent PlayerActionUI handles the
+            // save confirmation popup. But if no parent is managing us,
+            // fall back to direct save.
+            SaveInput();
         }
 
         private void ShowLoading()
@@ -412,7 +475,7 @@ namespace TheBunkerGames
                 resultPanel.SetActive(false);
         }
 
-        private void SetStatus(string text)
+        public void SetStatus(string text)
         {
             if (statusText != null)
                 statusText.text = text;
