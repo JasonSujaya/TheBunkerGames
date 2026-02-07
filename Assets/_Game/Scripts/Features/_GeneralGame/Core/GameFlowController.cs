@@ -51,11 +51,11 @@ namespace TheBunkerGames
                     gameManager.Inventory.ClearInventory();
                     if (profile.StartingItems != null)
                     {
-                        foreach (var itemSlot in profile.StartingItems)
+                        foreach (var entry in profile.StartingItems)
                         {
-                            if (!string.IsNullOrEmpty(itemSlot.ItemId) && itemSlot.Quantity > 0)
+                            if (entry.Item != null && entry.Quantity > 0)
                             {
-                                gameManager.Inventory.AddItem(itemSlot.ItemId, itemSlot.Quantity);
+                                gameManager.Inventory.AddItem(entry.Item, entry.Quantity);
                             }
                         }
                     }
