@@ -136,13 +136,31 @@ namespace TheBunkerGames
         }
 
         /// <summary>
-        /// Execute effects directly from LLM output string.
-        /// Example input: "ReduceHP:7, AddSanity:3"
+        /// Execute effects directly from LLM JSON output.
+        /// Expects either a full LLMStoryEventData JSON or a JSON array of effects.
         /// </summary>
         public void ExecuteFromLLMOutput(string llmOutput)
         {
-            var effects = LLMStoryEffectData.ParseMultiple(llmOutput);
-            ExecuteEffects(effects);
+            if (string.IsNullOrEmpty(llmOutput)) return;
+
+            // Try parsing as full event first
+            var storyEvent = LLMStoryEventData.FromJson(llmOutput);
+            if (storyEvent != null && storyEvent.Effects != null)
+            {
+                ExecuteEffects(storyEvent.Effects);
+                return;
+            }
+
+            // Fall back to parsing as single effect (legacy format)
+            var singleEffect = LLMStoryEffectData.FromJson(llmOutput);
+            if (singleEffect != null)
+            {
+                ExecuteEffect(singleEffect);
+            }
+            else
+            {
+                Debug.LogWarning($"[LLMEffectExecutor] Could not parse LLM output: {llmOutput}");
+            }
         }
 
         // -------------------------------------------------------------------------
