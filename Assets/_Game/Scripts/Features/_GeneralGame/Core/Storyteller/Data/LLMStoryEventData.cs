@@ -68,7 +68,7 @@ namespace TheBunkerGames
                 Effects = new List<LLMStoryEffectData>
                 {
                     new LLMStoryEffectData("ReduceWater", 7),
-                    new LLMStoryEffectData("ReduceSanity", 3, "Marcus")
+                    new LLMStoryEffectData("ReduceSanity", 3, "Mother")
                 },
                 Choices = new List<LLMStoryChoice>
                 {
@@ -77,15 +77,15 @@ namespace TheBunkerGames
                         Text = "Fix it yourself (risky)",
                         Effects = new List<LLMStoryEffectData>
                         {
-                            new LLMStoryEffectData("ReduceHP", 4)
+                            new LLMStoryEffectData("ReduceHP", 4, "Daughter")
                         }
                     },
                     new LLMStoryChoice
                     {
-                        Text = "Send Marcus to fix it",
+                        Text = "Send Son to fix it",
                         Effects = new List<LLMStoryEffectData>
                         {
-                            new LLMStoryEffectData("InjureCharacter", 5, "Marcus")
+                            new LLMStoryEffectData("InjureCharacter", 5, "Son")
                         }
                     }
                 }

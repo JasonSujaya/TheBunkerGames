@@ -25,16 +25,16 @@ namespace TheBunkerGames
   ""description"": ""A pipe in the water filtration system has burst!"",
   ""effects"": [
     { ""effectType"": ""ReduceWater"", ""intensity"": 7 },
-    { ""effectType"": ""ReduceSanity"", ""intensity"": 3, ""target"": ""Marcus"" }
+    { ""effectType"": ""ReduceSanity"", ""intensity"": 3, ""target"": ""Mother"" }
   ],
   ""choices"": [
     {
       ""text"": ""Fix it yourself (risky)"",
-      ""effects"": [{ ""effectType"": ""ReduceHP"", ""intensity"": 4 }]
+      ""effects"": [{ ""effectType"": ""ReduceHP"", ""intensity"": 4, ""target"": ""Daughter"" }]
     },
     {
-      ""text"": ""Send Marcus to fix it"",
-      ""effects"": [{ ""effectType"": ""InjureCharacter"", ""intensity"": 5, ""target"": ""Marcus"" }]
+      ""text"": ""Send Son to fix it"",
+      ""effects"": [{ ""effectType"": ""InjureCharacter"", ""intensity"": 5, ""target"": ""Son"" }]
     }
   ]
 }";

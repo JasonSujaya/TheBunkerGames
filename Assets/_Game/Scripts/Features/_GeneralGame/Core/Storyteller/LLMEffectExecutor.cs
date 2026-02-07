@@ -179,20 +179,47 @@ namespace TheBunkerGames
             return Mathf.RoundToInt(Mathf.Lerp(min, max, t));
         }
 
+        // -------------------------------------------------------------------------
+        // Character Lookup Helper
+        // -------------------------------------------------------------------------
+        private CharacterData GetTargetCharacter(string target)
+        {
+            if (string.IsNullOrEmpty(target))
+            {
+                Debug.LogWarning("[LLMEffectExecutor] No target specified for effect.");
+                return null;
+            }
+
+            if (FamilyManager.Instance == null)
+            {
+                Debug.LogError("[LLMEffectExecutor] FamilyManager not found!");
+                return null;
+            }
+
+            var character = FamilyManager.Instance.GetCharacter(target);
+            if (character == null)
+            {
+                Debug.LogWarning($"[LLMEffectExecutor] Character '{target}' not found in family!");
+                return null;
+            }
+
+            return character;
+        }
+
+        // -------------------------------------------------------------------------
+        // Private Effect Handlers (Now Connected to FamilyManager)
+        // -------------------------------------------------------------------------
         private void ApplyHealthChange(int intensity, string target, bool positive)
         {
             float amount = IntensityToValue(intensity, minHealthChange, maxHealthChange);
             if (!positive) amount = -amount;
             
-            // TODO: Connect to CharacterManager
-            Debug.Log($"[LLMEffectExecutor] Health change: {amount:+0.0} to '{target}'");
-            
-            // Example integration:
-            // if (CharacterManager.Instance != null)
-            // {
-            //     var character = CharacterManager.Instance.GetCharacter(target);
-            //     character?.ModifyHealth(amount);
-            // }
+            var character = GetTargetCharacter(target);
+            if (character != null)
+            {
+                character.ModifyHealth(amount);
+                Debug.Log($"[LLMEffectExecutor] Health {(positive ? "+" : "")}{amount:0.0} to '{target}' → Now: {character.Health:0.0}");
+            }
         }
 
         private void ApplySanityChange(int intensity, string target, bool positive)
@@ -200,7 +227,12 @@ namespace TheBunkerGames
             float amount = IntensityToValue(intensity, minSanityChange, maxSanityChange);
             if (!positive) amount = -amount;
             
-            Debug.Log($"[LLMEffectExecutor] Sanity change: {amount:+0.0} to '{target}'");
+            var character = GetTargetCharacter(target);
+            if (character != null)
+            {
+                character.ModifySanity(amount);
+                Debug.Log($"[LLMEffectExecutor] Sanity {(positive ? "+" : "")}{amount:0.0} to '{target}' → Now: {character.Sanity:0.0}");
+            }
         }
 
         private void ApplyHungerChange(int intensity, string target, bool positive)
@@ -208,7 +240,12 @@ namespace TheBunkerGames
             float amount = IntensityToValue(intensity, minHungerChange, maxHungerChange);
             if (!positive) amount = -amount;
             
-            Debug.Log($"[LLMEffectExecutor] Hunger change: {amount:+0.0} to '{target}'");
+            var character = GetTargetCharacter(target);
+            if (character != null)
+            {
+                character.ModifyHunger(amount);
+                Debug.Log($"[LLMEffectExecutor] Hunger {(positive ? "+" : "")}{amount:0.0} to '{target}' → Now: {character.Hunger:0.0}");
+            }
         }
 
         private void ApplyThirstChange(int intensity, string target, bool positive)
@@ -216,7 +253,12 @@ namespace TheBunkerGames
             float amount = IntensityToValue(intensity, minThirstChange, maxThirstChange);
             if (!positive) amount = -amount;
             
-            Debug.Log($"[LLMEffectExecutor] Thirst change: {amount:+0.0} to '{target}'");
+            var character = GetTargetCharacter(target);
+            if (character != null)
+            {
+                character.ModifyThirst(amount);
+                Debug.Log($"[LLMEffectExecutor] Thirst {(positive ? "+" : "")}{amount:0.0} to '{target}' → Now: {character.Thirst:0.0}");
+            }
         }
 
         private void ApplyResourceEffect(LLMStoryEffectData effect)
@@ -227,23 +269,43 @@ namespace TheBunkerGames
             
             string resourceType = effect.EffectType.Replace("Add", "").Replace("Reduce", "");
             Debug.Log($"[LLMEffectExecutor] Resource '{resourceType}' change: {amount:+0}");
+            // TODO: Connect to InventoryManager or ResourceManager
         }
 
         private void ApplyInjury(int intensity, string target)
         {
             float damage = IntensityToValue(intensity, minHealthChange, maxHealthChange);
-            Debug.Log($"[LLMEffectExecutor] Injure '{target}' for {damage:0.0} damage");
+            
+            var character = GetTargetCharacter(target);
+            if (character != null)
+            {
+                character.ModifyHealth(-damage);
+                character.IsInjured = true;
+                Debug.Log($"[LLMEffectExecutor] Injured '{target}' for {damage:0.0} damage → HP: {character.Health:0.0}");
+            }
         }
 
         private void ApplyHealing(int intensity, string target)
         {
             float heal = IntensityToValue(intensity, minHealthChange, maxHealthChange);
-            Debug.Log($"[LLMEffectExecutor] Heal '{target}' for {heal:0.0} HP");
+            
+            var character = GetTargetCharacter(target);
+            if (character != null)
+            {
+                character.ModifyHealth(heal);
+                character.IsInjured = false;
+                Debug.Log($"[LLMEffectExecutor] Healed '{target}' for {heal:0.0} HP → HP: {character.Health:0.0}");
+            }
         }
 
         private void KillCharacter(string target)
         {
-            Debug.Log($"[LLMEffectExecutor] KILL CHARACTER: '{target}'");
+            var character = GetTargetCharacter(target);
+            if (character != null)
+            {
+                character.ModifyHealth(-9999f); // Lethal damage
+                Debug.Log($"[LLMEffectExecutor] KILLED: '{target}'");
+            }
         }
 
         // -------------------------------------------------------------------------
