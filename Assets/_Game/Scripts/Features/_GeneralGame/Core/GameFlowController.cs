@@ -68,17 +68,22 @@ namespace TheBunkerGames
             // Increment Day
             gameManager.CurrentDay++;
             
-            // Simulation Logic (Placeholder or read from managers)
-            // In a real scenario, this would aggregate data from SurvivalManager/FamilyManager
-            if (gameManager.Family != null)
+            // 1. Fire Day Start Event (Triggers SurvivalManager decay, etc)
+            GameManager.FireDayStart();
+
+            // 2. Sync Data for Visualization
+            if (gameManager.SessionData != null)
             {
-                // If FamilyManager exists, use its data (Future implementation)
-                // gameManager.SessionData.FamilyCount = gameManager.Family.GetAliveCount();
-            }
-            else
-            {
-                // Simple Simulation for testing: Randomly decrease health slightly
-                gameManager.SessionData.AverageHealth = Mathf.Max(0, gameManager.SessionData.AverageHealth - UnityEngine.Random.Range(0f, 5f));
+                // Sync with Family Manager if available
+                if (gameManager.Family != null)
+                {
+                    gameManager.SessionData.UpdateSync(gameManager.Family);
+                }
+                else
+                {
+                    // Fallback Simulation if no family manager found
+                     gameManager.SessionData.AverageHealth = Mathf.Max(0, gameManager.SessionData.AverageHealth - UnityEngine.Random.Range(0f, 5f));
+                }
             }
 
             Debug.Log($"[Sim] ADVANCE DAY | Day: {gameManager.CurrentDay} | Family: {gameManager.SessionData.FamilyCount} | Health: {gameManager.SessionData.AverageHealth:F1}%");
