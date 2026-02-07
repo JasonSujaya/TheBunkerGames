@@ -26,14 +26,16 @@ namespace TheBunkerGames
         public CharacterSubtype Subtype = CharacterSubtype.Family;
 
         // -------------------------------------------------------------------------
-        // Exploration State
-        // -------------------------------------------------------------------------
-        // -------------------------------------------------------------------------
-        // Exploration State
+        // Status Conditions
         // -------------------------------------------------------------------------
         public bool IsExploring;
         public bool IsInjured;
         public bool IsDead;
+
+        // Sickness system
+        public bool IsSick;
+        public SicknessType Sickness = SicknessType.None;
+        public int SicknessSeverity; // 1-10, 0 = not sick
 
         // -------------------------------------------------------------------------
         // Constructors
@@ -96,12 +98,49 @@ namespace TheBunkerGames
         }
 
         // -------------------------------------------------------------------------
+        // Sickness Methods
+        // -------------------------------------------------------------------------
+        public void Infect(SicknessType type, int severity)
+        {
+            if (IsDead) return;
+            IsSick = true;
+            Sickness = type;
+            SicknessSeverity = Mathf.Clamp(severity, 1, 10);
+            Debug.Log($"[CharacterData] {Name} got sick: {type} (severity {severity})");
+        }
+
+        public void CureSickness()
+        {
+            IsSick = false;
+            Sickness = SicknessType.None;
+            SicknessSeverity = 0;
+            Debug.Log($"[CharacterData] {Name} has been cured.");
+        }
+
+        // -------------------------------------------------------------------------
         // Derived States
         // -------------------------------------------------------------------------
         public bool IsAlive => !IsDead;
         public bool IsInsane => Sanity <= 0f;
+        public bool IsStarving => Hunger <= 0f;
         public bool IsDehydrated => Thirst <= 0f;
         public bool IsCritical => Health <= 20f || Hunger <= 10f || Thirst <= 10f;
-        public bool IsAvailableForExploration => IsAlive && !IsExploring && !IsInjured;
+        public bool IsAvailableForExploration => IsAlive && !IsExploring && !IsInjured && !IsSick;
+
+        /// <summary>
+        /// Get a status summary string for debug/LLM context.
+        /// </summary>
+        public string GetStatusSummary()
+        {
+            if (IsDead) return "DEAD";
+            var tags = new System.Collections.Generic.List<string>();
+            if (IsCritical) tags.Add("CRITICAL");
+            if (IsInjured) tags.Add("INJURED");
+            if (IsSick) tags.Add($"SICK:{Sickness}(severity {SicknessSeverity})");
+            if (IsInsane) tags.Add("INSANE");
+            if (IsStarving) tags.Add("STARVING");
+            if (IsDehydrated) tags.Add("DEHYDRATED");
+            return tags.Count > 0 ? string.Join(", ", tags) : "OK";
+        }
     }
 }
