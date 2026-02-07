@@ -379,6 +379,64 @@ namespace TheBunkerGames
         }
 
         // -------------------------------------------------------------------------
+        // Player Input (editable in Inspector, synced at runtime)
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Player Inputs")]
+        [InfoBox("Type your responses here or in the game UI. These fields sync with the category panels at runtime.")]
+        [LabelText("Exploration Input")]
+        [MultiLineProperty(3)]
+        #endif
+        [Header("Player Inputs")]
+        [TextArea(2, 5)]
+        [SerializeField] private string explorationInput = "";
+
+        #if ODIN_INSPECTOR
+        [LabelText("Dilemma Input")]
+        [MultiLineProperty(3)]
+        #endif
+        [TextArea(2, 5)]
+        [SerializeField] private string dilemmaInput = "";
+
+        #if ODIN_INSPECTOR
+        [LabelText("Family Request Input")]
+        [MultiLineProperty(3)]
+        #endif
+        [TextArea(2, 5)]
+        [SerializeField] private string familyRequestInput = "";
+
+        // -------------------------------------------------------------------------
+        // Input Sync (Inspector ↔ CategoryPanels)
+        // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Get the inspector input for a category.
+        /// </summary>
+        public string GetInput(PlayerActionCategory category)
+        {
+            switch (category)
+            {
+                case PlayerActionCategory.Exploration: return explorationInput ?? "";
+                case PlayerActionCategory.Dilemma: return dilemmaInput ?? "";
+                case PlayerActionCategory.FamilyRequest: return familyRequestInput ?? "";
+                default: return "";
+            }
+        }
+
+        /// <summary>
+        /// Set the inspector input for a category (called by UI panels to sync back).
+        /// </summary>
+        public void SetInput(PlayerActionCategory category, string value)
+        {
+            switch (category)
+            {
+                case PlayerActionCategory.Exploration: explorationInput = value; break;
+                case PlayerActionCategory.Dilemma: dilemmaInput = value; break;
+                case PlayerActionCategory.FamilyRequest: familyRequestInput = value; break;
+            }
+        }
+
+        // -------------------------------------------------------------------------
         // Debug Buttons
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
@@ -422,30 +480,51 @@ namespace TheBunkerGames
             OnDailyActionsReady?.Invoke(currentDayState);
         }
 
-        [Button("Test Submit Exploration", ButtonSizes.Medium)]
+        [Button("Submit Exploration", ButtonSizes.Medium)]
         private void Debug_TestSubmitExploration()
         {
             if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode to test."); return; }
             if (currentDayState == null) { Debug.LogWarning("Prepare day actions first!"); return; }
-            SubmitAction(PlayerActionCategory.Exploration, "I'll carefully search the room for supplies and check behind the furniture.", null);
+            if (string.IsNullOrEmpty(explorationInput?.Trim())) { Debug.LogWarning("Type something in the Exploration Input field first!"); return; }
+            SubmitAction(PlayerActionCategory.Exploration, explorationInput.Trim(), null);
         }
 
-        [Button("Test Submit Dilemma", ButtonSizes.Medium)]
+        [Button("Submit Dilemma", ButtonSizes.Medium)]
         private void Debug_TestSubmitDilemma()
         {
             if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode to test."); return; }
             if (currentDayState == null) { Debug.LogWarning("Prepare day actions first!"); return; }
             if (!currentDayState.DilemmaActive) { Debug.LogWarning("Dilemma not active today!"); return; }
-            SubmitAction(PlayerActionCategory.Dilemma, "We should share the water equally among everyone.", null);
+            if (string.IsNullOrEmpty(dilemmaInput?.Trim())) { Debug.LogWarning("Type something in the Dilemma Input field first!"); return; }
+            SubmitAction(PlayerActionCategory.Dilemma, dilemmaInput.Trim(), null);
         }
 
-        [Button("Test Submit Family", ButtonSizes.Medium)]
+        [Button("Submit Family Request", ButtonSizes.Medium)]
         private void Debug_TestSubmitFamily()
         {
             if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode to test."); return; }
             if (currentDayState == null) { Debug.LogWarning("Prepare day actions first!"); return; }
             if (!currentDayState.FamilyRequestActive) { Debug.LogWarning("Family request not active today!"); return; }
-            SubmitAction(PlayerActionCategory.FamilyRequest, "I'll give them medicine and comfort them.", new List<string>());
+            if (string.IsNullOrEmpty(familyRequestInput?.Trim())) { Debug.LogWarning("Type something in the Family Request Input field first!"); return; }
+            SubmitAction(PlayerActionCategory.FamilyRequest, familyRequestInput.Trim(), new List<string>());
+        }
+
+        [Button("Submit All Inputs", ButtonSizes.Large)]
+        [GUIColor(0.2f, 0.6f, 1f)]
+        private void Debug_SubmitAll()
+        {
+            if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode to test."); return; }
+            if (currentDayState == null) { Debug.LogWarning("Prepare day actions first!"); return; }
+
+            // Store inputs into DailyActionState and submit all
+            if (currentDayState.ExplorationActive && !string.IsNullOrEmpty(explorationInput?.Trim()))
+                currentDayState.ExplorationInput = explorationInput.Trim();
+            if (currentDayState.DilemmaActive && !string.IsNullOrEmpty(dilemmaInput?.Trim()))
+                currentDayState.DilemmaInput = dilemmaInput.Trim();
+            if (currentDayState.FamilyRequestActive && !string.IsNullOrEmpty(familyRequestInput?.Trim()))
+                currentDayState.FamilyRequestInput = familyRequestInput.Trim();
+
+            SubmitAllActions();
         }
 
         [Button("Log Current State", ButtonSizes.Medium)]
