@@ -30,14 +30,37 @@ namespace TheBunkerGames
         // State
         // -------------------------------------------------------------------------
         [Title("Game State")]
-        [ReadOnly]
-        public GameState CurrentState = GameState.StatusReview;
+        [ShowInInspector, ReadOnly]
+        public GameSessionData SessionData = new GameSessionData();
+
+        [Serializable]
+        public struct GameSessionData
+        {
+            public GameState CurrentState;
+            public int CurrentDay;
+            public int FamilyCount;
+            public float AverageHealth;
+            public bool IsGameOver;
+        }
+
+        // Backward compatibility properties (optional, removing for strictness as requested)
+        public GameState CurrentState 
+        { 
+            get => SessionData.CurrentState; 
+            set => SessionData.CurrentState = value; 
+        }
         
-        [ReadOnly]
-        public int CurrentDay = 1;
+        public int CurrentDay 
+        { 
+            get => SessionData.CurrentDay; 
+            set => SessionData.CurrentDay = value; 
+        }
         
-        [ReadOnly]
-        public bool IsGameOver = false;
+        public bool IsGameOver 
+        { 
+            get => SessionData.IsGameOver; 
+            set => SessionData.IsGameOver = value; 
+        }
 
         // -------------------------------------------------------------------------
         // References (Auto-Wired)

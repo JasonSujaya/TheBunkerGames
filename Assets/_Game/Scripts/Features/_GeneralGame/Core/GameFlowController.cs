@@ -30,11 +30,18 @@ namespace TheBunkerGames
         {
             if (gameManager == null) return;
             
-            gameManager.CurrentDay = 1;
-            gameManager.IsGameOver = false;
+            // Reset Session Data
+            gameManager.SessionData = new GameManager.GameSessionData
+            {
+                CurrentDay = 1,
+                CurrentState = GameState.StatusReview,
+                IsGameOver = false,
+                FamilyCount = 4, // Default starting family
+                AverageHealth = 100f // Default health
+            };
             
-            Debug.Log("[GameFlow] Starting New Game sequence.");
-            SetState(GameState.StatusReview);
+            Debug.Log($"[Sim] GAME START | Day: {gameManager.CurrentDay} | Family: {gameManager.SessionData.FamilyCount} | Health: {gameManager.SessionData.AverageHealth}%");
+            
             GameManager.FireDayStart();
         }
 
@@ -62,8 +69,23 @@ namespace TheBunkerGames
         {
             if (gameManager == null) return;
 
+            // Increment Day
             gameManager.CurrentDay++;
-            Debug.Log($"[GameFlow] Day Advanced -> {gameManager.CurrentDay}");
+            
+            // Simulation Logic (Placeholder or read from managers)
+            // In a real scenario, this would aggregate data from SurvivalManager/FamilyManager
+            if (gameManager.Family != null)
+            {
+                // If FamilyManager exists, use its data (Future implementation)
+                // gameManager.SessionData.FamilyCount = gameManager.Family.GetAliveCount();
+            }
+            else
+            {
+                // Simple Simulation for testing: Randomly decrease health slightly
+                gameManager.SessionData.AverageHealth = Mathf.Max(0, gameManager.SessionData.AverageHealth - UnityEngine.Random.Range(0f, 5f));
+            }
+
+            Debug.Log($"[Sim] ADVANCE DAY | Day: {gameManager.CurrentDay} | Family: {gameManager.SessionData.FamilyCount} | Health: {gameManager.SessionData.AverageHealth:F1}%");
 
             var config = GameConfigDataSO.Instance;
             if (config != null && gameManager.CurrentDay > config.TotalDays)
