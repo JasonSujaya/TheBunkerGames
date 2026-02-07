@@ -412,7 +412,7 @@ namespace TheBunkerGames
             if (detailStatusText != null)
             {
                 if (panel.IsSaved)
-                    detailStatusText.text = "\u{1f512} Response saved and locked. Cannot be edited.";
+                    detailStatusText.text = "\ud83d\udd12 Response saved and locked. Cannot be edited.";
                 else
                     detailStatusText.text = "Type your response and save when ready.";
             }
@@ -537,7 +537,7 @@ namespace TheBunkerGames
             if (saveButtonText != null)
                 saveButtonText.text = "SAVED \u2713";
             if (detailStatusText != null)
-                detailStatusText.text = "\u{1f512} Response saved and locked. Cannot be edited.";
+                detailStatusText.text = "\ud83d\udd12 Response saved and locked. Cannot be edited.";
 
             // Update list item
             var listItem = GetListItem(category);
