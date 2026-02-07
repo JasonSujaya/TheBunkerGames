@@ -48,72 +48,90 @@ namespace TheBunkerGames
             if (descriptionText != null) descriptionText.text = "";
         }
 
-#if UNITY_EDITOR
-        [UnityEditor.MenuItem("GameObject/TheBunkerGames/UI/Storyteller Panel", false, 10)]
-        public static void CreateStorytellerUI()
+#if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.Button("Auto-Setup UI Hierarchy", ButtonSizes.Large)]
+        [Sirenix.OdinInspector.GUIColor(0f, 1f, 0f)]
+        private void Debug_AutoSetup()
         {
-            // 1. Find or Create Canvas
-            var canvas = FindFirstObjectByType<Canvas>();
-            if (canvas == null)
+            // 1. Ensure Panel
+            if (contentParent == null)
             {
-                var canvasGO = new GameObject("Canvas");
-                canvas = canvasGO.AddComponent<Canvas>();
-                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                canvasGO.AddComponent<UnityEngine.UI.CanvasScaler>();
-                canvasGO.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+                // Check for existing "Panel" child
+                var panelTransform = transform.Find("Panel");
+                if (panelTransform == null)
+                {
+                    var panelGO = new GameObject("Panel");
+                    panelGO.transform.SetParent(transform, false);
+                    panelTransform = panelGO.transform;
+                    
+                    var rect = panelGO.AddComponent<RectTransform>();
+                    rect.anchorMin = Vector2.zero;
+                    rect.anchorMax = Vector2.one;
+                    rect.offsetMin = Vector2.zero;
+                    rect.offsetMax = Vector2.zero;
+                    
+                    var img = panelGO.AddComponent<UnityEngine.UI.Image>();
+                    img.color = new Color(0, 0, 0, 0.9f);
+                }
+                contentParent = panelTransform.gameObject;
             }
 
-            // 2. Create Panel
-            var panelGO = new GameObject("Storyteller_Panel");
-            panelGO.transform.SetParent(canvas.transform, false);
-            var panelRect = panelGO.AddComponent<RectTransform>();
-            panelRect.anchorMin = new Vector2(0.3f, 0.3f);
-            panelRect.anchorMax = new Vector2(0.7f, 0.7f);
-            panelRect.offsetMin = Vector2.zero;
-            panelRect.offsetMax = Vector2.zero;
+            // 2. Ensure Title
+            if (titleText == null)
+            {
+                var titleTransform = contentParent.transform.Find("Title_Text");
+                if (titleTransform == null)
+                {
+                    var go = new GameObject("Title_Text");
+                    go.transform.SetParent(contentParent.transform, false);
+                    var txt = go.AddComponent<TextMeshProUGUI>();
+                    txt.text = "Event Title";
+                    txt.fontSize = 24;
+                    txt.alignment = TextAlignmentOptions.Center;
+                    txt.fontStyle = FontStyles.Bold;
+                    
+                    var r = txt.rectTransform;
+                    r.anchorMin = new Vector2(0, 0.85f);
+                    r.anchorMax = new Vector2(1, 1);
+                    r.offsetMin = Vector2.zero;
+                    r.offsetMax = Vector2.zero;
+                    
+                    titleText = txt;
+                }
+                else
+                {
+                    titleText = titleTransform.GetComponent<TextMeshProUGUI>();
+                }
+            }
+
+            // 3. Ensure Description
+            if (descriptionText == null)
+            {
+                var descTransform = contentParent.transform.Find("Description_Text");
+                if (descTransform == null)
+                {
+                    var go = new GameObject("Description_Text");
+                    go.transform.SetParent(contentParent.transform, false);
+                    var txt = go.AddComponent<TextMeshProUGUI>();
+                    txt.text = "Event Description...";
+                    txt.fontSize = 18;
+                    txt.alignment = TextAlignmentOptions.TopLeft;
+                    
+                    var r = txt.rectTransform;
+                    r.anchorMin = new Vector2(0.05f, 0.05f);
+                    r.anchorMax = new Vector2(0.95f, 0.8f);
+                    r.offsetMin = Vector2.zero;
+                    r.offsetMax = Vector2.zero;
+                    
+                    descriptionText = txt;
+                }
+                else
+                {
+                    descriptionText = descTransform.GetComponent<TextMeshProUGUI>();
+                }
+            }
             
-            // Add Background
-            var bgImage = panelGO.AddComponent<UnityEngine.UI.Image>();
-            bgImage.color = new Color(0, 0, 0, 0.9f);
-
-            // 3. Create Title
-            var titleGO = new GameObject("Title_Text");
-            titleGO.transform.SetParent(panelGO.transform, false);
-            var titleText = titleGO.AddComponent<TextMeshProUGUI>();
-            titleText.text = "Event Title";
-            titleText.fontSize = 24;
-            titleText.alignment = TextAlignmentOptions.Center;
-            titleText.fontStyle = FontStyles.Bold;
-            var titleRect = titleText.rectTransform;
-            titleRect.anchorMin = new Vector2(0, 0.85f);
-            titleRect.anchorMax = new Vector2(1, 1);
-            titleRect.offsetMin = Vector2.zero;
-            titleRect.offsetMax = Vector2.zero;
-
-            // 4. Create Description
-            var descGO = new GameObject("Description_Text");
-            descGO.transform.SetParent(panelGO.transform, false);
-            var descText = descGO.AddComponent<TextMeshProUGUI>();
-            descText.text = "Event Description...";
-            descText.fontSize = 18;
-            descText.alignment = TextAlignmentOptions.TopLeft;
-            var descRect = descText.rectTransform;
-            descRect.anchorMin = new Vector2(0.05f, 0.05f);
-            descRect.anchorMax = new Vector2(0.95f, 0.8f);
-            descRect.offsetMin = Vector2.zero;
-            descRect.offsetMax = Vector2.zero;
-
-            // 5. Add Component
-            // Note: In Editor, we can't AddComponent if the script is not compiled yet or found.
-            // But since this code IS inside the component script, it's fine.
-            var ui = panelGO.AddComponent<StorytellerUI>();
-            ui.titleText = titleText;
-            ui.descriptionText = descText;
-            ui.contentParent = panelGO;
-
-            // Select it
-            UnityEditor.Selection.activeGameObject = panelGO;
-            Debug.Log("[StorytellerUI] Created UI hierarchy.");
+            Debug.Log("[StorytellerUI] Auto-Setup Complete.");
         }
 #endif
     }
