@@ -117,7 +117,11 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
         [Title("Debug Controls")]
-        [Button("Force Advance Day")]
+        [Button("Start New Game", ButtonSizes.Large)]
+        [GUIColor(0f, 1f, 0f)]
+        private void Debug_StartNewGame() => StartNewGame();
+
+        [Button("Force Advance Day", ButtonSizes.Medium)]
         private void Debug_Advance() => AdvanceDay();
         #endif
     }
