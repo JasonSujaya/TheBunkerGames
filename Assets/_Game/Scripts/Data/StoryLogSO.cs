@@ -44,6 +44,14 @@ namespace TheBunkerGames
         /// </summary>
         public void RecordEvent(int day, string playerAction, LLMStoryEventData storyEvent)
         {
+            RecordEvent(day, playerAction, storyEvent, "");
+        }
+
+        /// <summary>
+        /// Record a story event for a specific day with an optional category tag.
+        /// </summary>
+        public void RecordEvent(int day, string playerAction, LLMStoryEventData storyEvent, string category)
+        {
             if (storyEvent == null) return;
 
             // Find or create the day entry
@@ -68,6 +76,7 @@ namespace TheBunkerGames
                 FullEventJson = storyEvent.ToJson(true),
                 EffectCount = storyEvent.Effects?.Count ?? 0,
                 ChoiceCount = storyEvent.Choices?.Count ?? 0,
+                Category = category,
                 Timestamp = DateTime.Now.ToString("HH:mm:ss")
             });
 
@@ -158,6 +167,11 @@ namespace TheBunkerGames
         [HorizontalGroup("$Title/Counts")]
         #endif
         public int ChoiceCount;
+
+        #if ODIN_INSPECTOR
+        [FoldoutGroup("$Title")]
+        #endif
+        public string Category;
 
         #if ODIN_INSPECTOR
         [FoldoutGroup("$Title")]

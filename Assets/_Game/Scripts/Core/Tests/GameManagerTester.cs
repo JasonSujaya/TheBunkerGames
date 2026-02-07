@@ -47,8 +47,8 @@ namespace TheBunkerGames.Tests
         private void Test_SetState_Changes()
         {
             gm.StartNewGame();
-            gm.SetState(GameState.AngelInteraction);
-            AssertEqual(GameState.AngelInteraction, gm.CurrentState, "State after SetState");
+            gm.SetState(GameState.CityExploration);
+            AssertEqual(GameState.CityExploration, gm.CurrentState, "State after SetState");
         }
 
         [TestMethod("SetState fires OnStateChanged event")]
@@ -70,13 +70,13 @@ namespace TheBunkerGames.Tests
         private void Test_SetState_SameState_NoEvent()
         {
             gm.StartNewGame();
-            gm.SetState(GameState.AngelInteraction);
+            gm.SetState(GameState.CityExploration);
 
             bool fired = false;
             Action<GameState> handler = s => fired = true;
             GameManager.OnStateChanged += handler;
 
-            gm.SetState(GameState.AngelInteraction);
+            gm.SetState(GameState.CityExploration);
             AssertFalse(fired, "Event should not fire for same state");
 
             GameManager.OnStateChanged -= handler;
@@ -156,26 +156,11 @@ namespace TheBunkerGames.Tests
             GameManager.OnDayStart -= handler;
         }
 
-        [TestMethod("SetState to NightCycle fires OnNightStart")]
-        private void Test_SetState_NightCycle_FiresNightStart()
-        {
-            gm.StartNewGame();
-
-            bool fired = false;
-            Action handler = () => fired = true;
-            GameManager.OnNightStart += handler;
-
-            gm.SetState(GameState.NightCycle);
-            AssertTrue(fired, "OnNightStart should fire when entering NightCycle");
-
-            GameManager.OnNightStart -= handler;
-        }
-
         [TestMethod("SetState to StatusReview fires OnDayStart")]
         private void Test_SetState_StatusReview_FiresDayStart()
         {
             gm.StartNewGame();
-            gm.SetState(GameState.NightCycle);
+            gm.SetState(GameState.CityExploration);
 
             bool fired = false;
             Action handler = () => fired = true;
@@ -188,25 +173,16 @@ namespace TheBunkerGames.Tests
         }
 
         // -------------------------------------------------------------------------
-        // Full Phase Loop
+        // State Transitions
         // -------------------------------------------------------------------------
-        [TestMethod("Full 5-phase loop advances through all states")]
-        private void Test_FullPhaseLoop()
+        [TestMethod("State transitions between StatusReview and CityExploration")]
+        private void Test_StateTransitions()
         {
             gm.StartNewGame();
-            AssertEqual(GameState.StatusReview, gm.CurrentState, "Phase 1");
-
-            gm.SetState(GameState.AngelInteraction);
-            AssertEqual(GameState.AngelInteraction, gm.CurrentState, "Phase 2");
+            AssertEqual(GameState.StatusReview, gm.CurrentState, "Phase 1: StatusReview");
 
             gm.SetState(GameState.CityExploration);
-            AssertEqual(GameState.CityExploration, gm.CurrentState, "Phase 3");
-
-            gm.SetState(GameState.DailyChoice);
-            AssertEqual(GameState.DailyChoice, gm.CurrentState, "Phase 4");
-
-            gm.SetState(GameState.NightCycle);
-            AssertEqual(GameState.NightCycle, gm.CurrentState, "Phase 5");
+            AssertEqual(GameState.CityExploration, gm.CurrentState, "Phase 2: CityExploration");
         }
     }
 }
