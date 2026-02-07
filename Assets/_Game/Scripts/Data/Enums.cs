@@ -95,6 +95,22 @@ namespace TheBunkerGames
     }
 
     // -------------------------------------------------------------------------
+    // Sickness Types (conditions that affect characters over time)
+    // -------------------------------------------------------------------------
+    public enum SicknessType
+    {
+        None,
+        Flu,
+        Infection,
+        RadiationPoisoning,
+        FoodPoisoning,
+        Fever,
+        Pneumonia,
+        Dysentery,
+        Plague
+    }
+
+    // -------------------------------------------------------------------------
     // Pre-Scripted Event Categories (government fallout narrative beats)
     // -------------------------------------------------------------------------
     public enum ScriptedEventCategory

@@ -113,7 +113,15 @@ namespace TheBunkerGames
                 case "KillCharacter":
                     KillCharacter(effect.Target);
                     break;
-                    
+
+                // Sickness Effects
+                case "InfectCharacter":
+                    ApplyInfection(effect.Intensity, effect.Target);
+                    break;
+                case "CureCharacter":
+                    CureCharacter(effect.Target);
+                    break;
+
                 // Special Effects
                 case "TriggerEvent":
                 case "UnlockArea":
@@ -317,6 +325,42 @@ namespace TheBunkerGames
             {
                 character.ModifyHealth(-9999f); // Lethal damage
                 Debug.Log($"[LLMEffectExecutor] KILLED: '{target}'");
+            }
+        }
+
+        private void ApplyInfection(int intensity, string target)
+        {
+            var character = GetTargetCharacter(target);
+            if (character != null)
+            {
+                // Pick sickness type based on intensity bracket
+                SicknessType type;
+                if (intensity <= 2) type = SicknessType.Flu;
+                else if (intensity <= 4) type = SicknessType.FoodPoisoning;
+                else if (intensity <= 5) type = SicknessType.Fever;
+                else if (intensity <= 6) type = SicknessType.Infection;
+                else if (intensity <= 7) type = SicknessType.Dysentery;
+                else if (intensity <= 8) type = SicknessType.Pneumonia;
+                else if (intensity <= 9) type = SicknessType.RadiationPoisoning;
+                else type = SicknessType.Plague;
+
+                character.Infect(type, intensity);
+
+                // Sickness also reduces health slightly
+                float healthHit = IntensityToValue(intensity, minHealthChange * 0.5f, maxHealthChange * 0.3f);
+                character.ModifyHealth(-healthHit);
+                Debug.Log($"[LLMEffectExecutor] Infected '{target}' with {type} (severity {intensity}) → HP: {character.Health:0.0}");
+            }
+        }
+
+        private void CureCharacter(string target)
+        {
+            var character = GetTargetCharacter(target);
+            if (character != null)
+            {
+                character.CureSickness();
+                character.IsInjured = false;
+                Debug.Log($"[LLMEffectExecutor] Cured '{target}' of all sickness and injuries.");
             }
         }
 
