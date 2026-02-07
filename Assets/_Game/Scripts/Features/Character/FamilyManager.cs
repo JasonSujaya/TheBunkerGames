@@ -18,6 +18,11 @@ namespace TheBunkerGames
         public static FamilyManager Instance { get; private set; }
 
         // -------------------------------------------------------------------------
+        // Configuration
+        // -------------------------------------------------------------------------
+        [SerializeField] private FamilyListSO defaultFamilyProfile;
+
+        // -------------------------------------------------------------------------
         // Public Properties (Filtering CharacterManager)
         // -------------------------------------------------------------------------
         public List<CharacterData> FamilyMembers => CharacterManager.Instance != null 
@@ -26,6 +31,28 @@ namespace TheBunkerGames
 
         public int AliveCount => FamilyMembers.FindAll(c => c.IsAlive).Count;
         public List<CharacterData> AvailableExplorers => FamilyMembers.FindAll(c => c.IsAvailableForExploration);
+
+        public void SpawnDefaultFamily()
+        {
+            if (defaultFamilyProfile == null)
+            {
+                Debug.LogWarning("[FamilyManager] No Default Family Profile assigned! Cannot spawn default family.");
+                return;
+            }
+
+            Debug.Log("[FamilyManager] Spawning Default Family...");
+            ClearFamily();
+
+            foreach (var memberDef in defaultFamilyProfile.DefaultFamilyMembers)
+            {
+                if (memberDef != null)
+                {
+                    AddCharacter(memberDef);
+                }
+            }
+            
+            Debug.Log($"[FamilyManager] Spawned {AliveCount} family members.");
+        }
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle

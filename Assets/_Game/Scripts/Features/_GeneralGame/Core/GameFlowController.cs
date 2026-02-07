@@ -38,6 +38,13 @@ namespace TheBunkerGames
             
             Debug.Log($"[Sim] GAME START | Day: {gameManager.CurrentDay} | Family: {gameManager.SessionData.FamilyCount} | Health: {gameManager.SessionData.AverageHealth}%");
             
+            // Spawn Default Family
+            if (gameManager.Family != null)
+            {
+                gameManager.Family.SpawnDefaultFamily();
+                gameManager.SessionData.UpdateSync(gameManager.Family);
+            }
+
             GameManager.FireDayStart();
         }
 
