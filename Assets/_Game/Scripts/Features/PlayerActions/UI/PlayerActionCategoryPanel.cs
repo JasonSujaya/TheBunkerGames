@@ -37,6 +37,15 @@ namespace TheBunkerGames
         [SerializeField] private Button submitButton;
         [SerializeField] private TMP_Text submitButtonText;
 
+        #if ODIN_INSPECTOR
+        [Title("Player Input (Live)")]
+        [InfoBox("This field is synced with the TMP_InputField at runtime. Edit here or in the game UI.")]
+        [MultiLineProperty(4)]
+        [OnValueChanged("SyncInputToField")]
+        #endif
+        [TextArea(2, 6)]
+        [SerializeField] private string playerInputText = "";
+
         [Header("Item Selection (Optional)")]
         [SerializeField] private Transform itemToggleContainer;
         [SerializeField] private GameObject itemTogglePrefab;
@@ -66,7 +75,7 @@ namespace TheBunkerGames
         public PlayerActionCategory Category => category;
         public bool IsSubmitted => isSubmitted;
         public bool HasResult => hasResult;
-        public string PlayerInput => playerInputField != null ? playerInputField.text : "";
+        public string PlayerInput => playerInputText ?? "";
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -76,6 +85,13 @@ namespace TheBunkerGames
             if (submitButton != null)
                 submitButton.onClick.AddListener(OnSubmitClicked);
 
+            if (playerInputField != null)
+                playerInputField.onValueChanged.AddListener(SyncInputFromField);
+
+            // Push any pre-filled editor text into the input field
+            if (playerInputField != null && !string.IsNullOrEmpty(playerInputText))
+                playerInputField.text = playerInputText;
+
             HideResult();
             HideLoading();
         }
@@ -84,6 +100,32 @@ namespace TheBunkerGames
         {
             if (submitButton != null)
                 submitButton.onClick.RemoveListener(OnSubmitClicked);
+
+            if (playerInputField != null)
+                playerInputField.onValueChanged.RemoveListener(SyncInputFromField);
+        }
+
+        // -------------------------------------------------------------------------
+        // Input Sync (Inspector ↔ TMP_InputField)
+        // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Called when the TMP_InputField value changes at runtime.
+        /// Syncs the value back to the serialized inspector field.
+        /// </summary>
+        private void SyncInputFromField(string newValue)
+        {
+            playerInputText = newValue;
+        }
+
+        /// <summary>
+        /// Called when the inspector field changes (Odin OnValueChanged).
+        /// Pushes the value to the TMP_InputField.
+        /// </summary>
+        private void SyncInputToField()
+        {
+            if (playerInputField != null && playerInputField.text != playerInputText)
+                playerInputField.text = playerInputText ?? "";
         }
 
         // -------------------------------------------------------------------------
@@ -129,6 +171,7 @@ namespace TheBunkerGames
             }
 
             // Reset input
+            playerInputText = "";
             if (playerInputField != null)
             {
                 playerInputField.text = "";
@@ -216,6 +259,7 @@ namespace TheBunkerGames
             hasResult = false;
             selectedItems.Clear();
 
+            playerInputText = "";
             if (playerInputField != null)
             {
                 playerInputField.text = "";
@@ -302,7 +346,7 @@ namespace TheBunkerGames
         {
             if (isSubmitted) return;
 
-            string input = playerInputField != null ? playerInputField.text : "";
+            string input = playerInputText ?? "";
 
             // Dilemma requires input
             if (category == PlayerActionCategory.Dilemma && string.IsNullOrEmpty(input.Trim()))
