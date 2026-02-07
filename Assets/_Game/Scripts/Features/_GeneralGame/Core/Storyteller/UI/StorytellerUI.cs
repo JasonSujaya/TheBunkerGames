@@ -49,7 +49,7 @@ namespace TheBunkerGames
         }
 
 #if ODIN_INSPECTOR
-        [Sirenix.OdinInspector.Button("Auto-Setup UI Hierarchy", ButtonSizes.Large)]
+        [Sirenix.OdinInspector.Button("Auto-Setup UI Hierarchy", Sirenix.OdinInspector.ButtonSizes.Large)]
         [Sirenix.OdinInspector.GUIColor(0f, 1f, 0f)]
         private void Debug_AutoSetup()
         {
