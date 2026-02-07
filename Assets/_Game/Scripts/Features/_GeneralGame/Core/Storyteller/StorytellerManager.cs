@@ -11,10 +11,8 @@ namespace TheBunkerGames
         public static StorytellerManager Instance { get; private set; }
 
         [Header("Configuration")]
-        [Header("Configuration")]
-        [Header("Configuration")]
         [SerializeField] private StoryScenarioSO currentScenario;
-        [SerializeField] private Storyteller.UI.StorytellerUI ui;
+        [SerializeField] private StorytellerUI ui;
 
         public static event System.Action<StoryEventSO> OnStoryEventTriggered;
 
@@ -122,11 +120,14 @@ namespace TheBunkerGames
             
             if (evt != null)
             {
-                Debug.Log($"[Storyteller] Day {day}: {evt.Title} - {evt.Description}");
+                // FORCE UI UPDATE by calling TriggerEvent
+                TriggerEvent(evt);
             }
             else
             {
                 Debug.Log($"[Storyteller] Day {day}: Event doesn't exist.");
+                // Clear UI if no event
+                if (ui != null) ui.UpdateUI(null);
             }
         }
         #endif
