@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb11da5a1aec94e398caf62ab8782cbb, type: 3}
+  m_Name: PreScriptedEventSchedule
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.PreScriptedEventScheduleSO
+  events:
+  - day: 1
+    category: 2
+    title: New Event
+    description: VERY VERY GOOD LUCK
+    effects: []
+    choices: []
+  - day: 14
+    category: 0
+    title: Massive Shortage
+    description: Massive Shortage
+    effects: []
+    choices: []

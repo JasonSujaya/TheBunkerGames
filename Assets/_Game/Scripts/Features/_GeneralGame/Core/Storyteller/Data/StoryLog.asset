@@ -12,6 +12,511 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69a4527ad74f843cfbc2270fd3cfbffb, type: 3}
   m_Name: StoryLog
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.StoryLogSO
-  days: []
-  totalEvents: 0
-  lastUpdated: 
+  days:
+  - DayNumber: 1
+    Events:
+    - PlayerAction: Search the storage room for supplies
+      Title: Dusty Discoveries
+      Description: While searching the storage room, the family finds some old boxes.
+        They contain some canned food and a few bottles of water, but also a lot
+        of dust and dirt. The air is stale, and the room is in disarray.
+      EffectCount: 5
+      ChoiceCount: 3
+      Timestamp: 15:51:55
+      FullEventJson: "{\n  \"title\": \"Dusty Discoveries\",\n  \"description\":
+        \"While searching the storage room, the family finds some old boxes. They
+        contain some canned food and a few bottles of water, but also a lot of dust
+        and dirt. The air is stale, and the room is in disarray.\",\n  \"effects\":
+        [\n    {\n      \"effectType\": \"AddFood\",\n      \"intensity\": 4,\n     
+        \"target\": \"\"\n    },\n    {\n      \"effectType\": \"AddWater\",\n     
+        \"intensity\": 3,\n      \"target\": \"\"\n    },\n    {\n      \"effectType\":
+        \"ReduceSanity\",\n      \"intensity\": 2,\n      \"target\": \"Daughter\"\n   
+        },\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\":
+        2,\n      \"target\": \"Mother\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 2,\n      \"target\": \"Son\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Organize the storage room\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
+        3,\n          \"target\": \"Daughter\"\n        },\n        {\n         
+        \"effectType\": \"AddSanity\",\n          \"intensity\": 3,\n          \"target\":
+        \"Mother\"\n        },\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 3,\n          \"target\": \"Son\"\n        },\n        {\n         
+        \"effectType\": \"ReduceHunger\",\n          \"intensity\": 5,\n         
+        \"target\": \"Daughter\"\n        },\n        {\n          \"effectType\":
+        \"ReduceHunger\",\n          \"intensity\": 5,\n          \"target\": \"Mother\"\n       
+        },\n        {\n          \"effectType\": \"ReduceHunger\",\n          \"intensity\":
+        5,\n          \"target\": \"Son\"\n        }\n      ]\n    },\n    {\n     
+        \"text\": \"Leave the room as it is and save energy\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        2,\n          \"target\": \"Daughter\"\n        },\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 2,\n         
+        \"target\": \"Mother\"\n        },\n        {\n          \"effectType\":
+        \"ReduceSanity\",\n          \"intensity\": 2,\n          \"target\": \"Son\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Search more thoroughly for additional
+        supplies\",\n      \"effects\": [\n        {\n          \"effectType\": \"AddSupplies\",\n         
+        \"intensity\": 2,\n          \"target\": \"\"\n        },\n        {\n         
+        \"effectType\": \"ReduceHP\",\n          \"intensity\": 3,\n          \"target\":
+        \"Daughter\"\n        },\n        {\n          \"effectType\": \"ReduceHP\",\n         
+        \"intensity\": 3,\n          \"target\": \"Mother\"\n        },\n       
+        {\n          \"effectType\": \"ReduceHP\",\n          \"intensity\": 3,\n         
+        \"target\": \"Son\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Search the storage room for supplies
+      Title: Dusty Discoveries
+      Description: While searching the storage room, the family finds some old boxes.
+        They contain some canned food and a few bottles of water, but everything
+        is covered in a thick layer of dust. The air is stale, and the room is dimly
+        lit.
+      EffectCount: 5
+      ChoiceCount: 3
+      Timestamp: 15:55:56
+      FullEventJson: "{\n  \"title\": \"Dusty Discoveries\",\n  \"description\":
+        \"While searching the storage room, the family finds some old boxes. They
+        contain some canned food and a few bottles of water, but everything is covered
+        in a thick layer of dust. The air is stale, and the room is dimly lit.\",\n 
+        \"effects\": [\n    {\n      \"effectType\": \"AddFood\",\n      \"intensity\":
+        4,\n      \"target\": \"\"\n    },\n    {\n      \"effectType\": \"AddWater\",\n     
+        \"intensity\": 3,\n      \"target\": \"\"\n    },\n    {\n      \"effectType\":
+        \"ReduceSanity\",\n      \"intensity\": 2,\n      \"target\": \"Daughter\"\n   
+        },\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\":
+        2,\n      \"target\": \"Mother\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 2,\n      \"target\": \"Son\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Take the supplies and clean the storage room\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 3,\n          \"target\": \"Daughter\"\n        },\n       
+        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 3,\n         
+        \"target\": \"Mother\"\n        },\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 3,\n          \"target\": \"Son\"\n       
+        },\n        {\n          \"effectType\": \"ReduceHunger\",\n          \"intensity\":
+        5,\n          \"target\": \"Daughter\"\n        },\n        {\n         
+        \"effectType\": \"ReduceHunger\",\n          \"intensity\": 5,\n         
+        \"target\": \"Mother\"\n        },\n        {\n          \"effectType\":
+        \"ReduceHunger\",\n          \"intensity\": 5,\n          \"target\": \"Son\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Leave the room as it is and
+        take only the supplies\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceSanity\",\n          \"intensity\": 2,\n          \"target\": \"Daughter\"\n       
+        },\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        2,\n          \"target\": \"Mother\"\n        },\n        {\n          \"effectType\":
+        \"ReduceSanity\",\n          \"intensity\": 2,\n          \"target\": \"Son\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Search more thoroughly, ignoring
+        the dust and stale air\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddFood\",\n          \"intensity\": 2,\n          \"target\": \"\"\n       
+        },\n        {\n          \"effectType\": \"AddWater\",\n          \"intensity\":
+        2,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"ReduceHP\",\n          \"intensity\": 3,\n          \"target\": \"Daughter\"\n       
+        },\n        {\n          \"effectType\": \"ReduceHP\",\n          \"intensity\":
+        3,\n          \"target\": \"Mother\"\n        },\n        {\n          \"effectType\":
+        \"ReduceHP\",\n          \"intensity\": 3,\n          \"target\": \"Son\"\n       
+        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Search the storage room for supplies
+      Title: Dusty Discoveries
+      Description: While searching the storage room, the family finds some old canned
+        food and a few bottles of water hidden behind some boxes. However, the dust
+        and stale air cause everyone to cough and feel a bit thirstier.
+      EffectCount: 5
+      ChoiceCount: 3
+      Timestamp: 15:56:28
+      FullEventJson: "{\n  \"title\": \"Dusty Discoveries\",\n  \"description\":
+        \"While searching the storage room, the family finds some old canned food
+        and a few bottles of water hidden behind some boxes. However, the dust and
+        stale air cause everyone to cough and feel a bit thirstier.\",\n  \"effects\":
+        [\n    {\n      \"effectType\": \"AddFood\",\n      \"intensity\": 4,\n     
+        \"target\": \"\"\n    },\n    {\n      \"effectType\": \"AddWater\",\n     
+        \"intensity\": 3,\n      \"target\": \"\"\n    },\n    {\n      \"effectType\":
+        \"AddThirst\",\n      \"intensity\": 2,\n      \"target\": \"Daughter\"\n   
+        },\n    {\n      \"effectType\": \"AddThirst\",\n      \"intensity\": 2,\n     
+        \"target\": \"Mother\"\n    },\n    {\n      \"effectType\": \"AddThirst\",\n     
+        \"intensity\": 2,\n      \"target\": \"Son\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Rest for a while to recover from the dust.\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"ReduceThirst\",\n         
+        \"intensity\": 3,\n          \"target\": \"Daughter\"\n        },\n       
+        {\n          \"effectType\": \"ReduceThirst\",\n          \"intensity\":
+        3,\n          \"target\": \"Mother\"\n        },\n        {\n          \"effectType\":
+        \"ReduceThirst\",\n          \"intensity\": 3,\n          \"target\": \"Son\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Continue searching for more
+        supplies.\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddThirst\",\n          \"intensity\": 3,\n          \"target\": \"Daughter\"\n       
+        },\n        {\n          \"effectType\": \"AddThirst\",\n          \"intensity\":
+        3,\n          \"target\": \"Mother\"\n        },\n        {\n          \"effectType\":
+        \"AddThirst\",\n          \"intensity\": 3,\n          \"target\": \"Son\"\n       
+        },\n        {\n          \"effectType\": \"AddSupplies\",\n          \"intensity\":
+        2,\n          \"target\": \"\"\n        }\n      ]\n    },\n    {\n     
+        \"text\": \"Drink some of the found water to quench thirst.\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceWater\",\n          \"intensity\":
+        2,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"ReduceThirst\",\n          \"intensity\": 5,\n          \"target\": \"Daughter\"\n       
+        },\n        {\n          \"effectType\": \"ReduceThirst\",\n          \"intensity\":
+        5,\n          \"target\": \"Mother\"\n        },\n        {\n          \"effectType\":
+        \"ReduceThirst\",\n          \"intensity\": 5,\n          \"target\": \"Son\"\n       
+        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Search the storage room for supplies
+      Title: Dusty Discoveries
+      Description: While searching the storage room, the family finds some old canned
+        food and a few bottles of water. However, the room is dusty and triggers
+        a coughing fit among the family members.
+      EffectCount: 5
+      ChoiceCount: 2
+      Timestamp: 15:57:29
+      FullEventJson: "{\n  \"title\": \"Dusty Discoveries\",\n  \"description\":
+        \"While searching the storage room, the family finds some old canned food
+        and a few bottles of water. However, the room is dusty and triggers a coughing
+        fit among the family members.\",\n  \"effects\": [\n    {\n      \"effectType\":
+        \"AddFood\",\n      \"intensity\": 4,\n      \"target\": \"\"\n    },\n   
+        {\n      \"effectType\": \"AddWater\",\n      \"intensity\": 3,\n      \"target\":
+        \"\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\":
+        2,\n      \"target\": \"Daughter\"\n    },\n    {\n      \"effectType\":
+        \"ReduceSanity\",\n      \"intensity\": 2,\n      \"target\": \"Mother\"\n   
+        },\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\":
+        2,\n      \"target\": \"Son\"\n    }\n  ],\n  \"choices\": [\n    {\n     
+        \"text\": \"Use the found water to clean the storage room\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceWater\",\n          \"intensity\":
+        2,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 3,\n          \"target\": \"Daughter\"\n       
+        },\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
+        3,\n          \"target\": \"Mother\"\n        },\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 3,\n          \"target\": \"Son\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Ration the found food and water
+        carefully\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceHunger\",\n          \"intensity\": 3,\n          \"target\": \"Daughter\"\n       
+        },\n        {\n          \"effectType\": \"ReduceHunger\",\n          \"intensity\":
+        3,\n          \"target\": \"Mother\"\n        },\n        {\n          \"effectType\":
+        \"ReduceHunger\",\n          \"intensity\": 3,\n          \"target\": \"Son\"\n       
+        },\n        {\n          \"effectType\": \"ReduceThirst\",\n          \"intensity\":
+        3,\n          \"target\": \"Daughter\"\n        },\n        {\n         
+        \"effectType\": \"ReduceThirst\",\n          \"intensity\": 3,\n         
+        \"target\": \"Mother\"\n        },\n        {\n          \"effectType\":
+        \"ReduceThirst\",\n          \"intensity\": 3,\n          \"target\": \"Son\"\n       
+        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Search the storage room for supplies
+      Title: A Glimpse of the Past
+      Description: While searching the storage room, the family finds a box of old
+        family photos and mementos. As they sift through the items, they are overwhelmed
+        with memories of their life before the bunker. The nostalgia lifts their
+        spirits but also reminds them of what they've lost.
+      EffectCount: 4
+      ChoiceCount: 3
+      Timestamp: 16:08:58
+      FullEventJson: "{\n  \"title\": \"A Glimpse of the Past\",\n  \"description\":
+        \"While searching the storage room, the family finds a box of old family
+        photos and mementos. As they sift through the items, they are overwhelmed
+        with memories of their life before the bunker. The nostalgia lifts their
+        spirits but also reminds them of what they've lost.\",\n  \"effects\": [\n   
+        {\n      \"effectType\": \"AddSanity\",\n      \"intensity\": 3,\n      \"target\":
+        \"Daughter\"\n    },\n    {\n      \"effectType\": \"AddSanity\",\n     
+        \"intensity\": 3,\n      \"target\": \"Father\"\n    },\n    {\n      \"effectType\":
+        \"AddSanity\",\n      \"intensity\": 3,\n      \"target\": \"Mother\"\n   
+        },\n    {\n      \"effectType\": \"AddSanity\",\n      \"intensity\": 3,\n     
+        \"target\": \"Son\"\n    }\n  ],\n  \"choices\": [\n    {\n      \"text\":
+        \"Spend time reminiscing together\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"AddSanity\",\n          \"intensity\": 2,\n          \"target\":
+        \"Daughter\"\n        },\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 2,\n          \"target\": \"Father\"\n        },\n       
+        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 2,\n         
+        \"target\": \"Mother\"\n        },\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 2,\n          \"target\": \"Son\"\n       
+        },\n        {\n          \"effectType\": \"ReduceHunger\",\n          \"intensity\":
+        2,\n          \"target\": \"\"\n        }\n      ]\n    },\n    {\n     
+        \"text\": \"Put the items away and focus on practical tasks\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"AddSupplies\",\n          \"intensity\":
+        3,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"ReduceSanity\",\n          \"intensity\": 1,\n          \"target\": \"Mother\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Use some items to decorate the
+        bunker\",\n      \"effects\": [\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 3,\n          \"target\": \"Daughter\"\n        },\n       
+        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 3,\n         
+        \"target\": \"Son\"\n        },\n        {\n          \"effectType\": \"ReduceSupplies\",\n         
+        \"intensity\": 2,\n          \"target\": \"\"\n        }\n      ]\n    }\n 
+        ]\n}"
+    - PlayerAction: Search the storage room for supplies
+      Title: A Difficult Discovery
+      Description: While searching the storage room, the family finds a locked box.
+        After prying it open, they discover a stash of food and water, but also a
+        handgun. The gun could be used for protection, but its presence in the bunker
+        raises questions about the previous owners and what they might have done
+        to survive.
+      EffectCount: 2
+      ChoiceCount: 3
+      Timestamp: 17:00:38
+      FullEventJson: "{\n  \"title\": \"A Difficult Discovery\",\n  \"description\":
+        \"While searching the storage room, the family finds a locked box. After
+        prying it open, they discover a stash of food and water, but also a handgun.
+        The gun could be used for protection, but its presence in the bunker raises
+        questions about the previous owners and what they might have done to survive.\",\n 
+        \"effects\": [\n    {\n      \"effectType\": \"AddSupplies\",\n      \"intensity\":
+        3,\n      \"target\": \"\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 2,\n      \"target\": \"Mother\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Take the gun and hide it from the children\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"AddSupplies\",\n         
+        \"intensity\": 2,\n          \"target\": \"\"\n        },\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 3,\n         
+        \"target\": \"Father\"\n        }\n      ]\n    },\n    {\n      \"text\":
+        \"Leave the gun where it is and take only the food and water\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"AddFood\",\n          \"intensity\":
+        4,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"AddWater\",\n          \"intensity\": 4,\n          \"target\": \"\"\n       
+        },\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
+        2,\n          \"target\": \"Mother\"\n        }\n      ]\n    },\n    {\n     
+        \"text\": \"Discuss the gun openly with the family and decide together\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"AddSupplies\",\n         
+        \"intensity\": 2,\n          \"target\": \"\"\n        },\n        {\n         
+        \"effectType\": \"AddSanity\",\n          \"intensity\": 2,\n          \"target\":
+        \"Daughter\"\n        },\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 2,\n          \"target\": \"Son\"\n        }\n      ]\n   
+        }\n  ]\n}"
+    - PlayerAction: Search the storage room for supplies
+      Title: A Beacon of Hope
+      Description: While searching the storage room, the family discovers an old
+        radio. As they turn it on, a government broadcast crackles through, repeating
+        'VERY VERY GOOD LUCK' in a loop. The eerie message lifts their spirits, but
+        also instills a sense of unease.
+      EffectCount: 5
+      ChoiceCount: 3
+      Timestamp: 17:01:30
+      FullEventJson: "{\n  \"title\": \"A Beacon of Hope\",\n  \"description\": \"While
+        searching the storage room, the family discovers an old radio. As they turn
+        it on, a government broadcast crackles through, repeating 'VERY VERY GOOD
+        LUCK' in a loop. The eerie message lifts their spirits, but also instills
+        a sense of unease.\",\n  \"effects\": [\n    {\n      \"effectType\": \"AddSanity\",\n     
+        \"intensity\": 3,\n      \"target\": \"Daughter\"\n    },\n    {\n      \"effectType\":
+        \"AddSanity\",\n      \"intensity\": 3,\n      \"target\": \"Father\"\n   
+        },\n    {\n      \"effectType\": \"AddSanity\",\n      \"intensity\": 3,\n     
+        \"target\": \"Mother\"\n    },\n    {\n      \"effectType\": \"AddSanity\",\n     
+        \"intensity\": 3,\n      \"target\": \"Son\"\n    },\n    {\n      \"effectType\":
+        \"ReduceSanity\",\n      \"intensity\": 2,\n      \"target\": \"Mother\"\n   
+        }\n  ],\n  \"choices\": [\n    {\n      \"text\": \"Focus on the positive
+        and share stories of good luck\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"AddSanity\",\n          \"intensity\": 2,\n          \"target\":
+        \"Daughter\"\n        },\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 2,\n          \"target\": \"Son\"\n        }\n      ]\n   
+        },\n    {\n      \"text\": \"Dwell on the eerie nature of the message\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"ReduceSanity\",\n         
+        \"intensity\": 3,\n          \"target\": \"Father\"\n        },\n       
+        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        3,\n          \"target\": \"Mother\"\n        }\n      ]\n    },\n    {\n     
+        \"text\": \"Ignore the message and continue searching for supplies\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"AddSupplies\",\n         
+        \"intensity\": 4,\n          \"target\": \"\"\n        },\n        {\n         
+        \"effectType\": \"ReduceHunger\",\n          \"intensity\": 2,\n         
+        \"target\": \"\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Search the storage room for supplies
+      Title: Unexpected Broadcast
+      Description: 'While searching the storage room, the family finds a stash of
+        canned food and water. Suddenly, a government broadcast interrupts their
+        search, blaring through the bunker''s speakers with a distorted message:
+        ''VERY VERY GOOD LUCK.'' The message repeats, causing confusion and unease
+        among the family members.'
+      EffectCount: 6
+      ChoiceCount: 3
+      Timestamp: 17:27:50
+      FullEventJson: "{\n  \"title\": \"Unexpected Broadcast\",\n  \"description\":
+        \"While searching the storage room, the family finds a stash of canned food
+        and water. Suddenly, a government broadcast interrupts their search, blaring
+        through the bunker's speakers with a distorted message: 'VERY VERY GOOD LUCK.'
+        The message repeats, causing confusion and unease among the family members.\",\n 
+        \"effects\": [\n    {\n      \"effectType\": \"AddFood\",\n      \"intensity\":
+        10,\n      \"target\": \"\"\n    },\n    {\n      \"effectType\": \"AddWater\",\n     
+        \"intensity\": 10,\n      \"target\": \"\"\n    },\n    {\n      \"effectType\":
+        \"ReduceSanity\",\n      \"intensity\": 5,\n      \"target\": \"Daughter\"\n   
+        },\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\":
+        5,\n      \"target\": \"Father\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 5,\n      \"target\": \"Mother\"\n    },\n    {\n      \"effectType\":
+        \"ReduceSanity\",\n      \"intensity\": 5,\n      \"target\": \"Son\"\n   
+        }\n  ],\n  \"choices\": [\n    {\n      \"text\": \"Investigate the broadcast
+        source\",\n      \"effects\": [\n        {\n          \"effectType\": \"ReduceSanity\",\n         
+        \"intensity\": 10,\n          \"target\": \"Father\"\n        },\n       
+        {\n          \"effectType\": \"AddSupplies\",\n          \"intensity\": 5,\n         
+        \"target\": \"\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Ignore
+        the broadcast and continue searching\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"AddFood\",\n          \"intensity\": 5,\n          \"target\":
+        \"\"\n        },\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 5,\n          \"target\": \"Mother\"\n        }\n      ]\n   
+        },\n    {\n      \"text\": \"Try to disable the broadcast system\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"ReduceSupplies\",\n         
+        \"intensity\": 3,\n          \"target\": \"\"\n        },\n        {\n         
+        \"effectType\": \"AddSanity\",\n          \"intensity\": 10,\n          \"target\":
+        \"Son\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Search the storage room for supplies
+      Title: Mysterious Broadcast
+      Description: 'While searching the storage room, the family discovers a hidden
+        radio. Suddenly, it crackles to life with a government broadcast: ''Citizens,
+        you are in for a treat. We have a special message for you: VERY VERY GOOD
+        LUCK. Stay tuned for more updates.'' The broadcast ends abruptly, leaving
+        the family confused and slightly unnerved.'
+      EffectCount: 2
+      ChoiceCount: 3
+      Timestamp: 17:48:16
+      FullEventJson: "{\n  \"title\": \"Mysterious Broadcast\",\n  \"description\":
+        \"While searching the storage room, the family discovers a hidden radio.
+        Suddenly, it crackles to life with a government broadcast: 'Citizens, you
+        are in for a treat. We have a special message for you: VERY VERY GOOD LUCK.
+        Stay tuned for more updates.' The broadcast ends abruptly, leaving the family
+        confused and slightly unnerved.\",\n  \"effects\": [\n    {\n      \"effectType\":
+        \"ReduceSanity\",\n      \"intensity\": 5,\n      \"target\": \"Father\"\n   
+        },\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\":
+        5,\n      \"target\": \"Mother\"\n    }\n  ],\n  \"choices\": [\n    {\n     
+        \"text\": \"Investigate the radio further\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        3,\n          \"target\": \"Son\"\n        },\n        {\n          \"effectType\":
+        \"AddSupplies\",\n          \"intensity\": 2,\n          \"target\": \"\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Ignore the radio and continue
+        searching for supplies\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddSupplies\",\n          \"intensity\": 5,\n          \"target\": \"\"\n       
+        },\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
+        2,\n          \"target\": \"Daughter\"\n        }\n      ]\n    },\n    {\n     
+        \"text\": \"Try to contact someone using the radio\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        5,\n          \"target\": \"Father\"\n        },\n        {\n          \"effectType\":
+        \"ReduceHP\",\n          \"intensity\": 3,\n          \"target\": \"Mother\"\n       
+        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Search the storage room for supplies
+      Title: Mysterious Broadcast
+      Description: 'While searching the storage room, the family finds a working
+        radio. Suddenly, a government broadcast cuts through the static: ''VERY VERY
+        GOOD LUCK.'' The message repeats, sending chills down their spines. The broadcast
+        seems to trigger a strange noise from the bunker''s ventilation system.'
+      EffectCount: 2
+      ChoiceCount: 3
+      Timestamp: 17:52:50
+      FullEventJson: "{\n  \"title\": \"Mysterious Broadcast\",\n  \"description\":
+        \"While searching the storage room, the family finds a working radio. Suddenly,
+        a government broadcast cuts through the static: 'VERY VERY GOOD LUCK.' The
+        message repeats, sending chills down their spines. The broadcast seems to
+        trigger a strange noise from the bunker's ventilation system.\",\n  \"effects\":
+        [\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\": 5,\n     
+        \"target\": \"Mother\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 5,\n      \"target\": \"Father\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Investigate the ventilation noise\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceHP\",\n          \"intensity\":
+        3,\n          \"target\": \"Father\"\n        },\n        {\n          \"effectType\":
+        \"AddSupplies\",\n          \"intensity\": 4,\n          \"target\": \"\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Ignore the noise and continue
+        searching for supplies\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddSupplies\",\n          \"intensity\": 6,\n          \"target\": \"\"\n       
+        },\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        3,\n          \"target\": \"Son\"\n        }\n      ]\n    },\n    {\n     
+        \"text\": \"Turn off the radio and take a break\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 4,\n         
+        \"target\": \"Daughter\"\n        },\n        {\n          \"effectType\":
+        \"AddHunger\",\n          \"intensity\": 5,\n          \"target\": \"Mother\"\n       
+        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Search the storage room for supplies
+      Title: A Mysterious Broadcast and a Difficult Discovery
+      Description: While searching the storage room, the family finds a hidden compartment
+        containing a substantial amount of food and water. Suddenly, a government
+        broadcast crackles to life, wishing listeners 'VERY VERY GOOD LUCK' in a
+        sinister tone. The family realizes that taking these supplies might mean
+        depriving someone else of them, but they desperately need resources to survive.
+      EffectCount: 4
+      ChoiceCount: 3
+      Timestamp: 18:00:37
+      FullEventJson: "{\n  \"title\": \"A Mysterious Broadcast and a Difficult Discovery\",\n 
+        \"description\": \"While searching the storage room, the family finds a hidden
+        compartment containing a substantial amount of food and water. Suddenly,
+        a government broadcast crackles to life, wishing listeners 'VERY VERY GOOD
+        LUCK' in a sinister tone. The family realizes that taking these supplies
+        might mean depriving someone else of them, but they desperately need resources
+        to survive.\",\n  \"effects\": [\n    {\n      \"effectType\": \"AddFood\",\n     
+        \"intensity\": 15,\n      \"target\": \"\"\n    },\n    {\n      \"effectType\":
+        \"AddWater\",\n      \"intensity\": 15,\n      \"target\": \"\"\n    },\n   
+        {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\": 5,\n     
+        \"target\": \"Mother\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 5,\n      \"target\": \"Father\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Take the supplies and keep quiet about it\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"ReduceSanity\",\n         
+        \"intensity\": 10,\n          \"target\": \"Daughter\"\n        },\n       
+        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        10,\n          \"target\": \"Son\"\n        }\n      ]\n    },\n    {\n     
+        \"text\": \"Take only half of the supplies, leaving the rest for others\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"ReduceFood\",\n         
+        \"intensity\": 8,\n          \"target\": \"\"\n        },\n        {\n         
+        \"effectType\": \"ReduceWater\",\n          \"intensity\": 8,\n         
+        \"target\": \"\"\n        },\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 5,\n          \"target\": \"Mother\"\n        },\n       
+        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 5,\n         
+        \"target\": \"Father\"\n        }\n      ]\n    },\n    {\n      \"text\":
+        \"Leave the supplies untouched and search elsewhere\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceFood\",\n          \"intensity\":
+        15,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"ReduceWater\",\n          \"intensity\": 15,\n          \"target\": \"\"\n       
+        },\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
+        10,\n          \"target\": \"Daughter\"\n        },\n        {\n         
+        \"effectType\": \"AddSanity\",\n          \"intensity\": 10,\n          \"target\":
+        \"Son\"\n        }\n      ]\n    }\n  ]\n}"
+  - DayNumber: 2
+    Events:
+    - PlayerAction: Search the storage room for supplies
+      Title: A Mysterious Rattle
+      Description: While searching the storage room, the family hears a strange rattling
+        noise coming from one of the corners. As they investigate, they find a loose
+        vent cover. Behind it, they discover a small, hidden compartment containing
+        some supplies, but disturbing the vent has caused dust and debris to fill
+        the air.
+      EffectCount: 3
+      ChoiceCount: 3
+      Timestamp: 16:09:27
+      FullEventJson: "{\n  \"title\": \"A Mysterious Rattle\",\n  \"description\":
+        \"While searching the storage room, the family hears a strange rattling noise
+        coming from one of the corners. As they investigate, they find a loose vent
+        cover. Behind it, they discover a small, hidden compartment containing some
+        supplies, but disturbing the vent has caused dust and debris to fill the
+        air.\",\n  \"effects\": [\n    {\n      \"effectType\": \"AddSupplies\",\n     
+        \"intensity\": 3,\n      \"target\": \"\"\n    },\n    {\n      \"effectType\":
+        \"ReduceSanity\",\n      \"intensity\": 2,\n      \"target\": \"Daughter\"\n   
+        },\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\":
+        2,\n      \"target\": \"Son\"\n    }\n  ],\n  \"choices\": [\n    {\n     
+        \"text\": \"Use the supplies to reinforce the vent cover\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceSupplies\",\n          \"intensity\":
+        2,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 3,\n          \"target\": \"Father\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Ignore the vent and focus on
+        the new supplies\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceHP\",\n          \"intensity\": 3,\n          \"target\": \"Mother\"\n       
+        },\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        3,\n          \"target\": \"Mother\"\n        }\n      ]\n    },\n    {\n     
+        \"text\": \"Investigate the vent further to see where it leads\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"ReduceHP\",\n         
+        \"intensity\": 2,\n          \"target\": \"Father\"\n        },\n       
+        {\n          \"effectType\": \"AddSupplies\",\n          \"intensity\": 2,\n         
+        \"target\": \"\"\n        }\n      ]\n    }\n  ]\n}"
+  - DayNumber: 3
+    Events:
+    - PlayerAction: Search the city
+      Title: The Stranger at the Door
+      Description: While searching the city, the family encounters a lone survivor
+        begging for help. The stranger is injured and dehydrated, claiming to have
+        valuable information about a safe zone. However, helping them would mean
+        sharing their scarce resources.
+      EffectCount: 2
+      ChoiceCount: 3
+      Timestamp: 16:12:14
+      FullEventJson: "{\n  \"title\": \"The Stranger at the Door\",\n  \"description\":
+        \"While searching the city, the family encounters a lone survivor begging
+        for help. The stranger is injured and dehydrated, claiming to have valuable
+        information about a safe zone. However, helping them would mean sharing their
+        scarce resources.\",\n  \"effects\": [\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 2,\n      \"target\": \"Mother\"\n    },\n    {\n      \"effectType\":
+        \"ReduceSanity\",\n      \"intensity\": 2,\n      \"target\": \"Father\"\n   
+        }\n  ],\n  \"choices\": [\n    {\n      \"text\": \"Invite the stranger into
+        the bunker and share resources\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"ReduceFood\",\n          \"intensity\": 3,\n          \"target\":
+        \"\"\n        },\n        {\n          \"effectType\": \"ReduceWater\",\n         
+        \"intensity\": 3,\n          \"target\": \"\"\n        },\n        {\n         
+        \"effectType\": \"AddSanity\",\n          \"intensity\": 5,\n          \"target\":
+        \"Daughter\"\n        },\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 5,\n          \"target\": \"Son\"\n        }\n      ]\n   
+        },\n    {\n      \"text\": \"Give the stranger some supplies but do not let
+        them into the bunker\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceFood\",\n          \"intensity\": 2,\n          \"target\": \"\"\n       
+        },\n        {\n          \"effectType\": \"ReduceWater\",\n          \"intensity\":
+        2,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"ReduceSanity\",\n          \"intensity\": 3,\n          \"target\": \"Mother\"\n       
+        },\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        3,\n          \"target\": \"Father\"\n        }\n      ]\n    },\n    {\n     
+        \"text\": \"Refuse to help the stranger and leave them behind\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        5,\n          \"target\": \"Daughter\"\n        },\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 5,\n         
+        \"target\": \"Son\"\n        },\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 3,\n          \"target\": \"Father\"\n        },\n       
+        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 3,\n         
+        \"target\": \"Mother\"\n        }\n      ]\n    }\n  ]\n}"
+  totalEvents: 13
+  lastUpdated: 2026-02-07 18:00:37
