@@ -124,7 +124,8 @@ namespace TheBunkerGames
                         var fallback = GenerateFallbackSurvivor();
                         onComplete?.Invoke(fallback);
                     },
-                    systemPrompt: characterPromptTemplate.SystemPrompt
+                    systemPrompt: characterPromptTemplate.SystemPrompt + "\n\nSchema:\n" + characterPromptTemplate.JsonSchemaExample,
+                    useJsonMode: true
                 );
             }
             else

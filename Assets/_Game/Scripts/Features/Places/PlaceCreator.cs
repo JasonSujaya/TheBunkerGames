@@ -87,7 +87,6 @@ namespace TheBunkerGames
                 string userPrompt = placePromptTemplate.BuildUserPrompt(Random.Range(1, 6), "post-apocalyptic bunker survival");
                 
                 LLMManager.Instance.QuickChat(
-                    LLMManager.Provider.OpenRouter,
                     userPrompt,
                     onSuccess: (response) => {
                         if (LLMJsonParser.TryParsePlace(response, out var data))
@@ -108,7 +107,8 @@ namespace TheBunkerGames
                         var fallback = GenerateFallbackPlace();
                         onComplete?.Invoke(fallback);
                     },
-                    systemPrompt: placePromptTemplate.SystemPrompt
+                    systemPrompt: placePromptTemplate.SystemPrompt + "\n\nSchema:\n" + placePromptTemplate.JsonSchemaExample,
+                    useJsonMode: true
                 );
             }
             else

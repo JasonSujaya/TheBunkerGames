@@ -20,7 +20,7 @@ MonoBehaviour:
 
 
     Available
-    item types: Food, Water, Medicine, Tool, Resource, Weapon, Misc'
+    item types: Food, Water, Meds, Tools, Junk'
   userPromptTemplate: 'Generate a {0} item. Context: {1}'
   jsonSchemaExample: "{\n  \"itemName\": \"Rusty Canned Beans\",\n  \"description\":
     \"A dented can with a faded label. The contents slosh ominously.\",\n  \"itemType\":

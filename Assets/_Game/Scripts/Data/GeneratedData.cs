@@ -21,6 +21,15 @@ namespace TheBunkerGames
     }
 
     /// <summary>
+    /// Wrapper for a list of generated items.
+    /// </summary>
+    [Serializable]
+    public class GeneratedItemBatch
+    {
+        public System.Collections.Generic.List<GeneratedItemData> items = new System.Collections.Generic.List<GeneratedItemData>();
+    }
+
+    /// <summary>
     /// Lightweight POCO for LLM-generated character data.
     /// </summary>
     [Serializable]

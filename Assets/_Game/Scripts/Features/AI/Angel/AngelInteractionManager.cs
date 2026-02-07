@@ -132,7 +132,6 @@ namespace TheBunkerGames
             if (LLMManager.Instance != null)
             {
                 LLMManager.Instance.QuickChat(
-                    LLMManager.Provider.OpenRouter,
                     context,
                     onSuccess: (res) => {
                         var mockResponse = logicController.GenerateMockResponse(currentMood, responsesData);

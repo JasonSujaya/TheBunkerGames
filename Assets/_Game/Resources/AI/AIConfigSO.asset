@@ -12,9 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17516b947e0be4d6199d9f0edc9ae866, type: 3}
   m_Name: AIConfigSO
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.AIConfigSO
+  activeProvider: 1
+  activeModelTier: 1
   openRouterApiKey: 
-  openRouterModel: openai/gpt-4o-mini
+  openRouterHighModel: openai/gpt-4o
+  openRouterMidModel: openai/gpt-4o-mini
+  openRouterLowModel: meta-llama/llama-3.2-3b-instruct:free
   mistralApiKey: 0wbqiztIPrNZPbFDTclxrQT8ZCe3vgi5
-  mistralModel: mistral-large-latest
+  mistralHighModel: mistral-large-latest
+  mistralMidModel: mistral-medium-latest
+  mistralLowModel: mistral-small-latest
   requestTimeout: 30
   enableDebugLogs: 1

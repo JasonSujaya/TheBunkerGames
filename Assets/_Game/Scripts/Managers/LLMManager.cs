@@ -66,9 +66,10 @@ public static LLMManager Instance { get; private set; }
             string prompt,
             Action<string> onSuccess,
             Action<string> onError = null,
-            string systemPrompt = null)
+            string systemPrompt = null,
+            bool useJsonMode = false)
         {
-            StartCoroutine(SendChatCoroutineGeneric(prompt, systemPrompt, onSuccess, onError));
+            StartCoroutine(SendChatCoroutineGeneric(prompt, systemPrompt, onSuccess, onError, useJsonMode));
         }
 
         /// <summary>
@@ -78,15 +79,15 @@ public static LLMManager Instance { get; private set; }
         /// [DEPRECATED] Use QuickChat without provider parameter.
         /// </summary>
         [Obsolete("Use QuickChat() without provider - reads from AIConfigSO.")]
-        
-public void QuickChat(
+        public void QuickChat(
             Provider provider,
             string prompt,
             Action<string> onSuccess,
             Action<string> onError = null,
-            string systemPrompt = null)
+            string systemPrompt = null,
+            bool useJsonMode = false)
         {
-            StartCoroutine(SendChatCoroutine(provider, prompt, systemPrompt, onSuccess, onError));
+            StartCoroutine(SendChatCoroutine(provider, prompt, systemPrompt, onSuccess, onError, useJsonMode));
         }
 
 
@@ -156,12 +157,15 @@ public void QuickChat(
 
 /// Static wrapper for QuickChat. Access via LLMManager.QuickChatStatic(...).
         /// </summary>
+        /// <summary>
+        /// Sends a quick chat request using the active provider from AIConfigSO.
+        /// </summary>
         public static void QuickChatStatic(
-            Provider provider,
             string prompt,
             Action<string> onSuccess,
             Action<string> onError = null,
-            string systemPrompt = null)
+            string systemPrompt = null,
+            bool useJsonMode = false)
         {
             if (Instance == null)
             {
@@ -169,8 +173,31 @@ public void QuickChat(
                 onError?.Invoke("No instance found.");
                 return;
             }
-            Instance.QuickChat(provider, prompt, onSuccess, onError, systemPrompt);
+            Instance.QuickChat(prompt, onSuccess, onError, systemPrompt, useJsonMode);
         }
+
+        /// <summary>
+        /// [DEPRECATED] Use QuickChatStatic without provider parameter.
+        /// </summary>
+        [Obsolete("Use QuickChatStatic() without provider - reads from AIConfigSO.")]
+#pragma warning disable CS0618
+        public static void QuickChatStatic(
+            Provider provider,
+            string prompt,
+            Action<string> onSuccess,
+            Action<string> onError = null,
+            string systemPrompt = null,
+            bool useJsonMode = false)
+        {
+            if (Instance == null)
+            {
+                Debug.LogError("[LLMManager] No instance found! Make sure [LLMManager] is in your scene.");
+                onError?.Invoke("No instance found.");
+                return;
+            }
+            Instance.QuickChat(provider, prompt, onSuccess, onError, systemPrompt, useJsonMode);
+        }
+#pragma warning restore CS0618
 
 
         // -------------------------------------------------------------------------
@@ -183,7 +210,8 @@ public void QuickChat(
             string prompt,
             string systemPrompt,
             Action<string> onSuccess,
-            Action<string> onError)
+            Action<string> onError,
+            bool useJsonMode = false)
         {
             if (configAsset == null)
             {
@@ -218,11 +246,25 @@ public void QuickChat(
             }
             messages.Add(new { role = "user", content = prompt });
 
-            var payload = new
+            // Create payload object based on json mode requirement
+            object payload;
+            if (useJsonMode)
             {
-                model = model,
-                messages = messages
-            };
+                payload = new
+                {
+                    model = model,
+                    messages = messages,
+                    response_format = new { type = "json_object" }
+                };
+            }
+            else
+            {
+                payload = new
+                {
+                    model = model,
+                    messages = messages
+                };
+            }
 
             string json = JsonConvert.SerializeObject(payload);
 
@@ -271,12 +313,14 @@ public void QuickChat(
 
         // -------------------------------------------------------------------------
 
+#pragma warning disable CS0618
         private IEnumerator SendChatCoroutine(
             Provider provider,
             string prompt,
             string systemPrompt,
             Action<string> onSuccess,
-            Action<string> onError)
+            Action<string> onError,
+            bool useJsonMode = false)
         {
             if (configAsset == null)
             {
@@ -369,6 +413,7 @@ public void QuickChat(
                 }
             }
         }
+#pragma warning restore CS0618
 
         // -------------------------------------------------------------------------
         // Data Classes
@@ -422,19 +467,21 @@ public void QuickChat(
             Debug.Log("[LLMManager] Auto Setup Complete.");
         }
 
-        [Button("Test OpenRouter", ButtonSizes.Medium)]
-        private void TestOpenRouter()
+        [Button("Test Active Model", ButtonSizes.Medium)]
+        private void TestActiveModel()
         {
             if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode to test."); return; }
+            if (configAsset == null || !configAsset.HasActiveKey) { Debug.LogError("Assign AIConfigSO and API Key first."); return; }
+
             lastResponse = "Waiting for response...";
-            QuickChat(Provider.OpenRouter, testPrompt, 
+            QuickChat(testPrompt, 
                 (res) => {
                     lastResponse = res;
-                    if (configAsset.EnableDebugLogs) Debug.Log($"[Test] OpenRouter says: {res}");
+                    if (configAsset.EnableDebugLogs) Debug.Log($"[Test] AI ({configAsset.ActiveProvider}) says: {res}");
                 }, 
                 (err) => {
                     lastResponse = $"ERROR: {err}";
-                    Debug.LogError($"[Test] OpenRouter Error: {err}");
+                    Debug.LogError($"[Test] AI Error: {err}");
                 });
         }
 
@@ -444,23 +491,6 @@ public void QuickChat(
         {
             if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode to check credits."); return; }
             CheckOpenRouterCredits();
-        }
-
-        
-[Button("Test Mistral", ButtonSizes.Medium)]
-        private void TestMistral()
-        {
-            if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode to test."); return; }
-            lastResponse = "Waiting for response...";
-            QuickChat(Provider.Mistral, testPrompt, 
-                (res) => {
-                    lastResponse = res;
-                    if (configAsset.EnableDebugLogs) Debug.Log($"[Test] Mistral says: {res}");
-                }, 
-                (err) => {
-                    lastResponse = $"ERROR: {err}";
-                    Debug.LogError($"[Test] Mistral Error: {err}");
-                });
         }
         #endif
     }

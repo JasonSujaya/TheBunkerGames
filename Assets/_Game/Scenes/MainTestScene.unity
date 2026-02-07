@@ -182,6 +182,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.QuestCreator
   questManager: {fileID: 61385605}
+  useLLM: 1
+  questPromptTemplate: {fileID: 11400000, guid: c8a28b6c609be41b688d1500f1d62725, type: 2}
   customQuestId: NewQuest
   customDescription: A.N.G.E.L. has a new objective for you.
 --- !u!1 &69753609
@@ -215,7 +217,7 @@ Transform:
   m_Children:
   - {fileID: 1622780863}
   - {fileID: 1516304335}
-  m_Father: {fileID: 2134911001}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &190765076
 GameObject:
@@ -296,6 +298,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.AIItemCreator
   inventoryManager: {fileID: 190765078}
+  useLLM: 1
+  itemPromptTemplate: {fileID: 11400000, guid: fe6620aff84ec47f6bd0b1d97510fc2a, type: 2}
   customItemName: Test Item
   customItemType: 3
   customDescription: A.N.G.E.L. generated this item
@@ -345,6 +349,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.CharacterCreator
   characterManager: {fileID: 0}
+  useLLM: 1
+  characterPromptTemplate: {fileID: 11400000, guid: c2207d177b7624f8baf06a245123a74d, type: 2}
   customName: New Entity
   customSubtype: 0
   customHealth: 100
@@ -460,6 +466,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.PlaceCreator
   placeManager: {fileID: 1165594562}
+  useLLM: 1
+  placePromptTemplate: {fileID: 11400000, guid: 2e9b761bf475e42758e5f6bd09dd407f, type: 2}
   customPlaceId: NewPlace
   customPlaceName: Mysterious Location
   customDescription: An unexplored location in the wasteland.
@@ -478,10 +486,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.PlaceManager
   placeDatabase: {fileID: 11400000, guid: a1fd3d190147c4d4c8f9bb8cdcc4a3ab, type: 2}
-  discoveredPlaces: []
+  activePlaces: []
   debugPlaceProfile: {fileID: 0}
   debugPlaceId: OldPharmacy
---- !u!1 &1263657060
+--- !u!1 &1404179564
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -489,34 +497,22 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1263657062}
-  - component: {fileID: 1263657061}
+  - component: {fileID: 1404179566}
+  - component: {fileID: 1404179567}
   m_Layer: 0
-  m_Name: SystemTester
+  m_Name: '[LLMManager]'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1263657061
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1263657060}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b3791f8c39c574679b3ee820b13fea3b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.SystemTester
---- !u!4 &1263657062
+--- !u!4 &1404179566
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1263657060}
+  m_GameObject: {fileID: 1404179564}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -525,6 +521,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1404179567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1404179564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 651d6ed0cd0254470a7859f2edfc9fb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.LLMManager
+  configAsset: {fileID: 11400000, guid: b28b1ba074e0f4290b2af611f4e7f385, type: 2}
+  testPrompt: Hello! Tell me a spooky bunker story.
+  lastResponse: 
 --- !u!1 &1516304334
 GameObject:
   m_ObjectHideFlags: 0
@@ -566,13 +577,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1516304334}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0631879b31376484588cb16310c1a976, type: 3}
+  m_Script: {fileID: 11500000, guid: 1bb2371aff8b34677ab32e8d47409912, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.AngelInteractionController
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.AngelInteractionManager
+  responsesData: {fileID: 0}
+  maxInteractionsPerDay: 3
   currentMood: 1
   processingLevel: 100
   interactionsThisDay: 0
-  maxInteractionsPerDay: 3
 --- !u!1 &1622780862
 GameObject:
   m_ObjectHideFlags: 0
@@ -635,7 +647,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1666803778
 Transform:
   m_ObjectHideFlags: 0
@@ -773,7 +785,6 @@ Transform:
   - {fileID: 419311372}
   - {fileID: 1165594560}
   - {fileID: 61385604}
-  - {fileID: 69753610}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
@@ -782,5 +793,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 2047560552}
   - {fileID: 2134911001}
-  - {fileID: 1263657062}
   - {fileID: 1666803778}
+  - {fileID: 69753610}
+  - {fileID: 1404179566}

@@ -33,6 +33,7 @@ namespace TheBunkerGames
         #endif
         [SerializeField] private bool useLLM = true;
         [SerializeField] private LLMPromptTemplateSO itemPromptTemplate;
+        [SerializeField] private int defaultBatchSize = 3;
 
 
         // -------------------------------------------------------------------------
@@ -116,7 +117,7 @@ namespace TheBunkerGames
             if (useLLM && LLMManager.Instance != null && itemPromptTemplate != null)
             {
                 Debug.Log("[AIItemCreator] <color=cyan>[LLM]</color> Generating item via AI...");
-                string[] itemTypes = { "Food", "Water", "Medicine", "Tool", "Resource" };
+                string[] itemTypes = { "Food", "Water", "Meds", "Tools", "Junk" };
                 string userPrompt = itemPromptTemplate.BuildUserPrompt(itemTypes[Random.Range(0, itemTypes.Length)], "scavenged in post-apocalyptic bunker");
                 
                 LLMManager.Instance.QuickChat(
@@ -125,7 +126,12 @@ namespace TheBunkerGames
                         if (LLMJsonParser.TryParseItem(response, out var data))
                         {
                             ItemType parsedType = ItemType.Junk;
-                            System.Enum.TryParse(data.itemType, true, out parsedType);
+                            // If parsing fails, Enum.TryParse overwrites with 0 (Food). 
+                            // We use a temporary variable to prevent this.
+                            if (System.Enum.TryParse(data.itemType, true, out ItemType result))
+                            {
+                                parsedType = result;
+                            }
                             var item = CreateAndAddToInventory(data.itemName, data.description, parsedType, 1);
                             Debug.Log($"[AIItemCreator] <color=cyan>[LLM]</color> Created: {data.itemName}");
                             onComplete?.Invoke(item);
@@ -142,7 +148,8 @@ namespace TheBunkerGames
                         var fallback = GenerateFallbackItem();
                         onComplete?.Invoke(fallback);
                     },
-                    systemPrompt: itemPromptTemplate.SystemPrompt
+                    systemPrompt: itemPromptTemplate.SystemPrompt + "\n\nSchema:\n" + itemPromptTemplate.JsonSchemaExample,
+                    useJsonMode: true
                 );
             }
             else
@@ -150,6 +157,66 @@ namespace TheBunkerGames
                 Debug.Log("[AIItemCreator] <color=orange>[STATIC]</color> LLM disabled, using fallback data.");
                 var item = GenerateFallbackItem();
                 onComplete?.Invoke(item);
+            }
+        }
+
+        /// <summary>
+        /// Generate a batch of items via AI.
+        /// </summary>
+        public void GenerateItemBatch(int count, System.Action<List<ItemData>> onComplete = null)
+        {
+            if (useLLM && LLMManager.Instance != null && itemPromptTemplate != null)
+            {
+                int finalCount = Mathf.Max(1, count);
+                Debug.Log($"[AIItemCreator] <color=cyan>[LLM]</color> Generating {finalCount} items via AI...");
+                
+                string[] itemTypes = { "Food", "Water", "Meds", "Tools", "Junk" };
+                string randomType = itemTypes[Random.Range(0, itemTypes.Length)];
+                
+                // Instruct AI to generate a list
+                string userPrompt = $"Generate a list of {finalCount} unique items. At least one should be {randomType}. Context: scavenged in post-apocalyptic bunker.";
+
+                LLMManager.Instance.QuickChat(
+                    userPrompt,
+                    onSuccess: (response) => {
+                        if (LLMJsonParser.TryParseItemBatch(response, out var data))
+                        {
+                            List<ItemData> createdItems = new List<ItemData>();
+                            foreach (var itemData in data.items)
+                            {
+                                ItemType parsedType = ItemType.Junk;
+                                if (System.Enum.TryParse(itemData.itemType, true, out ItemType result))
+                                    parsedType = result;
+
+                                var item = CreateAndAddToInventory(itemData.itemName, itemData.description, parsedType, 1);
+                                createdItems.Add(item);
+                            }
+                            Debug.Log($"[AIItemCreator] <color=cyan>[LLM]</color> Created batch of {createdItems.Count} items.");
+                            onComplete?.Invoke(createdItems);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("[AIItemCreator] <color=yellow>[LLM]</color> Failed to parse batch, using fallbacks.");
+                            List<ItemData> fallbackItems = new List<ItemData>();
+                            for(int i=0; i<finalCount; i++) fallbackItems.Add(GenerateFallbackItem());
+                            onComplete?.Invoke(fallbackItems);
+                        }
+                    },
+                    onError: (err) => {
+                        Debug.LogError($"[AIItemCreator] <color=red>[LLM ERROR]</color> {err}");
+                        List<ItemData> fallbackItems = new List<ItemData>();
+                        for(int i=0; i<finalCount; i++) fallbackItems.Add(GenerateFallbackItem());
+                        onComplete?.Invoke(fallbackItems);
+                    },
+                    systemPrompt: itemPromptTemplate.SystemPrompt + "\n\nCRITICAL: Respond with a JSON object containing an 'items' array of objects following this schema:\n" + itemPromptTemplate.JsonSchemaExample + "\n\nExample Output: { \"items\": [ {...}, {...} ] }",
+                    useJsonMode: true
+                );
+            }
+            else
+            {
+                List<ItemData> items = new List<ItemData>();
+                for (int i = 0; i < count; i++) items.Add(GenerateFallbackItem());
+                onComplete?.Invoke(items);
             }
         }
 
@@ -201,17 +268,16 @@ namespace TheBunkerGames
         [Button("Generate 1 Random Item")]
         private void Debug_CreateRandomAIItem()
         {
+            if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode to test LLM generation."); return; }
             GenerateRandomAIItem();
         }
 
-        [GUIColor(0.2f, 0.6f, 1.0f)]
-        [Button("Generate 5 Random Items")]
-        private void Debug_Generate5Items()
+        [Button("Create Batch AI Items", ButtonSizes.Medium)]
+        [GUIColor(0, 0.6f, 0.9f)]
+        private void Debug_CreateBatchAIItems()
         {
-            for (int i = 0; i < 5; i++)
-            {
-                GenerateRandomAIItem();
-            }
+            if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode to test LLM generation."); return; }
+            GenerateItemBatch(defaultBatchSize);
         }
 
         [SerializeField] private string customItemName = "New Prototype";

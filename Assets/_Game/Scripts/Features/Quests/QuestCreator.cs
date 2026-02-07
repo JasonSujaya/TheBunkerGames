@@ -122,7 +122,8 @@ namespace TheBunkerGames
                         var fallback = GenerateFallbackQuest();
                         onComplete?.Invoke(fallback);
                     },
-                    systemPrompt: questPromptTemplate.SystemPrompt
+                    systemPrompt: questPromptTemplate.SystemPrompt + "\n\nSchema:\n" + questPromptTemplate.JsonSchemaExample,
+                    useJsonMode: true
                 );
             }
             else
