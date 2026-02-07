@@ -31,14 +31,10 @@ namespace TheBunkerGames
             if (gameManager == null) return;
             
             // Reset Session Data
-            gameManager.SessionData = new GameSessionData
+            if (gameManager.SessionData != null)
             {
-                CurrentDay = 1,
-                CurrentState = GameState.StatusReview,
-                IsGameOver = false,
-                FamilyCount = 4, // Default starting family
-                AverageHealth = 100f // Default health
-            };
+                gameManager.SessionData.ResetData();
+            }
             
             Debug.Log($"[Sim] GAME START | Day: {gameManager.CurrentDay} | Family: {gameManager.SessionData.FamilyCount} | Health: {gameManager.SessionData.AverageHealth}%");
             

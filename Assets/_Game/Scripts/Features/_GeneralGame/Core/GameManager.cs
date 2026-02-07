@@ -32,7 +32,10 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // State
         // -------------------------------------------------------------------------
-        public GameSessionData SessionData = new GameSessionData();
+        // -------------------------------------------------------------------------
+        // State
+        // -------------------------------------------------------------------------
+        public GameSessionData SessionData;
 
         // Backward compatibility properties
         public GameState CurrentState 
@@ -93,12 +96,16 @@ namespace TheBunkerGames
             // Ensure controller has reference
             if (FlowController == null) FlowController = GetComponent<GameFlowController>();
             if (FlowController != null) FlowController.Initialize(this);
+
+            if (SessionData == null) SessionData = GetComponent<GameSessionData>();
+            if (SessionData == null) SessionData = gameObject.AddComponent<GameSessionData>();
         }
 
         private void Reset()
         {
             // Only auto-add Core dependencies
             FlowController = GetOrAdd<GameFlowController>();
+            SessionData = GetOrAdd<GameSessionData>();
         }
 
         private T GetOrAdd<T>() where T : Component
