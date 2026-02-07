@@ -35,10 +35,10 @@ namespace TheBunkerGames
         {
             if (nextPhaseButton != null)
             {
-                var flowController = FindFirstObjectByType<GameFlowController>();
-                if (flowController != null)
+                var debugHelper = FindFirstObjectByType<GamePhaseDebugHelper>();
+                if (debugHelper != null)
                 {
-                    nextPhaseButton.onClick.AddListener(flowController.AdvancePhase);
+                    nextPhaseButton.onClick.AddListener(debugHelper.AdvancePhase);
                 }
             }
 
