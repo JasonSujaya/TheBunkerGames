@@ -127,7 +127,13 @@ namespace TheBunkerGames
             string userPrompt = BuildUserPrompt(playerAction);
 
             if (enableDebugLogs)
-                Debug.Log($"[AIStorytellerMaker] Generating Day {currentDay} | Action: {playerAction}");
+            {
+                var debugSb = new StringBuilder();
+                debugSb.AppendLine($"[AIStorytellerMaker] === GENERATING Day {currentDay} | Action: {playerAction} ===");
+                debugSb.AppendLine($"--- SYSTEM PROMPT ---\n{systemPrompt}");
+                debugSb.AppendLine($"--- USER PROMPT ---\n{userPrompt}");
+                Debug.Log(debugSb.ToString());
+            }
 
             LLMManager.Instance.QuickChat(
                 userPrompt,
@@ -403,6 +409,9 @@ namespace TheBunkerGames
                 return;
             }
 
+            if (enableDebugLogs)
+                Debug.Log($"[AIStorytellerMaker] --- RAW LLM RESPONSE ---\n{response}");
+
             // Extract and parse JSON
             string json = LLMJsonParser.ExtractJson(response);
             if (string.IsNullOrEmpty(json))
@@ -423,7 +432,31 @@ namespace TheBunkerGames
             }
 
             if (enableDebugLogs)
-                Debug.Log($"[AIStorytellerMaker] Day {currentDay} → \"{storyEvent.Title}\" | {storyEvent.Effects?.Count ?? 0} effects, {storyEvent.Choices?.Count ?? 0} choices");
+            {
+                var parsedSb = new StringBuilder();
+                parsedSb.AppendLine($"[AIStorytellerMaker] --- PARSED EVENT (Day {currentDay}) ---");
+                parsedSb.AppendLine($"  Title: {storyEvent.Title}");
+                parsedSb.AppendLine($"  Description: {storyEvent.Description}");
+                if (storyEvent.Effects != null && storyEvent.Effects.Count > 0)
+                {
+                    parsedSb.AppendLine($"  Effects ({storyEvent.Effects.Count}):");
+                    foreach (var fx in storyEvent.Effects)
+                        parsedSb.AppendLine($"    - {fx.EffectType} intensity={fx.Intensity} target=\"{fx.Target}\"");
+                }
+                if (storyEvent.Choices != null && storyEvent.Choices.Count > 0)
+                {
+                    parsedSb.AppendLine($"  Choices ({storyEvent.Choices.Count}):");
+                    for (int i = 0; i < storyEvent.Choices.Count; i++)
+                    {
+                        var c = storyEvent.Choices[i];
+                        parsedSb.AppendLine($"    [{i}] \"{c.Text}\"");
+                        if (c.Effects != null)
+                            foreach (var cfx in c.Effects)
+                                parsedSb.AppendLine($"         -> {cfx.EffectType} intensity={cfx.Intensity} target=\"{cfx.Target}\"");
+                    }
+                }
+                Debug.Log(parsedSb.ToString());
+            }
 
             lastGeneratedEvent = storyEvent.ToJson(true);
 
