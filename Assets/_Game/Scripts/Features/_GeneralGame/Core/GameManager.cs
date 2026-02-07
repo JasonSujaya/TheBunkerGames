@@ -62,6 +62,7 @@ namespace TheBunkerGames
         public GameFlowController FlowController;
         public SurvivalManager Survival;
         public InventoryManager Inventory;
+        public ItemManager Items;
         public CharacterManager Characters;
         public FamilyManager Family;
         public PlaceManager Places;
@@ -124,6 +125,7 @@ namespace TheBunkerGames
             // Find external managers in the scene (do not create them)
             if (Survival == null) Survival = FindFirstObjectByType<SurvivalManager>();
             if (Inventory == null) Inventory = FindFirstObjectByType<InventoryManager>();
+            if (Items == null) Items = FindFirstObjectByType<ItemManager>();
             if (Characters == null) Characters = FindFirstObjectByType<CharacterManager>();
             if (Family == null) Family = FindFirstObjectByType<FamilyManager>();
             if (Places == null) Places = FindFirstObjectByType<PlaceManager>();

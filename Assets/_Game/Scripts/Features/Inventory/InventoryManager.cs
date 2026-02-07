@@ -20,11 +20,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Configuration
         // -------------------------------------------------------------------------
-        #if ODIN_INSPECTOR
-        [Title("Settings")]
-        [Required("Item Database is required for inventory to function")]
-        #endif
-        [SerializeField] private ItemDatabaseDataSO itemDatabase;
+        // Removed direct ItemDatabase reference. Uses ItemManager.Instance now.
 
         // -------------------------------------------------------------------------
         // Inventory Data
@@ -60,16 +56,6 @@ namespace TheBunkerGames
                 return;
             }
             Instance = this;
-
-            // Initialize the ItemDatabase singleton
-            if (itemDatabase != null)
-            {
-                ItemDatabaseDataSO.SetInstance(itemDatabase);
-            }
-            else
-            {
-                Debug.LogError("[InventoryManager] ItemDatabase reference is not assigned in Inspector!");
-            }
         }
 
         // -------------------------------------------------------------------------
@@ -90,11 +76,14 @@ namespace TheBunkerGames
                 return false;
             }
 
-            // Ensure the item exists in the database
-            if (!itemDatabase.AllItems.Contains(itemData))
+            // Ensure the item exists in the global database via ItemManager
+            if (ItemManager.Instance != null)
             {
-                Debug.LogWarning($"[InventoryManager] Item '{itemData.ItemName}' not in database. Adding it automatically.");
-                itemDatabase.AddItem(itemData);
+                ItemManager.Instance.RegisterItem(itemData);
+            }
+            else
+            {
+                 Debug.LogWarning("[InventoryManager] ItemManager instance not found! Item might not be registered.");
             }
 
             // Add to existing slot or create new slot
@@ -119,10 +108,17 @@ namespace TheBunkerGames
         {
             if (string.IsNullOrEmpty(itemId) || quantity <= 0) return false;
             
-            var itemData = itemDatabase?.GetItem(itemId);
+            // Use ItemManager to find the item definition
+            if (ItemManager.Instance == null)
+            {
+                 Debug.LogError("[InventoryManager] Cannot add item by ID - ItemManager is missing!");
+                 return false;
+            }
+
+            var itemData = ItemManager.Instance.GetItem(itemId);
             if (itemData == null)
             {
-                Debug.LogError($"[InventoryManager] Cannot add item '{itemId}' - not found in ItemDatabaseDataSO!");
+                Debug.LogError($"[InventoryManager] Cannot add item '{itemId}' - not found in ItemManager database!");
                 return false;
             }
 
@@ -158,7 +154,7 @@ namespace TheBunkerGames
                 items.Remove(slot);
             }
 
-            var itemData = itemDatabase?.GetItem(itemId);
+            var itemData = ItemManager.Instance != null ? ItemManager.Instance.GetItem(itemId) : null;
             string displayName = itemData != null ? itemData.ItemName : itemId;
             Debug.Log($"[InventoryManager] Removed {quantity}x {displayName}");
             return true;
@@ -210,15 +206,18 @@ namespace TheBunkerGames
         [Button("Add 5 Random Items")]
         private void Debug_AddRandomItems()
         {
-            if (itemDatabase == null || itemDatabase.AllItems.Count == 0)
+            if (ItemManager.Instance == null) return;
+            var allItems = ItemManager.Instance.GetAllItems();
+
+            if (allItems == null || allItems.Count == 0)
             {
-                Debug.LogWarning("[InventoryManager] No items found in database.");
+                Debug.LogWarning("[InventoryManager] No items found in ItemManager.");
                 return;
             }
 
             for (int i = 0; i < 5; i++)
             {
-                var randomItem = itemDatabase.AllItems[Random.Range(0, itemDatabase.AllItems.Count)];
+                var randomItem = allItems[Random.Range(0, allItems.Count)];
                 if (randomItem != null)
                     AddItem(randomItem, Random.Range(1, 3));
             }
@@ -236,7 +235,14 @@ namespace TheBunkerGames
             Debug.Log($"[InventoryManager] Total slots: {items.Count}, Total items: {TotalItemCount}");
             foreach (var slot in items)
             {
-                var data = slot.GetItemData(itemDatabase);
+                // Note: GetItemData might need updating if it relied on passed database, 
+                // but usually slots store IDs. We can look up via ItemManager.
+                ItemData data = null;
+                if (ItemManager.Instance != null)
+                {
+                    data = ItemManager.Instance.GetItem(slot.ItemId);
+                }
+                
                 string name = data != null ? data.ItemName : slot.ItemId;
                 Debug.Log($"  - {name}: {slot.Quantity}");
             }
@@ -247,9 +253,10 @@ namespace TheBunkerGames
             var list = new ValueDropdownList<ItemData>();
 
             // 1. Add Persistent Items from Database
-            if (itemDatabase != null && itemDatabase.AllItems != null)
+            if (ItemManager.Instance != null)
             {
-                foreach (var item in itemDatabase.AllItems)
+                var allItems = ItemManager.Instance.GetAllItems();
+                foreach (var item in allItems)
                 {
                     if (item != null)
                     {
