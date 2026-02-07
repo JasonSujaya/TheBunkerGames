@@ -232,21 +232,43 @@ namespace TheBunkerGames
         // Debug
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Title("Debug")]
+        [Title("Debug - Quick Test")]
+        #endif
+        [Header("Single Effect Test")]
+        [SerializeField] private LLMEffectType testEffectType = LLMEffectType.ReduceHP;
+        [SerializeField, Range(1, 10)] private int testIntensity = 5;
+        [SerializeField] private string testTarget = "Marcus";
+        
+        [Header("LLM Output Test")]
         [SerializeField] private string testLLMOutput = "ReduceHP:7, AddSanity:3";
         
-        [Button("Test Execute LLM Output", ButtonSizes.Large)]
+        #if ODIN_INSPECTOR
+        [Button("Execute Single Effect", ButtonSizes.Large)]
         [GUIColor(0, 1, 0)]
-        private void Debug_TestExecute()
+        private void Debug_ExecuteSingleEffect()
+        {
+            var effect = new LLMStoryEffectData(testEffectType, testIntensity, testTarget);
+            ExecuteEffect(effect);
+        }
+        
+        [Button("Execute LLM Output String")]
+        [GUIColor(0.8f, 0.8f, 1f)]
+        private void Debug_ExecuteLLMOutput()
         {
             ExecuteFromLLMOutput(testLLMOutput);
         }
 
-        [Button("Test Single Effect")]
-        private void Debug_TestSingleEffect(string effectType = "ReduceHP", int intensity = 5, string target = "Marcus")
+        [Button("Test All Effects")]
+        [GUIColor(1f, 0.5f, 0)]
+        private void Debug_TestAllEffects()
         {
-            var effect = new LLMStoryEffectData(effectType, intensity, target);
-            ExecuteEffect(effect);
+            Debug.Log("[LLMEffectExecutor] Testing ALL effect types with intensity 5...");
+            foreach (LLMEffectType type in System.Enum.GetValues(typeof(LLMEffectType)))
+            {
+                var effect = new LLMStoryEffectData(type, 5, "TestTarget");
+                ExecuteEffect(effect);
+            }
+            Debug.Log("[LLMEffectExecutor] All effects tested!");
         }
         #endif
     }
