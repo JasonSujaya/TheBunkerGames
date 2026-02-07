@@ -28,7 +28,11 @@ namespace TheBunkerGames
         InjureCharacter,
         HealCharacter,
         KillCharacter,
-        
+
+        // Sickness Effects
+        InfectCharacter,
+        CureCharacter,
+
         // Special Effects
         TriggerEvent,
         UnlockArea,

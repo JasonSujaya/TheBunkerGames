@@ -149,7 +149,7 @@ namespace TheBunkerGames
                 {
                     debugSb.AppendLine($"--- FAMILY STATUS ---");
                     foreach (var m in FamilyManager.Instance.FamilyMembers)
-                        debugSb.AppendLine($"  {m.Name}: HP={m.Health:F0} Hunger={m.Hunger:F0} Thirst={m.Thirst:F0} Sanity={m.Sanity:F0}");
+                        debugSb.AppendLine($"  {m.Name}: HP={m.Health:F0} Hunger={m.Hunger:F0} Thirst={m.Thirst:F0} Sanity={m.Sanity:F0} [{m.GetStatusSummary()}]");
                 }
 
                 // Log story history count
@@ -286,7 +286,9 @@ namespace TheBunkerGames
             sb.AppendLine("Character stats: AddHP, ReduceHP, AddSanity, ReduceSanity, AddHunger, ReduceHunger, AddThirst, ReduceThirst");
             sb.AppendLine("Resources: AddFood, ReduceFood, AddWater, ReduceWater, AddSupplies, ReduceSupplies");
             sb.AppendLine("Character: InjureCharacter, HealCharacter, KillCharacter");
+            sb.AppendLine("Sickness: InfectCharacter (makes them sick, intensity determines severity/type), CureCharacter (cures sickness)");
             sb.AppendLine("Intensity is 1-10 (1=minor, 10=extreme). Use KillCharacter sparingly and only in extreme cases.");
+            sb.AppendLine("InfectCharacter intensity: 1-2=Flu, 3-4=FoodPoisoning, 5=Fever, 6=Infection, 7=Dysentery, 8=Pneumonia, 9=RadiationPoisoning, 10=Plague");
             sb.AppendLine($"Target must be one of: {characterNames}");
             sb.AppendLine("For resource effects, target can be empty.");
             sb.AppendLine();
@@ -342,7 +344,7 @@ namespace TheBunkerGames
             sb.AppendLine($"=== DAY {currentDay} of {totalDays} (Event {eventsGeneratedToday + 1} of {eventsPerDay}) ===");
             sb.AppendLine();
 
-            // Current family status
+            // Current family status (full detail for AI context)
             sb.AppendLine("FAMILY STATUS:");
             if (FamilyManager.Instance != null)
             {
@@ -351,8 +353,7 @@ namespace TheBunkerGames
                 {
                     foreach (var member in family)
                     {
-                        string status = member.IsDead ? "DEAD" : member.IsCritical ? "CRITICAL" : member.IsInjured ? "INJURED" : "OK";
-                        sb.AppendLine($"- {member.Name}: HP={member.Health:F0} Hunger={member.Hunger:F0} Thirst={member.Thirst:F0} Sanity={member.Sanity:F0} [{status}]");
+                        sb.AppendLine($"- {member.Name}: HP={member.Health:F0} Hunger={member.Hunger:F0} Thirst={member.Thirst:F0} Sanity={member.Sanity:F0} [{member.GetStatusSummary()}]");
                     }
                 }
                 else
