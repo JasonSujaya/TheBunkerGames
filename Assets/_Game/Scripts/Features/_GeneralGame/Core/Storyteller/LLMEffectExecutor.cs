@@ -94,9 +94,11 @@ namespace TheBunkerGames
                 // Resource Effects
                 case "AddFood":
                 case "ReduceFood":
+                
                 case "AddWater":
                 case "ReduceWater":
                 case "AddSupplies":
+                
                 case "ReduceSupplies":
                     ApplyResourceEffect(effect);
                     break;

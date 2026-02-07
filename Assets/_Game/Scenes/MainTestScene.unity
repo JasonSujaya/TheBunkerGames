@@ -951,7 +951,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82b9045b5dd884c83949f6e38cec36d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.StorytellerUI
-  manager: {fileID: 2063215668}
   titleText: {fileID: 1144650965}
   descriptionText: {fileID: 1968091058}
   contentParent: {fileID: 800286617}
@@ -2458,8 +2457,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 933938748fd1c48d0becc5c23e120129, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.StorytellerManager
-  currentScenario: {fileID: 11400000, guid: ce935a7536db44c70a832188c5d5e511, type: 2}
   ui: {fileID: 800286619}
+  currentEventTitle: 
+  currentEventDescription: 
 --- !u!4 &2063215669
 Transform:
   m_ObjectHideFlags: 0
