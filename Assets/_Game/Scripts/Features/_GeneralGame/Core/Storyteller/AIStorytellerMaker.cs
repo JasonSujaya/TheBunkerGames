@@ -130,6 +130,31 @@ namespace TheBunkerGames
             {
                 var debugSb = new StringBuilder();
                 debugSb.AppendLine($"[AIStorytellerMaker] === GENERATING Day {currentDay} | Action: {playerAction} ===");
+
+                // Log pre-scripted events for today
+                if (preScriptedSchedule != null && preScriptedSchedule.HasEventsForDay(currentDay))
+                {
+                    var scheduled = preScriptedSchedule.GetEventsForDay(currentDay);
+                    debugSb.AppendLine($"--- PRE-SCRIPTED EVENTS FOR DAY {currentDay} ({scheduled.Count}) ---");
+                    for (int i = 0; i < scheduled.Count; i++)
+                        debugSb.AppendLine($"  [{scheduled[i].Category}] \"{scheduled[i].Title}\": {scheduled[i].Description}");
+                }
+                else
+                {
+                    debugSb.AppendLine($"--- PRE-SCRIPTED EVENTS FOR DAY {currentDay}: None ---");
+                }
+
+                // Log family status
+                if (FamilyManager.Instance != null && FamilyManager.Instance.FamilyMembers != null)
+                {
+                    debugSb.AppendLine($"--- FAMILY STATUS ---");
+                    foreach (var m in FamilyManager.Instance.FamilyMembers)
+                        debugSb.AppendLine($"  {m.Name}: HP={m.Health:F0} Hunger={m.Hunger:F0} Thirst={m.Thirst:F0} Sanity={m.Sanity:F0}");
+                }
+
+                // Log story history count
+                debugSb.AppendLine($"--- CONTEXT: {storyHistory.Count} past events | {usedEventTitles.Count} used titles ---");
+
                 debugSb.AppendLine($"--- SYSTEM PROMPT ---\n{systemPrompt}");
                 debugSb.AppendLine($"--- USER PROMPT ---\n{userPrompt}");
                 Debug.Log(debugSb.ToString());
