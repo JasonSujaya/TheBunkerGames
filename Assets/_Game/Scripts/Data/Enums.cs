@@ -93,4 +93,24 @@ namespace TheBunkerGames
         Survivor,
         Neutral
     }
+
+    // -------------------------------------------------------------------------
+    // Pre-Scripted Event Categories (government fallout narrative beats)
+    // -------------------------------------------------------------------------
+    public enum ScriptedEventCategory
+    {
+        ResourceShortage,
+        RaiderAttack,
+        GovernmentBroadcast,
+        Contamination,
+        RescueMission,
+        PoliticalUprising,
+        StructuralFailure,
+        DiseaseOutbreak,
+        TraderArrival,
+        MysteriousSignal,
+        MilitaryEncounter,
+        MoraleDrop,
+        EvacuationNotice
+    }
 }
