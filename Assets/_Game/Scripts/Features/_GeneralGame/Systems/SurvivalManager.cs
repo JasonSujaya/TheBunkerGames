@@ -96,6 +96,14 @@ namespace TheBunkerGames
                     Debug.Log($"[SurvivalManager] {member.Name} is dehydrated! Health reduced.");
                 }
 
+                // Check for Death
+                if (!member.IsAlive)
+                {
+                    Debug.LogWarning($"[SurvivalManager] {member.Name} has DIED from neglect.");
+                    // TODO: Trigger Game Over or Morale loss here
+                    continue;
+                }
+
                 // Log outcome if critical
                 if (member.IsCritical)
                 {
