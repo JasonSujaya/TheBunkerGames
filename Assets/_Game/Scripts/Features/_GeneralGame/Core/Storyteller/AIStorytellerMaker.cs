@@ -654,50 +654,7 @@ namespace TheBunkerGames
         // Debug
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
-        [Title("Debug - Test Generation")]
-        #endif
-        [Header("Test")]
-        [SerializeField, TextArea(2, 4)] private string testPlayerAction = "Search the storage room for supplies";
-
-        #if ODIN_INSPECTOR
-        [Button("Generate Story Event", ButtonSizes.Large)]
-        [GUIColor(0, 1, 0)]
-        private void Debug_GenerateEvent()
-        {
-            if (!Application.isPlaying)
-            {
-                Debug.LogWarning("Enter Play Mode to test.");
-                return;
-            }
-
-            GenerateStoryEvent(testPlayerAction, (result) =>
-            {
-                if (result != null)
-                    Debug.Log($"[AIStorytellerMaker] Test complete! Day {currentDay}, Event: {result.Title}");
-                else
-                    Debug.LogWarning("[AIStorytellerMaker] Test failed - no event generated.");
-            });
-        }
-
-        [Button("Next Day + Generate", ButtonSizes.Large)]
-        [GUIColor(1f, 0.6f, 0.2f)]
-        private void Debug_NextDay()
-        {
-            if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode."); return; }
-            if (isGenerating) { Debug.LogWarning("Already generating."); return; }
-
-            string action = testPlayerAction;
-            if (string.IsNullOrEmpty(action)) action = "Start the new day";
-
-            GenerateNextDay(action, (result) =>
-            {
-                if (result != null)
-                    Debug.Log($"[AIStorytellerMaker] Next day complete! Day {currentDay}, Event: {result.Title}");
-                else
-                    Debug.LogWarning("[AIStorytellerMaker] Next day failed.");
-            });
-        }
-
+        [Title("Debug")]
         [Button("Reset History")]
         [GUIColor(1f, 0.3f, 0.3f)]
         private void Debug_ResetHistory()
