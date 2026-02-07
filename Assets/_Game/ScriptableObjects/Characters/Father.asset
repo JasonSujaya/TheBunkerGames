@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2ee0084deb024f438cd173e2f07dbf8, type: 3}
   m_Name: Father
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.CharacterDefinitionSO
-  characterName: 
+  characterName: Father
   role: 0
-  description: 
+  description: The family patriarch. Tough and resourceful.
   portrait: {fileID: 0}
   maxHealth: 100
   maxHunger: 100
