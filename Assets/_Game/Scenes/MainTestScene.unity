@@ -911,7 +911,7 @@ GameObject:
   - component: {fileID: 800286620}
   - component: {fileID: 800286619}
   m_Layer: 5
-  m_Name: Image
+  m_Name: StoryTeller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -951,6 +951,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82b9045b5dd884c83949f6e38cec36d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.StorytellerUI
+  manager: {fileID: 0}
   titleText: {fileID: 1144650965}
   descriptionText: {fileID: 1968091058}
   contentParent: {fileID: 800286617}
@@ -2456,6 +2457,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.StorytellerManager
   currentScenario: {fileID: 11400000, guid: ce935a7536db44c70a832188c5d5e511, type: 2}
+  ui: {fileID: 800286619}
 --- !u!4 &2063215669
 Transform:
   m_ObjectHideFlags: 0
