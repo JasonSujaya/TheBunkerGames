@@ -21,6 +21,8 @@ namespace TheBunkerGames
         // Configuration
         // -------------------------------------------------------------------------
         [SerializeField] private FamilyListSO defaultFamilyProfile;
+        
+        public FamilyListSO DefaultFamilyProfile => defaultFamilyProfile;
 
         // -------------------------------------------------------------------------
         // Public Properties (Filtering CharacterManager)
