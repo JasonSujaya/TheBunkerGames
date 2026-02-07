@@ -11,7 +11,10 @@ namespace TheBunkerGames
         public static StorytellerManager Instance { get; private set; }
 
         [Header("Configuration")]
+        [Header("Configuration")]
         [SerializeField] private StoryScenarioSO currentScenario;
+
+        public static event System.Action<StoryEventSO> OnStoryEventTriggered;
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -66,6 +69,7 @@ namespace TheBunkerGames
         public void TriggerEvent(StoryEventSO storyEvent)
         {
             Debug.Log($"[Storyteller] Triggering Event: {storyEvent.Title}");
+            OnStoryEventTriggered?.Invoke(storyEvent);
             
             // Execute Immediate Effects
             if (storyEvent.ImmediateEffects != null)
