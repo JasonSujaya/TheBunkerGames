@@ -65,7 +65,67 @@ namespace TheBunkerGames.Editor
         private void CreateExampleAssets()
         {
             CreatePlayerPrefab();
+            CreatePlayerPrefab();
             CreateGameSettingsInternal();
+        }
+
+        #if ODIN_INSPECTOR
+        [Button(ButtonSizes.Medium), GUIColor(0.8f, 0.4f, 0.8f)]
+        #endif
+        private void CreateDefaultFamilyList()
+        {
+            string folderPath = "Assets/_Game/ScriptableObjects/Family";
+            string assetPath = Path.Combine(folderPath, "DefaultFamily.asset");
+
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+                AssetDatabase.Refresh();
+            }
+
+            var familyList = AssetDatabase.LoadAssetAtPath<FamilyListSO>(assetPath);
+            if (familyList == null)
+            {
+                familyList = ScriptableObject.CreateInstance<FamilyListSO>();
+                AssetDatabase.CreateAsset(familyList, assetPath);
+            }
+
+            // Find existing characters
+            string charFolder = "Assets/_Game/ScriptableObjects/Characters";
+            string[] guids = AssetDatabase.FindAssets("t:CharacterDefinitionSO", new[] { charFolder });
+            
+            familyList.DefaultFamilyMembers = new System.Collections.Generic.List<CharacterDefinitionSO>();
+
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                var character = AssetDatabase.LoadAssetAtPath<CharacterDefinitionSO>(path);
+                if (character != null && (character.name == "Father" || character.name == "Mother" || character.name == "Daughter" || character.name == "Son"))
+                {
+                    familyList.DefaultFamilyMembers.Add(character);
+                    Debug.Log($"[ProjectSetup] Added {character.name} to Family List.");
+                }
+            }
+
+            EditorUtility.SetDirty(familyList);
+            AssetDatabase.SaveAssets();
+
+            // Try to assign to FamilyManager in scene
+            var familyManager = FindObjectOfType<FamilyManager>();
+            if (familyManager != null)
+            {
+                SerializedObject so = new SerializedObject(familyManager);
+                var prop = so.FindProperty("defaultFamilyProfile");
+                if (prop != null)
+                {
+                    prop.objectReferenceValue = familyList;
+                    so.ApplyModifiedProperties();
+                    Debug.Log("[ProjectSetup] Assigned Default Family List to FamilyManager.");
+                }
+            }
+            
+            Selection.activeObject = familyList;
+            Debug.Log($"[ProjectSetup] Family List created at {assetPath}");
         }
 
         private void CreateScript(string path, string content)
@@ -197,6 +257,8 @@ namespace TheBunkerGames.Controllers
             if (GUILayout.Button("Create Template Scripts")) CreateTemplateScripts();
             GUILayout.Space(10);
             if (GUILayout.Button("Create Example Assets")) CreateExampleAssets();
+            GUILayout.Space(10);
+            if (GUILayout.Button("Create Default Family List")) CreateDefaultFamilyList();
         }
         #endif
     }
