@@ -46,7 +46,7 @@ namespace TheBunkerGames
             }
             else
             {
-                var target = CharacterManager.Instance.GetCharacterByName(targetName);
+                var target = CharacterManager.Instance.GetCharacter(targetName);
                 if (target != null)
                 {
                     target.ModifyHealth(amount);

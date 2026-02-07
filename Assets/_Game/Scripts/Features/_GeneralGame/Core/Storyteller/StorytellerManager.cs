@@ -46,10 +46,11 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Event Handling
         // -------------------------------------------------------------------------
-        private void HandleDayStart(int day)
+        private void HandleDayStart()
         {
-            if (currentScenario == null) return;
+            if (currentScenario == null || GameManager.Instance == null) return;
 
+            int day = GameManager.Instance.CurrentDay;
             var storyEvent = currentScenario.GetEventForDay(day);
             if (storyEvent != null)
             {
