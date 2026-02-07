@@ -50,6 +50,7 @@ public static LLMManager Instance { get; private set; }
                 return;
             }
             Instance = this;
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
         }
         // -------------------------------------------------------------------------

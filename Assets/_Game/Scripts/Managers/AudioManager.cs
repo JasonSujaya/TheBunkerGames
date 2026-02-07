@@ -6,6 +6,8 @@ namespace TheBunkerGames
     {
         public static AudioManager Instance { get; private set; }
 
+        [SerializeField] private bool enableDebugLogs = false;
+
         private void Awake()
         {
             if (Instance != null && Instance != this)
@@ -14,12 +16,13 @@ namespace TheBunkerGames
                 return;
             }
             Instance = this;
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
         }
 
         public void PlaySound(string soundName)
         {
-            Debug.Log($"[AudioManager] Playing sound: {soundName}");
+            if (enableDebugLogs) Debug.Log($"[AudioManager] Playing sound: {soundName}");
         }
     }
 }

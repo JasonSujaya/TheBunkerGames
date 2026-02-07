@@ -18,6 +18,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         [SerializeField] private GameManager gameManager;
         [SerializeField] private bool autoStartGame = true;
+        [SerializeField] private bool enableDebugLogs = false;
 
         // -------------------------------------------------------------------------
         // Logic
@@ -45,7 +46,7 @@ namespace TheBunkerGames
                 gameManager.SessionData.ResetData();
             }
             
-            Debug.Log($"[Sim] GAME START | Day: {gameManager.CurrentDay} | Family: {gameManager.SessionData.FamilyCount} | Health: {gameManager.SessionData.AverageHealth}%");
+            if (enableDebugLogs) Debug.Log($"[Sim] GAME START | Day: {gameManager.CurrentDay} | Family: {gameManager.SessionData.FamilyCount} | Health: {gameManager.SessionData.AverageHealth}%");
             
                 // Spawn Default Family & Items
                 if (gameManager.Family != null)
@@ -69,7 +70,7 @@ namespace TheBunkerGames
                                 }
                             }
                         }
-                        Debug.Log($"[Sim] Added starting items from {profile.name}");
+                        if (enableDebugLogs) Debug.Log($"[Sim] Added starting items from {profile.name}");
                     }
                 }
                 
@@ -85,7 +86,7 @@ namespace TheBunkerGames
                 if (gameManager.CurrentState == newState) return;
 
                 gameManager.CurrentState = newState;
-                Debug.Log($"[GameFlow] State -> {newState}");
+                if (enableDebugLogs) Debug.Log($"[GameFlow] State -> {newState}");
                 
                 GameManager.FireStateChanged(newState);
 
@@ -122,7 +123,7 @@ namespace TheBunkerGames
                     }
                 }
 
-                Debug.Log($"[Sim] ADVANCE DAY | Day: {gameManager.CurrentDay} | Family: {gameManager.SessionData.FamilyCount} | Health: {gameManager.SessionData.AverageHealth:F1}%");
+                if (enableDebugLogs) Debug.Log($"[Sim] ADVANCE DAY | Day: {gameManager.CurrentDay} | Family: {gameManager.SessionData.FamilyCount} | Health: {gameManager.SessionData.AverageHealth:F1}%");
 
                 var config = GameConfigDataSO.Instance;
                 if (config != null && gameManager.CurrentDay > config.TotalDays)
@@ -136,7 +137,7 @@ namespace TheBunkerGames
             if (gameManager == null || gameManager.CurrentDay <= 1) return;
             
             gameManager.CurrentDay--;
-            Debug.Log($"[GameFlow] Time Travel -> Day {gameManager.CurrentDay}");
+            if (enableDebugLogs) Debug.Log($"[GameFlow] Time Travel -> Day {gameManager.CurrentDay}");
             GameManager.FireDayStart();
         }
 
@@ -145,7 +146,7 @@ namespace TheBunkerGames
             if (gameManager == null) return;
 
             gameManager.IsGameOver = true;
-            Debug.Log($"[GameFlow] Game Over. Survived: {survived}");
+            if (enableDebugLogs) Debug.Log($"[GameFlow] Game Over. Survived: {survived}");
             GameManager.FireGameOver(survived);
         }
 

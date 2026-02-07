@@ -25,6 +25,7 @@ namespace TheBunkerGames
         [Required("Character Database is required")]
         #endif
         [SerializeField] private CharacterDatabaseDataSO characterDatabase;
+        [SerializeField] private bool enableDebugLogs = false;
 
         // -------------------------------------------------------------------------
         // Character Data
@@ -80,7 +81,7 @@ namespace TheBunkerGames
         {
             var character = new CharacterData(name, hunger, thirst, sanity, health, subtype);
             allCharacters.Add(character);
-            Debug.Log($"[CharacterManager] Added {subtype}: {name}");
+            if (enableDebugLogs) Debug.Log($"[CharacterManager] Added {subtype}: {name}");
         }
 
         public void AddCharacter(CharacterDefinitionSO data)
@@ -88,7 +89,7 @@ namespace TheBunkerGames
             if (data == null) return;
             var character = data.CreateCharacter();
             allCharacters.Add(character);
-            Debug.Log($"[CharacterManager] Added character from data: {data.CharacterName} ({data.Subtype})");
+            if (enableDebugLogs) Debug.Log($"[CharacterManager] Added character from data: {data.CharacterName} ({data.Subtype})");
         }
 
         public CharacterData GetCharacter(string name)
@@ -104,7 +105,7 @@ namespace TheBunkerGames
         public void ClearAllCharacters()
         {
             allCharacters.Clear();
-            Debug.Log("[CharacterManager] All characters cleared.");
+            if (enableDebugLogs) Debug.Log("[CharacterManager] All characters cleared.");
         }
 
         public void LoadCharacters(List<CharacterData> characters)
@@ -114,7 +115,7 @@ namespace TheBunkerGames
             {
                 allCharacters.AddRange(characters);
             }
-            Debug.Log($"[CharacterManager] Loaded {allCharacters.Count} character(s).");
+            if (enableDebugLogs) Debug.Log($"[CharacterManager] Loaded {allCharacters.Count} character(s).");
         }
 
         // -------------------------------------------------------------------------

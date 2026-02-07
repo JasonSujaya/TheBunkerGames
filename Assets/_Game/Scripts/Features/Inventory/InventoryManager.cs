@@ -30,6 +30,7 @@ namespace TheBunkerGames
         [ListDrawerSettings(ShowIndexLabels = true)]
         #endif
         [SerializeField] private List<InventorySlotData> items = new List<InventorySlotData>();
+        [SerializeField] private bool enableDebugLogs = false;
 
         // -------------------------------------------------------------------------
         // Public Properties
@@ -97,7 +98,7 @@ namespace TheBunkerGames
                 items.Add(new InventorySlotData(itemData.ItemName, quantity));
             }
 
-            Debug.Log($"[InventoryManager] Added {quantity}x {itemData.ItemName} ({itemData.Type})");
+            if (enableDebugLogs) Debug.Log($"[InventoryManager] Added {quantity}x {itemData.ItemName} ({itemData.Type})");
             return true;
         }
 
@@ -156,7 +157,7 @@ namespace TheBunkerGames
 
             var itemData = ItemManager.Instance != null ? ItemManager.Instance.GetItem(itemId) : null;
             string displayName = itemData != null ? itemData.ItemName : itemId;
-            Debug.Log($"[InventoryManager] Removed {quantity}x {displayName}");
+            if (enableDebugLogs) Debug.Log($"[InventoryManager] Removed {quantity}x {displayName}");
             return true;
         }
 
@@ -175,7 +176,7 @@ namespace TheBunkerGames
         public void ClearInventory()
         {
             items.Clear();
-            Debug.Log("[InventoryManager] Inventory cleared");
+            if (enableDebugLogs) Debug.Log("[InventoryManager] Inventory cleared");
         }
 
         // -------------------------------------------------------------------------

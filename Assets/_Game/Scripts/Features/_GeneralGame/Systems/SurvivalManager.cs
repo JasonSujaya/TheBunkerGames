@@ -32,6 +32,7 @@ namespace TheBunkerGames
         #endif
         [SerializeField] private float starvationHealthDamage = 10f;
         [SerializeField] private float dehydrationHealthDamage = 15f;
+        [SerializeField] private bool enableDebugLogs = false;
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -73,7 +74,7 @@ namespace TheBunkerGames
             }
 
             var family = FamilyManager.Instance.FamilyMembers;
-            Debug.Log($"[SurvivalManager] Processing daily decay for {family.Count} members.");
+            if (enableDebugLogs) Debug.Log($"[SurvivalManager] Processing daily decay for {family.Count} members.");
 
             foreach (var member in family)
             {
@@ -87,13 +88,13 @@ namespace TheBunkerGames
                 if (member.Hunger <= 0)
                 {
                     member.ModifyHealth(-starvationHealthDamage);
-                    Debug.Log($"[SurvivalManager] {member.Name} is starving! Health reduced.");
+                    if (enableDebugLogs) Debug.Log($"[SurvivalManager] {member.Name} is starving! Health reduced.");
                 }
 
                 if (member.Thirst <= 0)
                 {
                     member.ModifyHealth(-dehydrationHealthDamage);
-                    Debug.Log($"[SurvivalManager] {member.Name} is dehydrated! Health reduced.");
+                    if (enableDebugLogs) Debug.Log($"[SurvivalManager] {member.Name} is dehydrated! Health reduced.");
                 }
 
                 // Check for Death

@@ -21,6 +21,7 @@ namespace TheBunkerGames
         // Configuration
         // -------------------------------------------------------------------------
         [SerializeField] private FamilyListSO defaultFamilyProfile;
+        [SerializeField] private bool enableDebugLogs = false;
         
         public FamilyListSO DefaultFamilyProfile => defaultFamilyProfile;
 
@@ -42,7 +43,7 @@ namespace TheBunkerGames
                 return;
             }
 
-            Debug.Log("[FamilyManager] Spawning Default Family...");
+            if (enableDebugLogs) Debug.Log("[FamilyManager] Spawning Default Family...");
             ClearFamily();
 
             foreach (var memberDef in defaultFamilyProfile.DefaultFamilyMembers)
@@ -53,7 +54,7 @@ namespace TheBunkerGames
                 }
             }
             
-            Debug.Log($"[FamilyManager] Spawned {AliveCount} family members.");
+            if (enableDebugLogs) Debug.Log($"[FamilyManager] Spawned {AliveCount} family members.");
         }
 
         // -------------------------------------------------------------------------
@@ -102,7 +103,7 @@ namespace TheBunkerGames
                 {
                     CharacterManager.Instance.AllCharacters.Remove(member);
                 }
-                Debug.Log("[FamilyManager] Family members removed from CharacterManager.");
+                if (enableDebugLogs) Debug.Log("[FamilyManager] Family members removed from CharacterManager.");
             }
         }
 
@@ -121,7 +122,7 @@ namespace TheBunkerGames
                     CharacterManager.Instance.AllCharacters.Add(c);
                 }
             }
-            Debug.Log($"[FamilyManager] Loaded {characters?.Count ?? 0} family member(s).");
+            if (enableDebugLogs) Debug.Log($"[FamilyManager] Loaded {characters?.Count ?? 0} family member(s).");
         }
 
         public bool IsFamilyDead()
