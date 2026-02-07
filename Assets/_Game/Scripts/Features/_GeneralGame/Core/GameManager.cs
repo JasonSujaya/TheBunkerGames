@@ -78,14 +78,8 @@ namespace TheBunkerGames
 
         private void Reset()
         {
-            // Auto Setup Logic
+            // Only auto-add Core dependencies
             FlowController = GetOrAdd<GameFlowController>();
-            Survival = GetOrAdd<SurvivalManager>();
-            StatusReview = GetOrAdd<StatusReviewManager>();
-            AngelInteraction = GetOrAdd<AngelInteractionManager>();
-            CityExploration = GetOrAdd<CityExplorationManager>();
-            DailyChoice = GetOrAdd<DailyChoiceManager>();
-            NightCycle = GetOrAdd<NightCycleManager>();
         }
 
         private T GetOrAdd<T>() where T : Component
@@ -94,6 +88,24 @@ namespace TheBunkerGames
             if (component == null) component = gameObject.AddComponent<T>();
             return component;
         }
+
+        #if ODIN_INSPECTOR
+        [Title("Auto Setup")]
+        [Button("Find External Managers", ButtonSizes.Large)]
+        [GUIColor(0.2f, 0.8f, 0.2f)]
+        private void FindExternalManagers()
+        {
+            // Find external managers in the scene (do not create them)
+            if (Survival == null) Survival = FindFirstObjectByType<SurvivalManager>();
+            if (StatusReview == null) StatusReview = FindFirstObjectByType<StatusReviewManager>();
+            if (AngelInteraction == null) AngelInteraction = FindFirstObjectByType<AngelInteractionManager>();
+            if (CityExploration == null) CityExploration = FindFirstObjectByType<CityExplorationManager>();
+            if (DailyChoice == null) DailyChoice = FindFirstObjectByType<DailyChoiceManager>();
+            if (NightCycle == null) NightCycle = FindFirstObjectByType<NightCycleManager>();
+
+            Debug.Log("[GameManager] External managers updated.");
+        }
+        #endif
 
         // -------------------------------------------------------------------------
         // Public Methods (Redirects to Controller for easier access if needed)
