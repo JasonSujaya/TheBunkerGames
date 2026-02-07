@@ -12,6 +12,7 @@ namespace TheBunkerGames
         [SerializeField] private TextMeshProUGUI titleText;
         [SerializeField] private TextMeshProUGUI descriptionText;
         [SerializeField] private GameObject contentParent;
+        [SerializeField] private bool autoToggleVisibility = true;
 
         private void Awake()
         {
@@ -52,12 +53,12 @@ namespace TheBunkerGames
                     Debug.LogWarning("[StorytellerUI] DescriptionText is missing!");
                 }
 
-                if (contentParent != null) contentParent.SetActive(true);
+                if (contentParent != null && autoToggleVisibility) contentParent.SetActive(true);
             }
             else
             {
                 ClearText();
-                if (contentParent != null) contentParent.SetActive(false);
+                if (contentParent != null && autoToggleVisibility) contentParent.SetActive(false);
             }
         }
 
