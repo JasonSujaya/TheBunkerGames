@@ -41,7 +41,11 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Story Memory - tracks what happened so the AI stays consistent
         // -------------------------------------------------------------------------
-        private List<StoryBeat> storyHistory = new List<StoryBeat>();
+        #if ODIN_INSPECTOR
+        [Title("Story Log")]
+        [ListDrawerSettings(IsReadOnly = true)]
+        #endif
+        [SerializeField] private List<StoryBeat> storyHistory = new List<StoryBeat>();
         private bool isGenerating;
 
         // -------------------------------------------------------------------------
@@ -167,13 +171,20 @@ namespace TheBunkerGames
                 sb.AppendLine("- Day 7: Climax. Final day, everything comes to a head. Maximum stakes.");
             sb.AppendLine();
 
+            // Character names the AI must use
+            sb.AppendLine("CHARACTERS:");
+            string characterNames = GetCharacterNameList();
+            sb.AppendLine($"- The family members are: {characterNames}");
+            sb.AppendLine("- You MUST use these exact names as the \"target\" in effects. Do NOT invent names.");
+            sb.AppendLine();
+
             // Effect types the AI can use
             sb.AppendLine("AVAILABLE EFFECT TYPES:");
             sb.AppendLine("Character stats: AddHP, ReduceHP, AddSanity, ReduceSanity, AddHunger, ReduceHunger, AddThirst, ReduceThirst");
             sb.AppendLine("Resources: AddFood, ReduceFood, AddWater, ReduceWater, AddSupplies, ReduceSupplies");
             sb.AppendLine("Character: InjureCharacter, HealCharacter, KillCharacter");
             sb.AppendLine("Intensity is 1-10 (1=minor, 10=extreme). Use KillCharacter sparingly and only in extreme cases.");
-            sb.AppendLine("Target must be a character name (e.g. \"Father\", \"Mother\", \"Son\", \"Daughter\").");
+            sb.AppendLine($"Target must be one of: {characterNames}");
             sb.AppendLine("For resource effects, target can be empty.");
             sb.AppendLine();
 
@@ -189,7 +200,7 @@ namespace TheBunkerGames
             sb.AppendLine("  \"choices\": [");
             sb.AppendLine("    {");
             sb.AppendLine("      \"text\": \"Choice description\",");
-            sb.AppendLine("      \"effects\": [{\"effectType\": \"ReduceHP\", \"intensity\": 3, \"target\": \"Father\"}]");
+            sb.AppendLine($"      \"effects\": [{{\"effectType\": \"ReduceHP\", \"intensity\": 3, \"target\": \"{GetFirstCharacterName()}\"}}]");
             sb.AppendLine("    },");
             sb.AppendLine("    {");
             sb.AppendLine("      \"text\": \"Alternative choice\",");
@@ -380,15 +391,71 @@ namespace TheBunkerGames
             }
         }
 
+        /// <summary>
+        /// Gets a comma-separated list of actual character names from FamilyManager.
+        /// Falls back to default role names if no family is loaded.
+        /// </summary>
+        private string GetCharacterNameList()
+        {
+            if (FamilyManager.Instance != null)
+            {
+                var family = FamilyManager.Instance.FamilyMembers;
+                if (family != null && family.Count > 0)
+                {
+                    var names = new List<string>();
+                    foreach (var member in family)
+                    {
+                        if (!string.IsNullOrEmpty(member.Name) && member.IsAlive)
+                            names.Add($"\"{member.Name}\"");
+                    }
+                    if (names.Count > 0)
+                        return string.Join(", ", names);
+                }
+            }
+            return "\"Father\", \"Mother\", \"Son\", \"Daughter\"";
+        }
+
+        /// <summary>
+        /// Gets the first alive character name for use in JSON examples.
+        /// </summary>
+        private string GetFirstCharacterName()
+        {
+            if (FamilyManager.Instance != null)
+            {
+                var family = FamilyManager.Instance.FamilyMembers;
+                if (family != null)
+                {
+                    foreach (var member in family)
+                    {
+                        if (!string.IsNullOrEmpty(member.Name) && member.IsAlive)
+                            return member.Name;
+                    }
+                }
+            }
+            return "Father";
+        }
+
         // -------------------------------------------------------------------------
         // Data
         // -------------------------------------------------------------------------
         [Serializable]
         private class StoryBeat
         {
+            #if ODIN_INSPECTOR
+            [HorizontalGroup("Row", Width = 40)]
+            [HideLabel]
+            #endif
             public int Day;
+
+            #if ODIN_INSPECTOR
+            [HorizontalGroup("Row")]
+            [HideLabel]
+            #endif
             public string EventTitle;
+
             public string PlayerAction;
+
+            public override string ToString() => $"Day {Day}: {EventTitle}";
         }
 
         // -------------------------------------------------------------------------
