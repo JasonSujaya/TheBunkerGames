@@ -86,6 +86,9 @@ namespace TheBunkerGames
             this.target = target;
         }
 
+        public LLMStoryEffectData(LLMEffectType effectType, int intensity, string target = "")
+            : this(effectType.ToString(), intensity, target) { }
+
         // -------------------------------------------------------------------------
         // LLM Parsing Helper
         // -------------------------------------------------------------------------
