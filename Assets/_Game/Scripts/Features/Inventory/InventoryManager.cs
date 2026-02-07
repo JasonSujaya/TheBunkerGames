@@ -251,11 +251,30 @@ namespace TheBunkerGames
         private IEnumerable<ValueDropdownItem<ItemData>> GetAllItemDataList()
         {
             var list = new ValueDropdownList<ItemData>();
+            List<ItemData> allItems = null;
 
-            // 1. Add Persistent Items from Database
+            // 1. Try Runtime Instance
             if (ItemManager.Instance != null)
             {
-                var allItems = ItemManager.Instance.GetAllItems();
+                allItems = ItemManager.Instance.GetAllItems();
+            }
+            // 2. Fallback to AssetDatabase in Editor Mode
+            #if UNITY_EDITOR
+            else
+            {
+                // Find the database asset manually
+                string[] guids = UnityEditor.AssetDatabase.FindAssets("t:ItemDatabaseDataSO");
+                if (guids.Length > 0)
+                {
+                    string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
+                    var db = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemDatabaseDataSO>(path);
+                    if (db != null) allItems = db.AllItems;
+                }
+            }
+            #endif
+
+            if (allItems != null)
+            {
                 foreach (var item in allItems)
                 {
                     if (item != null)
@@ -265,14 +284,13 @@ namespace TheBunkerGames
                 }
             }
 
-            // 2. Add Session-Bound Items from AIItemCreator
+            // 3. Add Session-Bound Items from AIItemCreator (Runtime only)
             if (AIItemCreator.Instance != null && AIItemCreator.Instance.SessionItems != null)
             {
                 foreach (var sessionItem in AIItemCreator.Instance.SessionItems)
                 {
                     if (sessionItem != null)
                     {
-                        // Add if not already in list (though session items usually differ)
                         list.Add($"[S] {sessionItem.ItemName}", sessionItem);
                     }
                 }
