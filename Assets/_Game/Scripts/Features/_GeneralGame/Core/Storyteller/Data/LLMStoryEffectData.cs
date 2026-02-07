@@ -58,7 +58,6 @@ namespace TheBunkerGames
         [SerializeField] private string effectType;
         
         #if ODIN_INSPECTOR
-        [Range(1, 10)]
         [InfoBox("1 = Minor effect, 10 = Extreme effect")]
         #endif
         [SerializeField, Range(1, 10)] private int intensity = 5;
