@@ -58,10 +58,37 @@ namespace TheBunkerGames
         [SerializeField] private int totalDays = 30;
 
         #if ODIN_INSPECTOR
-        [Title("Debug")]
-        [ReadOnly]
+        [Title("State")]
+        [InfoBox("Shows which categories are active for today. Prepare Day Actions to roll availability.")]
+        [ReadOnly, LabelText("Exploration Active")]
         #endif
         [Header("State")]
+        [SerializeField] private bool explorationActive;
+
+        #if ODIN_INSPECTOR
+        [ReadOnly, LabelText("Dilemma Active")]
+        #endif
+        [SerializeField] private bool dilemmaActive;
+
+        #if ODIN_INSPECTOR
+        [ReadOnly, LabelText("Family Request Active")]
+        #endif
+        [SerializeField] private bool familyRequestActive;
+
+        #if ODIN_INSPECTOR
+        [ReadOnly, LabelText("Family Target")]
+        #endif
+        [SerializeField] private string familyRequestTargetDisplay = "";
+
+        #if ODIN_INSPECTOR
+        [ReadOnly, LabelText("Processing")]
+        #endif
+        [SerializeField] private bool isProcessingDisplay;
+
+        #if ODIN_INSPECTOR
+        [Title("Debug")]
+        #endif
+        [Header("Debug")]
         [SerializeField] private bool enableDebugLogs = true;
 
         // -------------------------------------------------------------------------
@@ -138,6 +165,8 @@ namespace TheBunkerGames
                 currentDayState.FamilyRequestTarget = PickFamilyRequestTarget();
             }
 
+            RefreshStateDisplay();
+
             if (enableDebugLogs)
             {
                 var active = currentDayState.GetActiveCategories();
@@ -200,6 +229,7 @@ namespace TheBunkerGames
             }
 
             isProcessing = true;
+            isProcessingDisplay = true;
             pendingResults++;
 
             var challenge = currentDayState.GetChallenge(category);
@@ -300,6 +330,7 @@ namespace TheBunkerGames
             if (pendingResults <= 0)
             {
                 isProcessing = false;
+                isProcessingDisplay = false;
 
                 if (enableDebugLogs)
                     Debug.Log($"[PlayerActionManager] All actions complete for Day {currentDayState.Day}. Total results: {dayResults.Count}");
@@ -376,6 +407,28 @@ namespace TheBunkerGames
                 return alive[UnityEngine.Random.Range(0, alive.Count)].Name;
 
             return null;
+        }
+
+        // -------------------------------------------------------------------------
+        // State Display Sync
+        // -------------------------------------------------------------------------
+        private void RefreshStateDisplay()
+        {
+            if (currentDayState != null)
+            {
+                explorationActive = currentDayState.ExplorationActive;
+                dilemmaActive = currentDayState.DilemmaActive;
+                familyRequestActive = currentDayState.FamilyRequestActive;
+                familyRequestTargetDisplay = currentDayState.FamilyRequestTarget ?? "";
+            }
+            else
+            {
+                explorationActive = false;
+                dilemmaActive = false;
+                familyRequestActive = false;
+                familyRequestTargetDisplay = "";
+            }
+            isProcessingDisplay = isProcessing;
         }
 
         // -------------------------------------------------------------------------
@@ -476,20 +529,24 @@ namespace TheBunkerGames
             currentDayState.FamilyRequestChallenge = challengePool != null ? challengePool.GetRandomFamilyRequest() : null;
             currentDayState.FamilyRequestTarget = PickFamilyRequestTarget();
 
+            RefreshStateDisplay();
             Debug.Log($"[Debug] Forced all categories active for Day {day}");
             OnDailyActionsReady?.Invoke(currentDayState);
         }
 
         [Button("Submit Exploration", ButtonSizes.Medium)]
+        [EnableIf("explorationActive")]
         private void Debug_TestSubmitExploration()
         {
             if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode to test."); return; }
             if (currentDayState == null) { Debug.LogWarning("Prepare day actions first!"); return; }
+            if (!currentDayState.ExplorationActive) { Debug.LogWarning("Exploration not active today!"); return; }
             if (string.IsNullOrEmpty(explorationInput?.Trim())) { Debug.LogWarning("Type something in the Exploration Input field first!"); return; }
             SubmitAction(PlayerActionCategory.Exploration, explorationInput.Trim(), null);
         }
 
         [Button("Submit Dilemma", ButtonSizes.Medium)]
+        [EnableIf("dilemmaActive")]
         private void Debug_TestSubmitDilemma()
         {
             if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode to test."); return; }
@@ -500,6 +557,7 @@ namespace TheBunkerGames
         }
 
         [Button("Submit Family Request", ButtonSizes.Medium)]
+        [EnableIf("familyRequestActive")]
         private void Debug_TestSubmitFamily()
         {
             if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode to test."); return; }
@@ -509,20 +567,26 @@ namespace TheBunkerGames
             SubmitAction(PlayerActionCategory.FamilyRequest, familyRequestInput.Trim(), new List<string>());
         }
 
-        [Button("Submit All Inputs", ButtonSizes.Large)]
+        [Button("Submit All Active Inputs", ButtonSizes.Large)]
         [GUIColor(0.2f, 0.6f, 1f)]
         private void Debug_SubmitAll()
         {
             if (!Application.isPlaying) { Debug.LogWarning("Enter Play Mode to test."); return; }
             if (currentDayState == null) { Debug.LogWarning("Prepare day actions first!"); return; }
 
-            // Store inputs into DailyActionState and submit all
+            // Only submit active categories that have input
             if (currentDayState.ExplorationActive && !string.IsNullOrEmpty(explorationInput?.Trim()))
+            {
                 currentDayState.ExplorationInput = explorationInput.Trim();
+            }
             if (currentDayState.DilemmaActive && !string.IsNullOrEmpty(dilemmaInput?.Trim()))
+            {
                 currentDayState.DilemmaInput = dilemmaInput.Trim();
+            }
             if (currentDayState.FamilyRequestActive && !string.IsNullOrEmpty(familyRequestInput?.Trim()))
+            {
                 currentDayState.FamilyRequestInput = familyRequestInput.Trim();
+            }
 
             SubmitAllActions();
         }
