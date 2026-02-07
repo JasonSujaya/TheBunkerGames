@@ -94,7 +94,10 @@ namespace TheBunkerGames
         /// <summary>
         /// Parse legacy format: "EffectType:Intensity" or "EffectType:Intensity:Target"
         /// </summary>
-        public static LLMStoryEffectData ParseLegacy(string llmOutput)
+        /// <summary>
+        /// Parse legacy format: "EffectType:Intensity" or "EffectType:Intensity:Target"
+        /// </summary>
+        public static LLMStoryEffectData Parse(string llmOutput)
         {
             if (string.IsNullOrEmpty(llmOutput)) return null;
             
