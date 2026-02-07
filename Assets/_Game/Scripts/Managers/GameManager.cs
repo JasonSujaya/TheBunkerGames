@@ -127,6 +127,21 @@ namespace TheBunkerGames
             }
         }
 
+        public void GoToPreviousDay()
+        {
+            if (currentDay > 1)
+            {
+                currentDay--;
+                Debug.Log($"[GameManager] Day reversed to: {currentDay}");
+                // Re-trigger day start for the previous day
+                OnDayStart?.Invoke();
+            }
+            else
+            {
+                Debug.LogWarning("[GameManager] Already at Day 1.");
+            }
+        }
+
         public void EndGame(bool survived)
         {
             isGameOver = true;
@@ -197,6 +212,10 @@ namespace TheBunkerGames
         [Button("Advance Day", ButtonSizes.Large)]
         [GUIColor(1f, 0.5f, 0.5f)]
         private void Debug_AdvanceDay() { if (Application.isPlaying) AdvanceDay(); }
+
+        [Button("Previous Day", ButtonSizes.Large)]
+        [GUIColor(0.5f, 0.5f, 1f)]
+        private void Debug_PrevDay() { if (Application.isPlaying) GoToPreviousDay(); }
         #endif
     }
 }
