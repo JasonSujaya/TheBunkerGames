@@ -823,7 +823,7 @@ namespace TheBunkerGames
             submitAll.gameObject.SetActive(false);
 
             // ===================================================================
-            // DETAIL PANEL (with ScrollRect for overflow)
+            // DETAIL PANEL — simple 3-zone layout (top bar, content, bottom bar)
             // ===================================================================
             var detail = MakeUI("DetailPanel", rp);
             detail.anchorMin = new Vector2(0.1f, 0.12f);
@@ -834,7 +834,7 @@ namespace TheBunkerGames
             var detailBg = detail.gameObject.AddComponent<Image>();
             detailBg.color = new Color(0.08f, 0.08f, 0.14f, 1f);
 
-            // Back button sits OUTSIDE the scroll area, pinned to top
+            // --- TOP: Back button row, pinned to top ---
             var backRow = MakeUI("BackRow", detail);
             backRow.anchorMin = new Vector2(0, 1);
             backRow.anchorMax = new Vector2(1, 1);
@@ -853,7 +853,7 @@ namespace TheBunkerGames
             var backBtnImg = backBtn.GetComponent<Image>();
             if (backBtnImg != null) backBtnImg.color = new Color(0.25f, 0.25f, 0.35f, 1f);
 
-            // Save/status row sits OUTSIDE the scroll area, pinned to bottom
+            // --- BOTTOM: Save button + status, pinned to bottom ---
             var bottomBar = MakeUI("BottomBar", detail);
             bottomBar.anchorMin = new Vector2(0, 0);
             bottomBar.anchorMax = new Vector2(1, 0);
@@ -871,7 +871,7 @@ namespace TheBunkerGames
             bottomVL.childControlHeight = false;
             bottomVL.childControlWidth = true;
 
-            // Save button — large, bright green, very visible
+            // Save button — large, bright green
             var saveBtnRT = MakeButton("SaveButton", bottomBar, "SAVE RESPONSE");
             PrefH(saveBtnRT.gameObject, 42);
             var saveBtnImg = saveBtnRT.GetComponent<Image>();
@@ -882,83 +882,63 @@ namespace TheBunkerGames
             saveBtnColors.disabledColor = new Color(0.15f, 0.2f, 0.15f, 0.5f);
             saveBtnRT.GetComponent<Button>().colors = saveBtnColors;
 
-            // Status text below save button
+            // Status text
             var dStatus = MakeTMP("DetailStatusText", bottomBar, "", 12, TextAlignmentOptions.Center);
             dStatus.color = new Color(0.6f, 0.6f, 0.6f);
             PrefH(dStatus.gameObject, 16);
 
-            // ScrollRect viewport sits between back button (top) and bottom bar
-            var scrollViewport = MakeUI("ScrollViewport", detail);
-            scrollViewport.anchorMin = new Vector2(0, 0);
-            scrollViewport.anchorMax = new Vector2(1, 1);
-            scrollViewport.offsetMin = new Vector2(0, 70); // above bottom bar
-            scrollViewport.offsetMax = new Vector2(0, -40); // below back row
-            scrollViewport.gameObject.AddComponent<Image>().color = new Color(0, 0, 0, 0); // transparent mask
-            var mask = scrollViewport.gameObject.AddComponent<Mask>();
-            mask.showMaskGraphic = false;
+            // --- MIDDLE: Content area between top bar and bottom bar ---
+            var contentArea = MakeUI("ContentArea", detail);
+            contentArea.anchorMin = new Vector2(0, 0);
+            contentArea.anchorMax = new Vector2(1, 1);
+            contentArea.offsetMin = new Vector2(0, 70);  // above bottom bar
+            contentArea.offsetMax = new Vector2(0, -40);  // below back row
 
-            var scrollRect = detail.gameObject.AddComponent<ScrollRect>();
-            scrollRect.viewport = scrollViewport;
-            scrollRect.horizontal = false;
-            scrollRect.vertical = true;
-            scrollRect.movementType = ScrollRect.MovementType.Clamped;
-            scrollRect.scrollSensitivity = 25;
-
-            // Scroll content — vertical layout
-            var scrollContent = MakeUI("ScrollContent", scrollViewport);
-            scrollContent.anchorMin = new Vector2(0, 1);
-            scrollContent.anchorMax = new Vector2(1, 1);
-            scrollContent.pivot = new Vector2(0.5f, 1);
-            scrollContent.sizeDelta = new Vector2(0, 0); // will be auto-sized
-
-            var contentSF = scrollContent.gameObject.AddComponent<ContentSizeFitter>();
-            contentSF.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-            var contentVL = scrollContent.gameObject.AddComponent<VerticalLayoutGroup>();
+            var contentVL = contentArea.gameObject.AddComponent<VerticalLayoutGroup>();
             contentVL.spacing = 8;
-            contentVL.padding = new RectOffset(25, 25, 10, 10);
+            contentVL.padding = new RectOffset(25, 25, 10, 15);
             contentVL.childForceExpandWidth = true;
             contentVL.childForceExpandHeight = false;
-            contentVL.childControlHeight = false;
+            contentVL.childControlHeight = true;
             contentVL.childControlWidth = true;
 
-            scrollRect.content = scrollContent;
-
             // Category label
-            var dCatLabel = MakeTMP("DetailCategoryLabel", scrollContent, "CATEGORY", 22, TextAlignmentOptions.Left);
+            var dCatLabel = MakeTMP("DetailCategoryLabel", contentArea, "CATEGORY", 22, TextAlignmentOptions.Left);
             dCatLabel.color = new Color(1f, 0.85f, 0.3f);
             dCatLabel.fontStyle = FontStyles.Bold;
             PrefH(dCatLabel.gameObject, 30);
 
             // Challenge title
-            var dTitle = MakeTMP("DetailChallengeTitle", scrollContent, "Challenge Title", 18, TextAlignmentOptions.Left);
+            var dTitle = MakeTMP("DetailChallengeTitle", contentArea, "Challenge Title", 18, TextAlignmentOptions.Left);
             dTitle.fontStyle = FontStyles.Bold;
             PrefH(dTitle.gameObject, 26);
 
             // Challenge description
-            var dDesc = MakeTMP("DetailChallengeDescription", scrollContent, "Challenge description...", 14, TextAlignmentOptions.TopLeft);
+            var dDesc = MakeTMP("DetailChallengeDescription", contentArea, "Challenge description...", 14, TextAlignmentOptions.TopLeft);
             PrefH(dDesc.gameObject, 60);
 
             // Separator
-            var sep = MakeUI("Separator", scrollContent);
+            var sep = MakeUI("Separator", contentArea);
             PrefH(sep.gameObject, 2);
             var sepImg = sep.gameObject.AddComponent<Image>();
             sepImg.color = new Color(0.3f, 0.3f, 0.4f, 0.5f);
 
             // Input field label
-            var inputLabel = MakeTMP("InputLabel", scrollContent, "Your Response:", 14, TextAlignmentOptions.Left);
+            var inputLabel = MakeTMP("InputLabel", contentArea, "Your Response:", 14, TextAlignmentOptions.Left);
             inputLabel.color = new Color(0.7f, 0.7f, 0.7f);
-            PrefH(inputLabel.gameObject, 20);
+            PrefH(inputLabel.gameObject, 22);
 
-            // Input field
+            // Input field — uses flexibleHeight to fill remaining space
             var inputGO = new GameObject("DetailInputField");
-            inputGO.transform.SetParent(scrollContent, false);
+            inputGO.transform.SetParent(contentArea, false);
             var inputRT = inputGO.AddComponent<RectTransform>();
-            inputRT.sizeDelta = new Vector2(0, 100);
             var inputBg = inputGO.AddComponent<Image>();
             inputBg.color = new Color(0.15f, 0.15f, 0.2f, 1f);
             var dInputField = inputGO.AddComponent<TMP_InputField>();
             dInputField.lineType = TMP_InputField.LineType.MultiLineNewline;
+            var inputLE = inputGO.AddComponent<LayoutElement>();
+            inputLE.flexibleHeight = 1;  // fill remaining space
+            inputLE.minHeight = 80;
 
             var textArea = MakeUI("Text Area", inputRT);
             Stretch(textArea, 8);
@@ -972,11 +952,10 @@ namespace TheBunkerGames
             dInputField.textViewport = textArea;
             dInputField.textComponent = inputTxt;
             dInputField.placeholder = ph;
-            PrefH(inputGO, 100);
 
-            // Item toggle container
-            var dItemC = MakeUI("DetailItemToggleContainer", scrollContent);
-            PrefH(dItemC.gameObject, 40);
+            // Item toggle container (for inventory items, if any)
+            var dItemC = MakeUI("DetailItemToggleContainer", contentArea);
+            PrefH(dItemC.gameObject, 0);  // hidden by default, grows when items added
             var dItemHL = dItemC.gameObject.AddComponent<HorizontalLayoutGroup>();
             dItemHL.spacing = 5;
             dItemHL.childForceExpandWidth = false;
