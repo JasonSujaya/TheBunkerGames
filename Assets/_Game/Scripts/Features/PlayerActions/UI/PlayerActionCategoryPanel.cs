@@ -111,21 +111,28 @@ namespace TheBunkerGames
 
         /// <summary>
         /// Called when the TMP_InputField value changes at runtime.
-        /// Syncs the value back to the serialized inspector field.
+        /// Syncs the value back to the serialized inspector field and manager.
         /// </summary>
         private void SyncInputFromField(string newValue)
         {
             playerInputText = newValue;
+
+            // Sync to PlayerActionManager so its inspector stays up to date
+            if (PlayerActionManager.Instance != null)
+                PlayerActionManager.Instance.SetInput(category, newValue);
         }
 
         /// <summary>
         /// Called when the inspector field changes (Odin OnValueChanged).
-        /// Pushes the value to the TMP_InputField.
+        /// Pushes the value to the TMP_InputField and manager.
         /// </summary>
         private void SyncInputToField()
         {
             if (playerInputField != null && playerInputField.text != playerInputText)
                 playerInputField.text = playerInputText ?? "";
+
+            if (PlayerActionManager.Instance != null)
+                PlayerActionManager.Instance.SetInput(category, playerInputText ?? "");
         }
 
         // -------------------------------------------------------------------------
