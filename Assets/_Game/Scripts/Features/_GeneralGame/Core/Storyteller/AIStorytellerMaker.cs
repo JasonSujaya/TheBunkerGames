@@ -30,6 +30,13 @@ namespace TheBunkerGames
         [SerializeField] private bool enableDebugLogs = true;
 
         #if ODIN_INSPECTOR
+        [Title("Story Log Asset")]
+        [InfoBox("Assign a StoryLogSO asset. All generated events are saved here, organized by day. Persists between play sessions.", InfoMessageType.Info)]
+        [Required("Create a StoryLogSO via Create > TheBunkerGames > Story Log")]
+        #endif
+        [SerializeField] private StoryLogSO storyLog;
+
+        #if ODIN_INSPECTOR
         [Title("Story History")]
         [ReadOnly]
         #endif
@@ -133,6 +140,8 @@ namespace TheBunkerGames
             currentDay = 1;
             lastPlayerAction = "";
             lastGeneratedEvent = "";
+            if (storyLog != null)
+                storyLog.Clear();
             Debug.Log("[AIStorytellerMaker] Story history cleared.");
         }
 
@@ -348,13 +357,24 @@ namespace TheBunkerGames
 
             lastGeneratedEvent = storyEvent.ToJson(true);
 
-            // Record in story history
+            // Record in story history (runtime memory)
             storyHistory.Add(new StoryBeat
             {
                 Day = currentDay,
                 EventTitle = storyEvent.Title,
                 PlayerAction = playerAction
             });
+
+            // Record in StoryLogSO (persists in editor)
+            if (storyLog != null)
+            {
+                storyLog.RecordEvent(currentDay, playerAction, storyEvent);
+                Debug.Log($"[AIStorytellerMaker] Saved to StoryLog SO → Day {currentDay}: \"{storyEvent.Title}\"");
+            }
+            else
+            {
+                Debug.LogWarning("[AIStorytellerMaker] No StoryLogSO assigned! Events won't persist. Assign one in the inspector.");
+            }
 
             // Fire event
             OnStoryGenerated?.Invoke(storyEvent);
