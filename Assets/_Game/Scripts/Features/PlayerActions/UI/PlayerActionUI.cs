@@ -169,6 +169,7 @@ namespace TheBunkerGames
         private int resultsReceived;
         private int totalActive;
         private bool isInputListenerActive;
+        private int currentDay; // Track the day to ignore stale LLM callbacks
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -237,9 +238,30 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Event Handlers
         // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Public method to directly refresh the UI for a new day.
+        /// Called by GameFlowController after PrepareDailyActions to bypass event subscription issues.
+        /// </summary>
+        public void RefreshForNewDay()
+        {
+            if (PlayerActionManager.Instance == null || PlayerActionManager.Instance.CurrentDayState == null)
+            {
+                Debug.LogWarning("[PlayerActionUI] RefreshForNewDay called but no daily state available");
+                return;
+            }
+
+            Debug.Log($"<color=cyan>[PlayerActionUI] RefreshForNewDay called directly</color>");
+            HandleDailyActionsReady(PlayerActionManager.Instance.CurrentDayState);
+        }
+
         private void HandleDailyActionsReady(DailyActionState state)
         {
+            // ALWAYS log this to confirm event is firing
+            Debug.Log($"<color=yellow>[PlayerActionUI] HandleDailyActionsReady called for Day {state.Day}</color>");
+
             currentState = state;
+            currentDay = state.Day; // Track current day to filter stale callbacks
             resultsReceived = 0;
             savedCategories.Clear();
             currentlyViewingCategory = null;
@@ -278,15 +300,22 @@ namespace TheBunkerGames
         {
             if (result == null) return;
 
+            // Ignore stale results from previous days (async LLM callbacks)
+            if (currentState == null || currentState.Day != currentDay)
+            {
+                Debug.Log($"[PlayerActionUI] Ignoring stale result for [{result.Category}] - current day changed");
+                return;
+            }
+
             resultsReceived++;
 
             if (enableDebugLogs)
                 Debug.Log($"[PlayerActionUI] Result received for [{result.Category}] ({resultsReceived}/{totalActive})");
 
-            // Update list item
-            var listItem = GetListItem(result.Category);
-            if (listItem != null)
-                listItem.SetComplete();
+            // Update list item - but don't mark as complete since we want fresh state for the new day
+            // var listItem = GetListItem(result.Category);
+            // if (listItem != null)
+            //     listItem.SetComplete();
 
             // Route result to category panel for storage
             var panel = GetPanel(result.Category);
@@ -299,7 +328,8 @@ namespace TheBunkerGames
             if (enableDebugLogs)
                 Debug.Log("[PlayerActionUI] All actions complete!");
 
-            ShowCompletionSummary();
+            // Completion panel is disabled - actions auto-submit on day advance
+            // ShowCompletionSummary();
         }
 
         // -------------------------------------------------------------------------
@@ -307,6 +337,11 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         private void SetupCategoryPanels(DailyActionState state)
         {
+            // Reset all panels first to clear saved state from previous day
+            if (explorationPanel != null) explorationPanel.ResetPanel();
+            if (dilemmaPanel != null) dilemmaPanel.ResetPanel();
+            if (familyRequestPanel != null) familyRequestPanel.ResetPanel();
+
             if (explorationPanel != null)
             {
                 if (state.ExplorationActive && state.ExplorationChallenge != null)
@@ -334,6 +369,9 @@ namespace TheBunkerGames
 
         private void SetupListItems(DailyActionState state)
         {
+            if (enableDebugLogs)
+                Debug.Log($"[PlayerActionUI] SetupListItems called for Day {state.Day}");
+
             // Exploration (always active)
             if (explorationListItem != null)
             {
@@ -344,6 +382,10 @@ namespace TheBunkerGames
                         "EXPLORATION",
                         state.ExplorationChallenge.Title,
                         OnListItemClicked);
+                    // Force reset the saved state visually (belt and suspenders)
+                    explorationListItem.SetSaved(false);
+                    if (enableDebugLogs)
+                        Debug.Log($"[PlayerActionUI] Exploration list item initialized and reset to unsaved. IsSaved={explorationListItem.IsSaved}");
                 }
                 else
                 {
@@ -361,6 +403,10 @@ namespace TheBunkerGames
                         "DILEMMA",
                         state.DilemmaChallenge.Title,
                         OnListItemClicked);
+                    // Force reset the saved state visually
+                    dilemmaListItem.SetSaved(false);
+                    if (enableDebugLogs)
+                        Debug.Log($"[PlayerActionUI] Dilemma list item initialized and reset to unsaved. IsSaved={dilemmaListItem.IsSaved}");
                 }
                 else
                 {
@@ -381,6 +427,10 @@ namespace TheBunkerGames
                         displayName,
                         state.FamilyRequestChallenge.Title,
                         OnListItemClicked);
+                    // Force reset the saved state visually
+                    familyRequestListItem.SetSaved(false);
+                    if (enableDebugLogs)
+                        Debug.Log($"[PlayerActionUI] FamilyRequest list item initialized and reset to unsaved. IsSaved={familyRequestListItem.IsSaved}");
                 }
                 else
                 {

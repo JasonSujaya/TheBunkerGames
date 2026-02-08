@@ -1023,6 +1023,38 @@ MonoBehaviour:
         },\n        {\n          \"effectType\": \"InjureCharacter\",\n         
         \"intensity\": 2,\n          \"target\": \"Doomsday Dave\"\n        }\n     
         ]\n    }\n  ]\n}"
+    - PlayerAction: Drink
+      Title: Unquenched Thirst
+      Description: Drinking water without addressing the medicine cabinet doesn't
+        solve the challenge. However, it does reduce your thirst. You still need
+        to find a way to open the medicine cabinet.
+      EffectCount: 3
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 19:46:38
+      FullEventJson: "{\n  \"title\": \"Unquenched Thirst\",\n  \"description\":
+        \"Drinking water without addressing the medicine cabinet doesn't solve the
+        challenge. However, it does reduce your thirst. You still need to find a
+        way to open the medicine cabinet.\",\n  \"effects\": [\n    {\n      \"effectType\":
+        \"ReduceThirst\",\n      \"intensity\": 10,\n      \"target\": \"Rick Sanchex\"\n   
+        },\n    {\n      \"effectType\": \"ReduceThirst\",\n      \"intensity\":
+        15,\n      \"target\": \"Morty Sanchex\"\n    },\n    {\n      \"effectType\":
+        \"ReduceThirst\",\n      \"intensity\": 20,\n      \"target\": \"Chef Ramsay\"\n   
+        }\n  ],\n  \"choices\": [\n    {\n      \"text\": \"Search for tools to open
+        the cabinet\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceSupplies\",\n          \"intensity\": 5,\n          \"target\": \"\"\n       
+        },\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
+        5,\n          \"target\": \"Rick Sanchex\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Try to force it open with brute strength\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceHP\",\n          \"intensity\":
+        10,\n          \"target\": \"Rick Sanchex\"\n        },\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 5,\n         
+        \"target\": \"Morty Sanchex\"\n        }\n      ]\n    },\n    {\n      \"text\":
+        \"Leave it for now and explore another area\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"AddHunger\",\n          \"intensity\": 10,\n         
+        \"target\": \"Chef Ramsay\"\n        },\n        {\n          \"effectType\":
+        \"AddThirst\",\n          \"intensity\": 10,\n          \"target\": \"Chef
+        Ramsay\"\n        }\n      ]\n    }\n  ]\n}"
   - DayNumber: 2
     Events:
     - PlayerAction: Search the storage room for supplies
@@ -1588,6 +1620,176 @@ MonoBehaviour:
         5,\n          \"target\": \"Chef Ramsay\"\n        },\n        {\n         
         \"effectType\": \"ReduceSanity\",\n          \"intensity\": 5,\n         
         \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Fun
+      Title: Trader's Bargain
+      Description: The trader hands over a large amount of food, but takes your only
+        weapon. The family enjoys a hearty meal, but feels vulnerable without any
+        means of defense.
+      EffectCount: 4
+      ChoiceCount: 3
+      Category: Dilemma
+      Timestamp: 19:47:53
+      FullEventJson: "{\n  \"title\": \"Trader's Bargain\",\n  \"description\": \"The
+        trader hands over a large amount of food, but takes your only weapon. The
+        family enjoys a hearty meal, but feels vulnerable without any means of defense.\",\n 
+        \"effects\": [\n    {\n      \"effectType\": \"AddFood\",\n      \"intensity\":
+        8,\n      \"target\": \"\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 10,\n      \"target\": \"Doomsday Dave\"\n    },\n    {\n     
+        \"effectType\": \"ReduceSanity\",\n      \"intensity\": 5,\n      \"target\":
+        \"Chef Ramsay\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 5,\n      \"target\": \"Rick Sanchex\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Search the bunker for a hidden weapon\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 5,\n          \"target\": \"Doomsday Dave\"\n        },\n       
+        {\n          \"effectType\": \"ReduceHunger\",\n          \"intensity\":
+        10,\n          \"target\": \"Doomsday Dave\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Ration the new food to make it last\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
+        3,\n          \"target\": \"Chef Ramsay\"\n        },\n        {\n         
+        \"effectType\": \"ReduceFood\",\n          \"intensity\": 3,\n          \"target\":
+        \"\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Ask the trader
+        if they have any other items to trade\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"AddSupplies\",\n          \"intensity\": 2,\n         
+        \"target\": \"\"\n        },\n        {\n          \"effectType\": \"ReduceSanity\",\n         
+        \"intensity\": 2,\n          \"target\": \"Rick Sanchex\"\n        }\n     
+        ]\n    }\n  ]\n}"
+    - PlayerAction: Eat the good
+      Title: Confusion and Hunger
+      Description: The family is confused by the nonsensical suggestion and decides
+        to eat some food while trying to figure out what to do. The air vent remains
+        jammed, and the air quality continues to drop.
+      EffectCount: 4
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 19:52:44
+      FullEventJson: "{\n  \"title\": \"Confusion and Hunger\",\n  \"description\":
+        \"The family is confused by the nonsensical suggestion and decides to eat
+        some food while trying to figure out what to do. The air vent remains jammed,
+        and the air quality continues to drop.\",\n  \"effects\": [\n    {\n     
+        \"effectType\": \"ReduceFood\",\n      \"intensity\": 3,\n      \"target\":
+        \"\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\":
+        5,\n      \"target\": \"Rick Sanchex\"\n    },\n    {\n      \"effectType\":
+        \"ReduceSanity\",\n      \"intensity\": 5,\n      \"target\": \"Morty Sanchex\"\n   
+        },\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\":
+        5,\n      \"target\": \"Chef Ramsay\"\n    }\n  ],\n  \"choices\": [\n   
+        {\n      \"text\": \"Attempt to clear the vent with a tool\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"AddSupplies\",\n          \"intensity\":
+        2,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"ReduceHP\",\n          \"intensity\": 3,\n          \"target\": \"Rick
+        Sanchex\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Ignore the
+        vent and focus on something else\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 3,\n         
+        \"target\": \"Morty Sanchex\"\n        },\n        {\n          \"effectType\":
+        \"ReduceHP\",\n          \"intensity\": 2,\n          \"target\": \"Chef
+        Ramsay\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Use a makeshift
+        filter to improve air quality temporarily\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"ReduceSupplies\",\n          \"intensity\":
+        4,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 3,\n          \"target\": \"Rick
+        Sanchex\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Hi
+      Title: Miscommunication
+      Description: Your greeting doesn't address the ventilation issue. The air quality
+        continues to deteriorate, causing discomfort and minor health issues for
+        the family.
+      EffectCount: 6
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 19:56:41
+      FullEventJson: "{\n  \"title\": \"Miscommunication\",\n  \"description\": \"Your
+        greeting doesn't address the ventilation issue. The air quality continues
+        to deteriorate, causing discomfort and minor health issues for the family.\",\n 
+        \"effects\": [\n    {\n      \"effectType\": \"ReduceHP\",\n      \"intensity\":
+        5,\n      \"target\": \"Rick Sanchex\"\n    },\n    {\n      \"effectType\":
+        \"ReduceHP\",\n      \"intensity\": 3,\n      \"target\": \"Doomsday Dave\"\n   
+        },\n    {\n      \"effectType\": \"ReduceHP\",\n      \"intensity\": 4,\n     
+        \"target\": \"Morty Sanchex\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 2,\n      \"target\": \"Rick Sanchex\"\n    },\n    {\n     
+        \"effectType\": \"ReduceSanity\",\n      \"intensity\": 2,\n      \"target\":
+        \"Doomsday Dave\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 2,\n      \"target\": \"Morty Sanchex\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Attempt to clear the vent with available tools\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"ReduceSupplies\",\n         
+        \"intensity\": 3,\n          \"target\": \"\"\n        },\n        {\n         
+        \"effectType\": \"AddHP\",\n          \"intensity\": 5,\n          \"target\":
+        \"Rick Sanchex\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Search
+        for alternative ventilation methods\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"ReduceSupplies\",\n          \"intensity\": 2,\n         
+        \"target\": \"\"\n        },\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 3,\n          \"target\": \"Doomsday Dave\"\n        }\n     
+        ]\n    },\n    {\n      \"text\": \"Ignore the problem and focus on other
+        tasks\",\n      \"effects\": [\n        {\n          \"effectType\": \"ReduceHP\",\n         
+        \"intensity\": 3,\n          \"target\": \"Morty Sanchex\"\n        },\n       
+        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        2,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n 
+        ]\n}"
+    - PlayerAction: Food
+      Title: Unrelated Response
+      Description: The family looks at the food supplies, but it doesn't help with
+        the flickering lights. The electrical issue persists, and the lights continue
+        to flicker, causing unease among the family members.
+      EffectCount: 3
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 20:01:11
+      FullEventJson: "{\n  \"title\": \"Unrelated Response\",\n  \"description\":
+        \"The family looks at the food supplies, but it doesn't help with the flickering
+        lights. The electrical issue persists, and the lights continue to flicker,
+        causing unease among the family members.\",\n  \"effects\": [\n    {\n     
+        \"effectType\": \"ReduceSanity\",\n      \"intensity\": 5,\n      \"target\":
+        \"Rick Sanchex\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 5,\n      \"target\": \"Morty Sanchex\"\n    },\n    {\n     
+        \"effectType\": \"ReduceSanity\",\n      \"intensity\": 5,\n      \"target\":
+        \"Doomsday Dave\"\n    }\n  ],\n  \"choices\": [\n    {\n      \"text\":
+        \"Attempt to fix the wiring with available tools\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"ReduceSupplies\",\n          \"intensity\":
+        3,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 5,\n          \"target\": \"Rick
+        Sanchex\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Ignore the
+        issue and hope it resolves itself\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 10,\n         
+        \"target\": \"Morty Sanchex\"\n        },\n        {\n          \"effectType\":
+        \"ReduceSanity\",\n          \"intensity\": 10,\n          \"target\": \"Doomsday
+        Dave\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Search for a
+        manual on electrical repairs\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"ReduceHunger\",\n          \"intensity\": 5,\n         
+        \"target\": \"Rick Sanchex\"\n        },\n        {\n          \"effectType\":
+        \"ReduceThirst\",\n          \"intensity\": 5,\n          \"target\": \"Rick
+        Sanchex\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Blast it with my portal gun
+      Title: Portal Gun Blast
+      Description: Rick's portal gun blast warps the door's metal, causing it to
+        buckle and swing open. However, the force of the blast sends debris flying,
+        and a sharp piece cuts Morty's arm. Behind the door, you find a cache of
+        supplies, but the noise has also caused a small leak in a nearby water pipe.
+      EffectCount: 3
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 20:14:48
+      FullEventJson: "{\n  \"title\": \"Portal Gun Blast\",\n  \"description\": \"Rick's
+        portal gun blast warps the door's metal, causing it to buckle and swing open.
+        However, the force of the blast sends debris flying, and a sharp piece cuts
+        Morty's arm. Behind the door, you find a cache of supplies, but the noise
+        has also caused a small leak in a nearby water pipe.\",\n  \"effects\": [\n   
+        {\n      \"effectType\": \"AddSupplies\",\n      \"intensity\": 8,\n     
+        \"target\": \"\"\n    },\n    {\n      \"effectType\": \"InjureCharacter\",\n     
+        \"intensity\": 3,\n      \"target\": \"Morty Sanchex\"\n    },\n    {\n     
+        \"effectType\": \"ReduceWater\",\n      \"intensity\": 5,\n      \"target\":
+        \"\"\n    }\n  ],\n  \"choices\": [\n    {\n      \"text\": \"Use the supplies
+        to bandage Morty's wound\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"HealCharacter\",\n          \"intensity\": 3,\n          \"target\": \"Morty
+        Sanchex\"\n        },\n        {\n          \"effectType\": \"ReduceSupplies\",\n         
+        \"intensity\": 2,\n          \"target\": \"\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Ignore the wound and focus on fixing the water leak\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"AddWater\",\n         
+        \"intensity\": 3,\n          \"target\": \"\"\n        },\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 5,\n         
+        \"target\": \"Morty Sanchex\"\n        }\n      ]\n    },\n    {\n      \"text\":
+        \"Have Doomsday Dave assess the new supplies\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 5,\n         
+        \"target\": \"Doomsday Dave\"\n        },\n        {\n          \"effectType\":
+        \"ReduceHunger\",\n          \"intensity\": 5,\n          \"target\": \"Doomsday
+        Dave\"\n        }\n      ]\n    }\n  ]\n}"
   - DayNumber: 3
     Events:
     - PlayerAction: Search the city
@@ -1631,5 +1833,41 @@ MonoBehaviour:
         \"intensity\": 3,\n          \"target\": \"Father\"\n        },\n       
         {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 3,\n         
         \"target\": \"Mother\"\n        }\n      ]\n    }\n  ]\n}"
-  totalEvents: 47
-  lastUpdated: 2026-02-08 19:45:38
+    - PlayerAction: Clean the floor
+      Title: Missed Opportunity
+      Description: You decide to clean the floor instead of engaging with the trader.
+        The bunker looks spotless, which raises everyone's spirits slightly. However,
+        you miss the opportunity to acquire more food or keep your weapon.
+      EffectCount: 3
+      ChoiceCount: 3
+      Category: Dilemma
+      Timestamp: 19:57:11
+      FullEventJson: "{\n  \"title\": \"Missed Opportunity\",\n  \"description\":
+        \"You decide to clean the floor instead of engaging with the trader. The
+        bunker looks spotless, which raises everyone's spirits slightly. However,
+        you miss the opportunity to acquire more food or keep your weapon.\",\n 
+        \"effects\": [\n    {\n      \"effectType\": \"AddSanity\",\n      \"intensity\":
+        5,\n      \"target\": \"Rick Sanchex\"\n    },\n    {\n      \"effectType\":
+        \"AddSanity\",\n      \"intensity\": 5,\n      \"target\": \"Doomsday Dave\"\n   
+        },\n    {\n      \"effectType\": \"AddSanity\",\n      \"intensity\": 5,\n     
+        \"target\": \"Morty Sanchex\"\n    }\n  ],\n  \"choices\": [\n    {\n     
+        \"text\": \"Scavenge for food\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"AddFood\",\n          \"intensity\": 3,\n          \"target\":
+        \"\"\n        },\n        {\n          \"effectType\": \"ReduceHP\",\n         
+        \"intensity\": 5,\n          \"target\": \"Rick Sanchex\"\n        }\n     
+        ]\n    },\n    {\n      \"text\": \"Search for a hidden weapon\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"AddSupplies\",\n         
+        \"intensity\": 2,\n          \"target\": \"\"\n        },\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 3,\n         
+        \"target\": \"Doomsday Dave\"\n        }\n      ]\n    },\n    {\n      \"text\":
+        \"Ration the current food supply\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"ReduceHunger\",\n          \"intensity\": 2,\n         
+        \"target\": \"Rick Sanchex\"\n        },\n        {\n          \"effectType\":
+        \"ReduceHunger\",\n          \"intensity\": 2,\n          \"target\": \"Doomsday
+        Dave\"\n        },\n        {\n          \"effectType\": \"ReduceHunger\",\n         
+        \"intensity\": 2,\n          \"target\": \"Morty Sanchex\"\n        },\n       
+        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        4,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n 
+        ]\n}"
+  totalEvents: 54
+  lastUpdated: 2026-02-08 20:14:48

@@ -178,6 +178,12 @@ namespace TheBunkerGames
                     hud.RefreshAll();
                 }
 
+                // 2b. Force refresh PlayerActionUI directly (bypasses event subscription issues)
+                if (PlayerActionUI.Instance != null)
+                {
+                    PlayerActionUI.Instance.RefreshForNewDay();
+                }
+
                 // 3. Sync Data for Visualization
                 if (gameManager.SessionData != null)
                 {
