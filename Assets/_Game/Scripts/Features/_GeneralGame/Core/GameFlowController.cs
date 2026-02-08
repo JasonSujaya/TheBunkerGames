@@ -17,6 +17,7 @@ namespace TheBunkerGames
         // Configuration
         // -------------------------------------------------------------------------
         [SerializeField] private GameManager gameManager;
+        [SerializeField] private DayTransitionUI dayTransitionUI;
         [SerializeField] private bool autoStartGame = true;
         [SerializeField] private bool enableDebugLogs = false;
 
@@ -97,15 +98,53 @@ namespace TheBunkerGames
                 }
             }
 
-            public void AdvanceDay()
+            public void AdvanceDay(bool skipTransition = false)
             {
                 if (gameManager == null) return;
 
-                // Submit current day's actions before advancing
-                if (gameManager.Actions != null && gameManager.CurrentDay > 0)
+                int fromDay = gameManager.CurrentDay;
+                int toDay = fromDay + 1;
+
+                // Skip transition for initial game start (Day 0 -> Day 1) or if explicitly requested
+                if (skipTransition || fromDay == 0)
                 {
-                    gameManager.Actions.SubmitAllActions();
-                    if (enableDebugLogs) Debug.Log($"[GameFlow] Submitted actions for Day {gameManager.CurrentDay}");
+                    ExecuteDayAdvance();
+                    return;
+                }
+
+                // Show transition screen if available
+                if (dayTransitionUI != null)
+                {
+                    // Enable the GameObject and set Instance
+                    dayTransitionUI.gameObject.SetActive(true);
+                    
+                    if (enableDebugLogs) Debug.Log($"[GameFlow] Showing transition: Day {fromDay} -> Day {toDay}");
+                    
+                    dayTransitionUI.ShowTransition(
+                        fromDay, 
+                        toDay, 
+                        "Day is transitioning...",
+                        () => ExecuteDayAdvance()
+                    );
+                }
+                else
+                {
+                    // No transition UI, execute immediately
+                    ExecuteDayAdvance();
+                }
+            }
+
+            /// <summary>
+            /// Executes the actual day advancement logic.
+            /// Called directly or after transition animation completes.
+            /// </summary>
+            private void ExecuteDayAdvance()
+            {
+                // Submit current day's actions before advancing
+                if (PlayerActionManager.Instance != null && gameManager.CurrentDay > 0)
+                {
+                    Debug.Log($"[GameFlow] Calling SubmitAllActions for Day {gameManager.CurrentDay}...");
+                    PlayerActionManager.Instance.SubmitAllActions();
                 }
 
                 // Increment Day

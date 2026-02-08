@@ -260,12 +260,31 @@ namespace TheBunkerGames
 
         /// <summary>
         /// Submit all active categories at once. Convenience method.
+        /// Syncs inspector input fields to currentDayState before submitting.
         /// </summary>
         public void SubmitAllActions()
         {
+            Debug.Log($"[PlayerActionManager] SubmitAllActions called. currentDayState null? {currentDayState == null}");
+            
             if (currentDayState == null) return;
 
+            // Sync inspector fields to currentDayState (so inspector-entered values are submitted)
+            if (currentDayState.ExplorationActive && !string.IsNullOrEmpty(explorationInput?.Trim()) && string.IsNullOrEmpty(currentDayState.ExplorationInput))
+            {
+                currentDayState.ExplorationInput = explorationInput.Trim();
+            }
+            if (currentDayState.DilemmaActive && !string.IsNullOrEmpty(dilemmaInput?.Trim()) && string.IsNullOrEmpty(currentDayState.DilemmaInput))
+            {
+                currentDayState.DilemmaInput = dilemmaInput.Trim();
+            }
+            if (currentDayState.FamilyRequestActive && !string.IsNullOrEmpty(familyRequestInput?.Trim()) && string.IsNullOrEmpty(currentDayState.FamilyRequestInput))
+            {
+                currentDayState.FamilyRequestInput = familyRequestInput.Trim();
+            }
+
             var active = currentDayState.GetActiveCategories();
+            Debug.Log($"[PlayerActionManager] Active categories: {active.Count} - {string.Join(", ", active)}");
+            
             foreach (var cat in active)
             {
                 string input = "";
@@ -290,8 +309,11 @@ namespace TheBunkerGames
                         break;
                 }
 
+                Debug.Log($"[PlayerActionManager] Category {cat}: input='{input}', alreadySubmitted={dayResults.ContainsKey(cat)}");
+                
                 if (!string.IsNullOrEmpty(input) && !dayResults.ContainsKey(cat))
                 {
+                    Debug.Log($"[PlayerActionManager] Submitting {cat} action...");
                     SubmitAction(cat, input, items);
                 }
             }
@@ -545,14 +567,33 @@ namespace TheBunkerGames
 
         /// <summary>
         /// Set the inspector input for a category (called by UI panels to sync back).
+        /// Also syncs to currentDayState so SubmitAllActions() can find the input.
         /// </summary>
         public void SetInput(PlayerActionCategory category, string value)
         {
+            // Update inspector fields
             switch (category)
             {
                 case PlayerActionCategory.Exploration: explorationInput = value; break;
                 case PlayerActionCategory.Dilemma: dilemmaInput = value; break;
                 case PlayerActionCategory.FamilyRequest: familyRequestInput = value; break;
+            }
+            
+            // Also sync to currentDayState so SubmitAllActions() can find the input
+            if (currentDayState != null)
+            {
+                switch (category)
+                {
+                    case PlayerActionCategory.Exploration:
+                        currentDayState.ExplorationInput = value;
+                        break;
+                    case PlayerActionCategory.Dilemma:
+                        currentDayState.DilemmaInput = value;
+                        break;
+                    case PlayerActionCategory.FamilyRequest:
+                        currentDayState.FamilyRequestInput = value;
+                        break;
+                }
             }
         }
 
