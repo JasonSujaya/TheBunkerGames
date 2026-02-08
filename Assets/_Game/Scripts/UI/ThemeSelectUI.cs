@@ -563,8 +563,18 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         public void Show()
         {
-            if (canvasRoot == null) return;
-            canvasRoot.SetActive(true);
+            // First, ensure this GameObject is active
+            gameObject.SetActive(true);
+            
+            if (canvasRoot != null)
+            {
+                canvasRoot.SetActive(true);
+            }
+            else
+            {
+                Debug.LogWarning("[ThemeSelectUI] canvasRoot is null. Did you run Auto Setup?");
+            }
+            
             selectedTheme = null;
             currentIndex = 0;
 
@@ -581,6 +591,7 @@ namespace TheBunkerGames
         {
             StopVideo();
             if (canvasRoot != null) canvasRoot.SetActive(false);
+            gameObject.SetActive(false);
         }
 
         // -------------------------------------------------------------------------

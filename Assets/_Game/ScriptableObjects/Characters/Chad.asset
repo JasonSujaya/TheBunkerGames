@@ -19,7 +19,7 @@ MonoBehaviour:
     construction worker with a talent for fixing just about anything. Not much of
     a talker, but his actions speak volumes.
   portrait: {fileID: 2458917243557503670, guid: 114ee4ea52e9f4276a825f4d11dbaee9, type: 3}
-  bodyImage: {fileID: 0}
+  bodyImage: {fileID: 4825131749643440923, guid: b70c6dad916464d93b533507c7b2b91f, type: 3}
   maxHealth: 90
   maxHunger: 85
   maxThirst: 85

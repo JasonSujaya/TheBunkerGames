@@ -50,6 +50,13 @@ namespace TheBunkerGames
             if (enableDebugLogs) Debug.Log($"[AudioManager] Playing sound: {soundName}");
         }
 
+        public void PlaySFX(AudioClip clip, float volume = 1f)
+        {
+            if (clip == null) return;
+            // PlayOneShot allows multiple sounds to overlap
+            musicSource.PlayOneShot(clip, volume);
+        }
+
         public void PlayMusicList(List<AudioClip> playlist, bool shuffle)
         {
             if (playlist == null || playlist.Count == 0) return;

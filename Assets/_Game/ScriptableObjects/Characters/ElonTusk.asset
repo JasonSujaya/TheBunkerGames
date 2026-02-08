@@ -20,7 +20,7 @@ MonoBehaviour:
     with scrap electronics. Sleeps four hours a night and posts bunker updates on
     a dead social network.
   portrait: {fileID: -835532059487295024, guid: aff42e461b2874dfc81dfa7f0bebee66, type: 3}
-  bodyImage: {fileID: 0}
+  bodyImage: {fileID: 333663907999740468, guid: 3c2091fba21f6439ab35c6b0ac0a35aa, type: 3}
   maxHealth: 70
   maxHunger: 65
   maxThirst: 65

@@ -18,7 +18,7 @@ MonoBehaviour:
   description: A fiery celebrity chef who can turn canned beans into a gourmet meal.
     His sharp tongue keeps morale interesting.
   portrait: {fileID: 5779106381930009108, guid: 516cd6201bdff4880ae3d35c60a189de, type: 3}
-  bodyImage: {fileID: 0}
+  bodyImage: {fileID: -935902738348113922, guid: d8e5f8d48cc344210957ef3caf3a9ab0, type: 3}
   maxHealth: 85
   maxHunger: 100
   maxThirst: 90

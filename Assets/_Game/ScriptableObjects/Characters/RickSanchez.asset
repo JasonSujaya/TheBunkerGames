@@ -20,7 +20,7 @@ MonoBehaviour:
     he might be right. Built a portal gun out of bunker scraps on day one. Constantly
     muttering about how everyone else is an idiot.
   portrait: {fileID: -8198393618177738103, guid: b55de6e8dec7041808ece24f02d66a54, type: 3}
-  bodyImage: {fileID: 0}
+  bodyImage: {fileID: 6608756609379564770, guid: 47dcac70b12e44697bed2d17967a7a78, type: 3}
   maxHealth: 65
   maxHunger: 60
   maxThirst: 55

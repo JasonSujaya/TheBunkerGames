@@ -41,41 +41,29 @@ namespace TheBunkerGames
         {
             if (startButton != null)
             {
+                startButton.onClick.RemoveListener(OnStartButtonClicked);
                 startButton.onClick.AddListener(OnStartButtonClicked);
+                if (enableDebugLogs) Debug.Log("[HomeUI] Wired Up Start Button");
             }
             if (settingsButton != null)
             {
+                settingsButton.onClick.RemoveListener(OnSettingsButtonClicked);
                 settingsButton.onClick.AddListener(OnSettingsButtonClicked);
             }
             if (quitButton != null)
             {
+                quitButton.onClick.RemoveListener(OnQuitButtonClicked);
                 quitButton.onClick.AddListener(OnQuitButtonClicked);
             }
         }
 
+        // Event fired when "Start" is clicked
+        public event System.Action OnStartGameRequested;
+
         public void OnStartButtonClicked()
         {
-            if (enableDebugLogs) Debug.Log("[HomeUI] Start Button Clicked");
-            
-            // If GameFlowController exists, use it? Or just load scene?
-            // For now, let's assume direct scene load or GameFlow trigger.
-            // If GameFlowController is present in this scene (e.g. DDOL), we could use it.
-            // But usually Home is a separate scene.
-            
-            if (Application.CanStreamedLevelBeLoaded(gameSceneName))
-            {
-                SceneManager.LoadScene(gameSceneName);
-            }
-            else
-            {
-                Debug.LogWarning($"[HomeUI] Scene '{gameSceneName}' cannot be loaded. Check Build Settings.");
-                // Fallback for logic if we are already in the "Game" scene
-                var flow = FindFirstObjectByType<GameFlowController>();
-                if (flow != null)
-                {
-                    flow.StartNewGame();
-                }
-            }
+            Debug.Log("[HomeUI] Start Button Clicked (Invoking Event)"); // Always Log
+            OnStartGameRequested?.Invoke();
         }
 
         public void OnSettingsButtonClicked()
