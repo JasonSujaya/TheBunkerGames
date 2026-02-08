@@ -100,8 +100,10 @@ namespace TheBunkerGames
     {
         GovernmentShutdown,
         ZombieApocalypse,
-        NaturalDisaster,
-        Pandemic
+        Frostpunk,
+        Pandemic,
+        RickMortyInvasion,
+        CatUprising
     }
 
     // -------------------------------------------------------------------------
