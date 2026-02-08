@@ -66,6 +66,7 @@ namespace TheBunkerGames
         [Header("UI References")]
         [SerializeField] private TextMeshProUGUI titleText;
         [SerializeField] private TextMeshProUGUI descriptionText;
+        [SerializeField] private TextMeshProUGUI challengeContextText; // Shows original challenge description
         [SerializeField] private GameObject contentParent;
 
         #if ODIN_INSPECTOR
@@ -197,6 +198,24 @@ namespace TheBunkerGames
             var storyEvent = eventQueue[currentEventIndex];
             ClearEffectEntries();
 
+            // Display challenge context (the original challenge description)
+            if (challengeContextText != null)
+            {
+                if (!string.IsNullOrEmpty(storyEvent.ChallengeContext))
+                {
+                    challengeContextText.gameObject.SetActive(true);
+                    // Show challenge title if available, otherwise just the context
+                    if (!string.IsNullOrEmpty(storyEvent.ChallengeTitle))
+                        challengeContextText.text = $"<b>{storyEvent.ChallengeTitle}</b>\n<i>{storyEvent.ChallengeContext}</i>";
+                    else
+                        challengeContextText.text = $"<i>{storyEvent.ChallengeContext}</i>";
+                }
+                else
+                {
+                    challengeContextText.gameObject.SetActive(false);
+                }
+            }
+
             if (titleText != null)
                 titleText.text = storyEvent.Title;
             else
@@ -252,6 +271,7 @@ namespace TheBunkerGames
         {
             if (titleText != null) titleText.text = "";
             if (descriptionText != null) descriptionText.text = "";
+            if (challengeContextText != null) challengeContextText.text = "";
         }
 
         // -------------------------------------------------------------------------
@@ -328,7 +348,37 @@ namespace TheBunkerGames
                 contentParent = panelTransform.gameObject;
             }
 
-            // 2. Ensure Title
+            // 2. Ensure Challenge Context Text (shows original challenge)
+            if (challengeContextText == null)
+            {
+                var contextTransform = contentParent.transform.Find("Challenge_Context_Text");
+                if (contextTransform == null)
+                {
+                    var go = new GameObject("Challenge_Context_Text");
+                    go.transform.SetParent(contentParent.transform, false);
+                    var txt = go.AddComponent<TextMeshProUGUI>();
+                    txt.text = "<b>Challenge</b>\n<i>Original challenge description...</i>";
+                    txt.fontSize = 14;
+                    txt.alignment = TextAlignmentOptions.TopLeft;
+                    txt.color = new Color(0.8f, 0.8f, 0.6f, 1f); // Slightly muted yellow
+                    if (bodyFont != null) txt.font = bodyFont;
+                    txt.richText = true;
+                    
+                    var r = txt.rectTransform;
+                    r.anchorMin = new Vector2(0.05f, 0.82f);
+                    r.anchorMax = new Vector2(0.95f, 0.92f);
+                    r.offsetMin = Vector2.zero;
+                    r.offsetMax = Vector2.zero;
+                    
+                    challengeContextText = txt;
+                }
+                else
+                {
+                    challengeContextText = contextTransform.GetComponent<TextMeshProUGUI>();
+                }
+            }
+
+            // 3. Ensure Title (shifted down to make room for challenge context)
             if (titleText == null)
             {
                 var titleTransform = contentParent.transform.Find("Title_Text");
@@ -345,8 +395,8 @@ namespace TheBunkerGames
                     if (titleFont != null) txt.font = titleFont;
                     
                     var r = txt.rectTransform;
-                    r.anchorMin = new Vector2(0, 0.85f);
-                    r.anchorMax = new Vector2(1, 1);
+                    r.anchorMin = new Vector2(0, 0.72f); // Shifted down from 0.85
+                    r.anchorMax = new Vector2(1, 0.82f);
                     r.offsetMin = Vector2.zero;
                     r.offsetMax = Vector2.zero;
                     

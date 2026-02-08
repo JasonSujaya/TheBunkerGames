@@ -76,7 +76,7 @@ namespace TheBunkerGames
 
             LLMManager.Instance.QuickChat(
                 userPrompt,
-                (response) => HandleLLMResponse(response, category, playerInput, itemsUsed, onComplete),
+                (response) => HandleLLMResponse(response, category, challenge, playerInput, itemsUsed, familyTarget, onComplete),
                 (error) => HandleLLMError(error, category, playerInput, itemsUsed, onComplete),
                 systemPrompt,
                 useJsonMode
@@ -312,8 +312,10 @@ namespace TheBunkerGames
         private void HandleLLMResponse(
             string response,
             PlayerActionCategory category,
+            PlayerActionChallenge challenge,
             string playerInput,
             List<string> itemsUsed,
+            string familyTarget,
             Action<PlayerActionResult> onComplete)
         {
             if (string.IsNullOrEmpty(response))
@@ -344,6 +346,16 @@ namespace TheBunkerGames
                 var errorResult = CreateErrorResult(category, playerInput, itemsUsed, "Failed to parse story event JSON.");
                 onComplete?.Invoke(errorResult);
                 return;
+            }
+
+            // Set challenge context so UI can display the original challenge
+            if (challenge != null)
+            {
+                storyEvent.ChallengeTitle = challenge.Title;
+                // Get the description (with family target substitution for family requests)
+                storyEvent.ChallengeContext = category == PlayerActionCategory.FamilyRequest && !string.IsNullOrEmpty(familyTarget)
+                    ? challenge.GetDescription(familyTarget)
+                    : challenge.Description;
             }
 
             if (enableDebugLogs)

@@ -28,6 +28,23 @@ namespace TheBunkerGames
         public List<LLMStoryChoice> Choices = new List<LLMStoryChoice>();
 
         // -------------------------------------------------------------------------
+        // Runtime Context (not from JSON, set by code)
+        // -------------------------------------------------------------------------
+        /// <summary>
+        /// The original challenge title (e.g., "Jammed Air Vent").
+        /// Set at runtime when creating the story event result.
+        /// </summary>
+        [JsonIgnore]
+        public string ChallengeTitle;
+
+        /// <summary>
+        /// The original challenge description so players remember what they were responding to.
+        /// Set at runtime when creating the story event result.
+        /// </summary>
+        [JsonIgnore]
+        public string ChallengeContext;
+
+        // -------------------------------------------------------------------------
         // Parsing
         // -------------------------------------------------------------------------
         /// <summary>
