@@ -366,6 +366,9 @@ namespace TheBunkerGames
             nameText.alignment = TextAlignmentOptions.TopLeft;
             nameText.color = detailTextColor;
             nameText.fontStyle = FontStyles.Bold;
+            nameText.enableAutoSizing = true;
+            nameText.fontSizeMin = 16;
+            nameText.fontSizeMax = 32;
             if (titleFont != null) nameText.font = titleFont;
             detailNameText = nameText;
 
@@ -421,6 +424,9 @@ namespace TheBunkerGames
             bioText.fontSize = 20;
             bioText.alignment = TextAlignmentOptions.TopLeft;
             bioText.color = detailTextColor;
+            bioText.enableAutoSizing = true;
+            bioText.fontSizeMin = 12;
+            bioText.fontSizeMax = 26;
             if (subtitleFont != null) bioText.font = subtitleFont;
             detailBioText = bioText;
         }
