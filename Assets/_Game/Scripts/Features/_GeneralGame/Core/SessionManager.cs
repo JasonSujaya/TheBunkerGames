@@ -33,9 +33,11 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Public Methods
         // -------------------------------------------------------------------------
+#if ODIN_INSPECTOR
         [Title("Session Controls")]
         [Button("Start New Run", ButtonSizes.Large)]
         [GUIColor(0.2f, 0.8f, 0.2f)] // Kept green as it's a primary action
+#endif
         public void StartNewRun()
         {
             Debug.Log("[SessionManager] Starting new run...");
@@ -53,8 +55,10 @@ namespace TheBunkerGames
             // 2. Future: Load Scene, Reset Audio, etc.
         }
 
+#if ODIN_INSPECTOR
         [Button("Give Up / End Run", ButtonSizes.Medium)]
         [GUIColor(0.8f, 0.2f, 0.2f)] // Red for destructive action
+#endif
         public void GiveUpRun()
         {
             if (GameManager.Instance != null && !GameManager.Instance.IsGameOver)
