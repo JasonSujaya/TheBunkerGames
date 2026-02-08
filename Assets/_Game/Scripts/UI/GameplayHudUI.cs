@@ -52,6 +52,11 @@ namespace TheBunkerGames
         #endif
         [SerializeField] private PlayerActionUI playerActionUI;
 
+        #if ODIN_INSPECTOR
+        [Title("Family Body Slots (drag scene GameObjects with Image)")]
+        #endif
+        [SerializeField] private Image[] familyBodySlots = new Image[3];
+
         // -------------------------------------------------------------------------
         // Visual Assets (drag & drop in Inspector)
         // -------------------------------------------------------------------------
@@ -770,6 +775,7 @@ namespace TheBunkerGames
             CacheReferences();
             WireButtons();
             PopulateCharacterList();
+            RefreshFamilyBodies();
             UpdateDayDisplay();
             UpdateResourceDisplay();
             if (enableDebugLogs) Debug.Log("[GameplayHudUI] Shown.");
@@ -892,6 +898,70 @@ namespace TheBunkerGames
             foreach (var d in FamilyManager.Instance.DefaultFamilyProfile.DefaultFamilyMembers)
                 if (d != null && d.CharacterName == characterName && d.Portrait != null) return d.Portrait;
             return null;
+        }
+
+        private Sprite FindBodyImage(string characterName)
+        {
+            if (FamilyManager.Instance == null || FamilyManager.Instance.DefaultFamilyProfile == null) return null;
+            foreach (var d in FamilyManager.Instance.DefaultFamilyProfile.DefaultFamilyMembers)
+                if (d != null && d.CharacterName == characterName && d.BodyImage != null) return d.BodyImage;
+            return null;
+        }
+
+        /// <summary>
+        /// Updates the family body slot Images with the body sprites from the current family members.
+        /// Slots are matched by index: slot 0 = first family member, slot 1 = second, etc.
+        /// </summary>
+        public void RefreshFamilyBodies()
+        {
+            if (familyBodySlots == null) return;
+
+            // Get family from runtime or editor profile
+            List<CharacterDefinitionSO> defs = null;
+            List<CharacterData> runtimeFamily = null;
+
+            if (FamilyManager.Instance != null)
+            {
+                runtimeFamily = FamilyManager.Instance.FamilyMembers;
+                if (FamilyManager.Instance.DefaultFamilyProfile != null)
+                    defs = FamilyManager.Instance.DefaultFamilyProfile.DefaultFamilyMembers;
+            }
+            else
+            {
+                // Editor fallback
+                var fm = FindFirstObjectByType<FamilyManager>();
+                if (fm != null && fm.DefaultFamilyProfile != null)
+                    defs = fm.DefaultFamilyProfile.DefaultFamilyMembers;
+            }
+
+            for (int i = 0; i < familyBodySlots.Length; i++)
+            {
+                if (familyBodySlots[i] == null) continue;
+
+                Sprite body = null;
+
+                // Try runtime family first
+                if (runtimeFamily != null && i < runtimeFamily.Count)
+                    body = FindBodyImage(runtimeFamily[i].Name);
+
+                // Fallback to definition
+                if (body == null && defs != null && i < defs.Count && defs[i] != null)
+                    body = defs[i].BodyImage;
+
+                if (body != null)
+                {
+                    familyBodySlots[i].sprite = body;
+                    familyBodySlots[i].color = Color.white;
+                    familyBodySlots[i].preserveAspect = true;
+                    familyBodySlots[i].gameObject.SetActive(true);
+                }
+                else
+                {
+                    familyBodySlots[i].gameObject.SetActive(false);
+                }
+            }
+
+            if (enableDebugLogs) Debug.Log("[GameplayHudUI] Family bodies refreshed.");
         }
 
         // =====================================================================
@@ -1097,6 +1167,9 @@ namespace TheBunkerGames
         [Button("Show",  ButtonSizes.Medium)] private void Debug_Show()    => Show();
         [Button("Hide",  ButtonSizes.Medium)] private void Debug_Hide()    => Hide();
         [Button("Refresh Characters", ButtonSizes.Medium)] private void Debug_Refresh() => PopulateCharacterList();
+        [Button("Refresh Family Bodies", ButtonSizes.Medium)]
+        [GUIColor(0.4f, 0.8f, 1f)]
+        private void Debug_RefreshBodies() => RefreshFamilyBodies();
         #endif
     }
 }
