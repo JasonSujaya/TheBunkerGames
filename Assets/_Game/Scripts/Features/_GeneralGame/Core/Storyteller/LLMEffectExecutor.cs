@@ -53,7 +53,7 @@ namespace TheBunkerGames
         [SerializeField] private float maxThirstChange = 40f;
         
         [Header("Resource Effects")]  
-        [SerializeField] private int minResourceChange = 1;
+        [SerializeField] private int minResourceChange = 5;
         [SerializeField] private int maxResourceChange = 10;
 
         // -------------------------------------------------------------------------
@@ -368,7 +368,8 @@ namespace TheBunkerGames
                 // If not found, create a generic item via AIItemCreator
                 if (itemData == null && AIItemCreator.Instance != null)
                 {
-                    itemData = AIItemCreator.Instance.CreateItem(resourceType, itemType);
+                    string description = $"AI-granted {resourceType} resource";
+                    itemData = AIItemCreator.Instance.CreateRuntimeItem(resourceType, description, itemType);
                 }
                 
                 if (itemData != null)
