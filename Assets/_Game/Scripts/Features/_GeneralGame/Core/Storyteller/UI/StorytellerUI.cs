@@ -14,12 +14,17 @@ namespace TheBunkerGames
         [SerializeField] private TextMeshProUGUI titleText;
         [SerializeField] private TextMeshProUGUI descriptionText;
         [SerializeField] private GameObject contentParent;
-        
+
         [Header("Interaction")]
         [SerializeField] private Button closeButton;
         [SerializeField] private Button continueButton;
         [SerializeField] private TMP_InputField inputField;
-        
+
+        [Header("Effect Display")]
+        [SerializeField] private Transform effectsContainer;
+        [SerializeField] private EffectDisplayEntry effectEntryPrefab;
+        [SerializeField] private EffectIconDatabaseSO effectIconDatabase;
+
         [SerializeField] private bool autoToggleVisibility = true;
 
         private void Awake()
@@ -35,11 +40,13 @@ namespace TheBunkerGames
         private void OnEnable()
         {
             StorytellerManager.OnStoryEventReceived += ShowEvent;
+            LLMEffectExecutor.OnEffectExecuted += ShowEffectEntry;
         }
 
         private void OnDisable()
         {
             StorytellerManager.OnStoryEventReceived -= ShowEvent;
+            LLMEffectExecutor.OnEffectExecuted -= ShowEffectEntry;
         }
 
         // -------------------------------------------------------------------------
@@ -52,6 +59,9 @@ namespace TheBunkerGames
         {
             if (storyEvent != null)
             {
+                // Clear previous effect entries when a new event arrives
+                ClearEffectEntries();
+
                 if (titleText != null)
                     titleText.text = storyEvent.Title;
                 else
@@ -62,7 +72,7 @@ namespace TheBunkerGames
                 else
                     Debug.LogWarning("[StorytellerUI] DescriptionText is missing!");
 
-                if (contentParent != null && autoToggleVisibility) 
+                if (contentParent != null && autoToggleVisibility)
                     contentParent.SetActive(true);
             }
             else
@@ -77,9 +87,10 @@ namespace TheBunkerGames
         public void Hide()
         {
             ClearText();
+            ClearEffectEntries();
             if (inputField != null) inputField.text = "";
-            
-            if (contentParent != null && autoToggleVisibility) 
+
+            if (contentParent != null && autoToggleVisibility)
                 contentParent.SetActive(false);
         }
 
@@ -87,6 +98,53 @@ namespace TheBunkerGames
         {
             if (titleText != null) titleText.text = "";
             if (descriptionText != null) descriptionText.text = "";
+        }
+
+        // -------------------------------------------------------------------------
+        // Effect Display
+        // -------------------------------------------------------------------------
+        private void ShowEffectEntry(EffectDisplayData data)
+        {
+            if (effectEntryPrefab == null || effectsContainer == null) return;
+
+            // Look up character portrait
+            Sprite portrait = null;
+            if (!string.IsNullOrEmpty(data.Target) && CharacterDatabaseDataSO.Instance != null)
+            {
+                var charDef = CharacterDatabaseDataSO.Instance.GetCharacter(data.Target);
+                if (charDef != null) portrait = charDef.Portrait;
+            }
+
+            // Look up effect icon and color
+            var iconDb = effectIconDatabase != null ? effectIconDatabase : EffectIconDatabaseSO.Instance;
+            Sprite icon = null;
+            Color tintColor = data.IsPositive ? new Color(0.2f, 0.8f, 0.2f) : new Color(0.9f, 0.2f, 0.2f);
+
+            if (iconDb != null)
+            {
+                string category = EffectIconDatabaseSO.EffectTypeToCategory(data.EffectType);
+                var entry = iconDb.GetEntry(category);
+                if (entry != null)
+                {
+                    icon = entry.icon;
+                    tintColor = data.IsPositive ? entry.positiveColor : entry.negativeColor;
+                }
+                else
+                {
+                    icon = iconDb.FallbackIcon;
+                }
+            }
+
+            // Spawn entry
+            var instance = Instantiate(effectEntryPrefab, effectsContainer);
+            instance.Setup(data, portrait, icon, tintColor);
+        }
+
+        private void ClearEffectEntries()
+        {
+            if (effectsContainer == null) return;
+            for (int i = effectsContainer.childCount - 1; i >= 0; i--)
+                Destroy(effectsContainer.GetChild(i).gameObject);
         }
 
 #if ODIN_INSPECTOR
@@ -312,6 +370,47 @@ namespace TheBunkerGames
                 }
             }
             
+            // 7. Ensure Effects Container
+            if (effectsContainer == null)
+            {
+                var containerTransform = contentParent.transform.Find("Effects_Container");
+                if (containerTransform == null)
+                {
+                    var go = new GameObject("Effects_Container");
+                    go.transform.SetParent(contentParent.transform, false);
+                    go.AddComponent<UnityEngine.UI.Image>().color = new Color(0, 0, 0, 0f);
+
+                    var vlg = go.AddComponent<VerticalLayoutGroup>();
+                    vlg.padding = new RectOffset(8, 8, 4, 4);
+                    vlg.spacing = 4;
+                    vlg.childAlignment = TextAnchor.UpperLeft;
+                    vlg.childControlWidth = true;
+                    vlg.childControlHeight = false;
+                    vlg.childForceExpandWidth = true;
+                    vlg.childForceExpandHeight = false;
+
+                    var csf = go.AddComponent<ContentSizeFitter>();
+                    csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+                    var r = go.GetComponent<RectTransform>();
+                    r.anchorMin = new Vector2(0.05f, 0.2f);
+                    r.anchorMax = new Vector2(0.95f, 0.45f);
+                    r.offsetMin = Vector2.zero;
+                    r.offsetMax = Vector2.zero;
+
+                    containerTransform = go.transform;
+                }
+                effectsContainer = containerTransform;
+            }
+
+            // 8. Auto-load EffectIconDatabase from Resources if not assigned
+            if (effectIconDatabase == null)
+            {
+                effectIconDatabase = UnityEngine.Resources.Load<EffectIconDatabaseSO>("EffectIconDatabaseSO");
+                if (effectIconDatabase != null)
+                    Debug.Log("[StorytellerUI] Auto-loaded EffectIconDatabaseSO from Resources.");
+            }
+
             Debug.Log("[StorytellerUI] Auto-Setup Complete.");
         }
 #endif

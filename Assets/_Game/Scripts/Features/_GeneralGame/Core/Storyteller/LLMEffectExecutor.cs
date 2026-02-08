@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Collections.Generic;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
@@ -13,6 +14,14 @@ namespace TheBunkerGames
     public class LLMEffectExecutor : MonoBehaviour
     {
         public static LLMEffectExecutor Instance { get; private set; }
+
+        // -------------------------------------------------------------------------
+        // Events
+        // -------------------------------------------------------------------------
+        /// <summary>
+        /// Fired after each effect is executed, with display data for UI.
+        /// </summary>
+        public static event Action<EffectDisplayData> OnEffectExecuted;
 
         // -------------------------------------------------------------------------
         // Configuration - Maps intensity to actual values
@@ -193,6 +202,23 @@ namespace TheBunkerGames
         }
 
         // -------------------------------------------------------------------------
+        // Effect Display Broadcasting
+        // -------------------------------------------------------------------------
+        private void BroadcastEffect(string effectType, string target, float valueChange, bool isPositive)
+        {
+            string category = EffectIconDatabaseSO.EffectTypeToCategory(effectType);
+            var displayData = new EffectDisplayData
+            {
+                EffectType = effectType,
+                Target = target ?? "",
+                ValueChange = valueChange,
+                IsPositive = isPositive,
+                DisplayLabel = category
+            };
+            OnEffectExecuted?.Invoke(displayData);
+        }
+
+        // -------------------------------------------------------------------------
         // Private Effect Handlers
         // -------------------------------------------------------------------------
         private float IntensityToValue(int intensity, float min, float max)
@@ -249,6 +275,7 @@ namespace TheBunkerGames
                 character.ModifyHealth(amount);
                 if (enableDebugLogs)
                     Debug.Log($"[LLMEffectExecutor] Health {(positive ? "+" : "")}{amount:0.0} to '{target}' → Now: {character.Health:0.0}");
+                BroadcastEffect(positive ? "AddHP" : "ReduceHP", target, amount, positive);
             }
         }
 
@@ -263,6 +290,7 @@ namespace TheBunkerGames
                 character.ModifySanity(amount);
                 if (enableDebugLogs)
                     Debug.Log($"[LLMEffectExecutor] Sanity {(positive ? "+" : "")}{amount:0.0} to '{target}' → Now: {character.Sanity:0.0}");
+                BroadcastEffect(positive ? "AddSanity" : "ReduceSanity", target, amount, positive);
             }
         }
 
@@ -277,6 +305,7 @@ namespace TheBunkerGames
                 character.ModifyHunger(amount);
                 if (enableDebugLogs)
                     Debug.Log($"[LLMEffectExecutor] Hunger {(positive ? "+" : "")}{amount:0.0} to '{target}' → Now: {character.Hunger:0.0}");
+                BroadcastEffect(positive ? "AddHunger" : "ReduceHunger", target, amount, positive);
             }
         }
 
@@ -291,6 +320,7 @@ namespace TheBunkerGames
                 character.ModifyThirst(amount);
                 if (enableDebugLogs)
                     Debug.Log($"[LLMEffectExecutor] Thirst {(positive ? "+" : "")}{amount:0.0} to '{target}' → Now: {character.Thirst:0.0}");
+                BroadcastEffect(positive ? "AddThirst" : "ReduceThirst", target, amount, positive);
             }
         }
 
@@ -304,6 +334,7 @@ namespace TheBunkerGames
             if (enableDebugLogs)
                 Debug.Log($"[LLMEffectExecutor] Resource '{resourceType}' change: {amount:+0}");
             // TODO: Connect to InventoryManager or ResourceManager
+            BroadcastEffect(effect.EffectType, effect.Target, amount, positive);
         }
 
         private void ApplyInjury(int intensity, string target)
@@ -317,6 +348,7 @@ namespace TheBunkerGames
                 character.IsInjured = true;
                 if (enableDebugLogs)
                     Debug.Log($"[LLMEffectExecutor] Injured '{target}' for {damage:0.0} damage → HP: {character.Health:0.0}");
+                BroadcastEffect("InjureCharacter", target, -damage, false);
             }
         }
 
@@ -331,6 +363,7 @@ namespace TheBunkerGames
                 character.IsInjured = false;
                 if (enableDebugLogs)
                     Debug.Log($"[LLMEffectExecutor] Healed '{target}' for {heal:0.0} HP → HP: {character.Health:0.0}");
+                BroadcastEffect("HealCharacter", target, heal, true);
             }
         }
 
@@ -342,6 +375,7 @@ namespace TheBunkerGames
                 character.ModifyHealth(-9999f); // Lethal damage
                 if (enableDebugLogs)
                     Debug.Log($"[LLMEffectExecutor] KILLED: '{target}'");
+                BroadcastEffect("KillCharacter", target, 0, false);
             }
         }
 
@@ -368,6 +402,7 @@ namespace TheBunkerGames
                 character.ModifyHealth(-healthHit);
                 if (enableDebugLogs)
                     Debug.Log($"[LLMEffectExecutor] Infected '{target}' with {type} (severity {intensity}) → HP: {character.Health:0.0}");
+                BroadcastEffect("InfectCharacter", target, -healthHit, false);
             }
         }
 
@@ -380,6 +415,7 @@ namespace TheBunkerGames
                 character.IsInjured = false;
                 if (enableDebugLogs)
                     Debug.Log($"[LLMEffectExecutor] Cured '{target}' of all sickness and injuries.");
+                BroadcastEffect("CureCharacter", target, 0, true);
             }
         }
 
