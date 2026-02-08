@@ -26,13 +26,16 @@ namespace TheBunkerGames
         public FamilyListSO DefaultFamilyProfile => defaultFamilyProfile;
 
         /// <summary>
-        /// Clears the default profile reference at runtime. 
-        /// Use this when manually populating the family (e.g. from FamilySelectUI) 
-        /// to ensure StartNewGame doesn't accidentally spawn the defaults.
+        /// Updates the default family profile with a new list of members.
+        /// This is used by FamilySelectUI to inject the selected family into the game start flow.
         /// </summary>
-        public void ClearDefaultProfile()
+        public void UpdateDefaultFamilyProfile(List<CharacterDefinitionSO> newMembers)
         {
-            defaultFamilyProfile = null;
+            if (defaultFamilyProfile != null)
+            {
+                defaultFamilyProfile.DefaultFamilyMembers.Clear();
+                defaultFamilyProfile.DefaultFamilyMembers.AddRange(newMembers);
+            }
         }
 
         // -------------------------------------------------------------------------

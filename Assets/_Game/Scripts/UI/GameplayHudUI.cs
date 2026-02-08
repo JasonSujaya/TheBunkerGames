@@ -1037,8 +1037,21 @@ namespace TheBunkerGames
         // =====================================================================
         public void Show()
         {
-            if (canvasRoot == null) return;
-            canvasRoot.SetActive(true);
+            // Ensure the main object is active first
+            gameObject.SetActive(true);
+
+            // Fallback: If canvasRoot is missing, try to find it by name, or assume we are the root
+            if (canvasRoot == null)
+            {
+                var child = transform.Find("GameplayHudCanvas");
+                if (child != null) canvasRoot = child.gameObject;
+                else canvasRoot = gameObject; // Fallback to self
+                
+                if (enableDebugLogs) Debug.LogWarning("[GameplayHudUI] canvasRoot was null! Auto-assigned to " + canvasRoot.name);
+            }
+
+            if (canvasRoot != null) canvasRoot.SetActive(true);
+            
             WireButtons();
             PopulateCharacterList();
             RefreshFamilyBodies();

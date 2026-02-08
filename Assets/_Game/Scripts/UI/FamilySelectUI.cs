@@ -735,7 +735,22 @@ namespace TheBunkerGames
             if (gridRect != null)
                 LayoutRebuilder.ForceRebuildLayoutImmediate(gridRect);
 
-            // Apply random rotations to each card for a hand-pinned look
+            // Apply random rotations AFTER layout is fully settled (defer to end of frame)
+            StartCoroutine(ApplyCardRotationsDeferred());
+        }
+
+        /// <summary>
+        /// Applies decorative random rotations to cards after waiting for layout to fully settle.
+        /// This prevents GridLayoutGroup conflicts on initial display.
+        /// </summary>
+        private IEnumerator ApplyCardRotationsDeferred()
+        {
+            // Wait for end of frame to ensure layout is complete
+            yield return new WaitForEndOfFrame();
+            
+            // Force another layout pass just to be safe
+            Canvas.ForceUpdateCanvases();
+            
             for (int i = 0; i < portraitCards.Count; i++)
             {
                 if (portraitCards[i] == null) continue;
@@ -999,23 +1014,16 @@ namespace TheBunkerGames
 
             var selected = selectedCharacters.ToList();
 
-            // Clear existing family and add each selected character
+            // Inject selection into the Default Profile
+            // usage: GameFlowController will then spawn this profile (including items)
             if (FamilyManager.Instance != null)
             {
-                FamilyManager.Instance.ClearFamily();
-                // Workaround: Clear default profile so GameFlowController doesn't respawn it
-                FamilyManager.Instance.ClearDefaultProfile();
-
-                foreach (var charDef in selected)
-                {
-                    FamilyManager.Instance.AddCharacter(charDef);
-                }
-
-                if (enableDebugLogs) Debug.Log($"[FamilySelectUI] Spawned {selected.Count} characters into FamilyManager.");
+                FamilyManager.Instance.UpdateDefaultFamilyProfile(selected);
+                if (enableDebugLogs) Debug.Log($"[FamilySelectUI] Updated Default Profile to {selected.Count} characters.");
             }
             else
             {
-                Debug.LogWarning("[FamilySelectUI] FamilyManager.Instance is null — cannot spawn characters.");
+                Debug.LogWarning("[FamilySelectUI] FamilyManager.Instance is null!");
             }
 
             Hide();
@@ -1115,18 +1123,19 @@ namespace TheBunkerGames
 
         private IEnumerator ShakeCard(Transform cardTransform)
         {
+            // Store the card's original rotation (which includes the random "pinned" rotation)
             Quaternion originalRot = cardTransform.localRotation;
-            Vector3 originalPos = cardTransform.localPosition;
-
-            // Choose a random shake style
-            int style = UnityEngine.Random.Range(0, 3);
+            // NOTE: Do NOT store/restore localPosition - GridLayoutGroup controls position!
+            
+            // Choose a random shake style (only rotation-based to avoid layout conflicts)
+            int style = UnityEngine.Random.Range(0, 2); // 0 or 1 only - skip scale-based bounce
             float duration;
+            float elapsed = 0f;
 
             switch (style)
             {
                 case 0: // Quick jitter shake
                     duration = 0.4f;
-                    float elapsed = 0f;
                     while (elapsed < duration)
                     {
                         float t = elapsed / duration;
@@ -1140,7 +1149,6 @@ namespace TheBunkerGames
 
                 case 1: // Gentle wobble
                     duration = 0.8f;
-                    elapsed = 0f;
                     while (elapsed < duration)
                     {
                         float t = elapsed / duration;
@@ -1151,28 +1159,10 @@ namespace TheBunkerGames
                         yield return null;
                     }
                     break;
-
-                case 2: // Bounce (slight scale pulse + tilt)
-                    duration = 0.6f;
-                    elapsed = 0f;
-                    Vector3 baseScale = cardTransform.localScale;
-                    while (elapsed < duration)
-                    {
-                        float t = elapsed / duration;
-                        float scalePulse = 1f + Mathf.Sin(t * Mathf.PI * 2f) * 0.04f;
-                        float angle = Mathf.Sin(elapsed * 18f) * (1f - t) * 2f;
-                        cardTransform.localScale = baseScale * scalePulse;
-                        cardTransform.localRotation = originalRot * Quaternion.Euler(0, 0, angle);
-                        elapsed += Time.deltaTime;
-                        yield return null;
-                    }
-                    cardTransform.localScale = baseScale;
-                    break;
             }
 
-            // Reset to original
+            // Reset to original rotation only - GridLayoutGroup handles position
             cardTransform.localRotation = originalRot;
-            cardTransform.localPosition = originalPos;
         }
 
         // -------------------------------------------------------------------------
