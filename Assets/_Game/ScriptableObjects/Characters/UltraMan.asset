@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2ee0084deb024f438cd173e2f07dbf8, type: 3}
+  m_Name: UltraMan
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.CharacterDefinitionSO
+  characterName: Ultra Man
+  role: 4
+  subtype: 0
+  description: Claims to be an alien from another planet with incredible powers.
+    Wears a cape made from a bedsheet and insists on being called 'The Man of Steel
+    Nerves.' Oddly strong and weirdly good at finding things. His weakness? Anything
+    green and glowy.
+  portrait: {fileID: 0}
+  maxHealth: 100
+  maxHunger: 90
+  maxThirst: 90
+  maxSanity: 85
+  startingTraits:
+  - Super Strong
+  - Cape Wearer
+  - Allergic to Green

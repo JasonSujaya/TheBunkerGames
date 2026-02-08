@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2ee0084deb024f438cd173e2f07dbf8, type: 3}
+  m_Name: ElonTusk
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.CharacterDefinitionSO
+  characterName: Elon Tusk
+  role: 4
+  subtype: 0
+  description: A tech billionaire who arrived in a self-driving bunker pod. Won't
+    stop talking about colonizing Mars as Plan B. Keeps trying to automate everything
+    with scrap electronics. Sleeps four hours a night and posts bunker updates on
+    a dead social network.
+  portrait: {fileID: 0}
+  maxHealth: 70
+  maxHunger: 65
+  maxThirst: 65
+  maxSanity: 75
+  startingTraits:
+  - Tech Genius
+  - Sleep Deprived
+  - Visionary
