@@ -328,13 +328,71 @@ namespace TheBunkerGames
         {
             int amount = IntensityToValue(effect.Intensity, minResourceChange, maxResourceChange);
             bool positive = effect.EffectType.StartsWith("Add");
-            if (!positive) amount = -amount;
             
+            // Extract resource type from effect (e.g., "AddFood" -> "Food")
             string resourceType = effect.EffectType.Replace("Add", "").Replace("Reduce", "");
-            if (enableDebugLogs)
-                Debug.Log($"[LLMEffectExecutor] Resource '{resourceType}' change: {amount:+0}");
-            // TODO: Connect to InventoryManager or ResourceManager
-            BroadcastEffect(effect.EffectType, effect.Target, amount, positive);
+            
+            // Map resource type to item type
+            ItemType itemType = resourceType switch
+            {
+                "Food" => ItemType.Food,
+                "Water" => ItemType.Water,
+                "Supplies" => ItemType.Tools,
+                "Meds" => ItemType.Meds,
+                _ => ItemType.Junk
+            };
+
+            if (InventoryManager.Instance == null)
+            {
+                Debug.LogWarning("[LLMEffectExecutor] InventoryManager not found - cannot apply resource effect!");
+                return;
+            }
+
+            if (positive)
+            {
+                // Create or find an item and add to inventory
+                ItemData itemData = null;
+                
+                // First try ItemManager
+                if (ItemManager.Instance != null)
+                {
+                    itemData = ItemManager.Instance.GetItem(resourceType);
+                }
+                
+                // If not found, create a generic item via AIItemCreator
+                if (itemData == null && AIItemCreator.Instance != null)
+                {
+                    itemData = AIItemCreator.Instance.CreateItem(resourceType, itemType);
+                }
+                
+                if (itemData != null)
+                {
+                    InventoryManager.Instance.AddItem(itemData, amount);
+                    if (enableDebugLogs)
+                        Debug.Log($"[LLMEffectExecutor] Added {amount}x {itemData.ItemName} to inventory");
+                }
+                else
+                {
+                    // Fallback: add by ID string
+                    InventoryManager.Instance.AddItem(resourceType, amount);
+                    if (enableDebugLogs)
+                        Debug.Log($"[LLMEffectExecutor] Added {amount}x {resourceType} (generic) to inventory");
+                }
+            }
+            else
+            {
+                // Remove from inventory
+                bool removed = InventoryManager.Instance.RemoveItem(resourceType, amount);
+                if (enableDebugLogs)
+                {
+                    if (removed)
+                        Debug.Log($"[LLMEffectExecutor] Removed {amount}x {resourceType} from inventory");
+                    else
+                        Debug.LogWarning($"[LLMEffectExecutor] Failed to remove {amount}x {resourceType} - insufficient quantity");
+                }
+            }
+            
+            BroadcastEffect(effect.EffectType, effect.Target, positive ? amount : -amount, positive);
         }
 
         private void ApplyInjury(int intensity, string target)
