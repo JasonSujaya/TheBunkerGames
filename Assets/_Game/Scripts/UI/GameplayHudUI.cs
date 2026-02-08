@@ -47,6 +47,11 @@ namespace TheBunkerGames
         [SerializeField] private int canvasSortOrder = 50;
         [SerializeField] private bool enableDebugLogs = false;
 
+        #if ODIN_INSPECTOR
+        [Title("UI References")]
+        #endif
+        [SerializeField] private PlayerActionUI playerActionUI;
+
         // -------------------------------------------------------------------------
         // Visual Assets (drag & drop in Inspector)
         // -------------------------------------------------------------------------
@@ -825,7 +830,11 @@ namespace TheBunkerGames
 
             Wire("OurThingsBtn", () => { OnOurThingsClicked?.Invoke(); });
             Wire("EndDayBtn",    () => { OnEndDayClicked?.Invoke(); });
-            Wire("DiaryBtn",     () => { OnDiaryClicked?.Invoke(); });
+            Wire("DiaryBtn",     () =>
+            {
+                OnDiaryClicked?.Invoke();
+                if (playerActionUI != null) playerActionUI.Show();
+            });
         }
 
         private void WireChild(Transform parent, string childName, UnityEngine.Events.UnityAction action)

@@ -86,8 +86,6 @@ namespace TheBunkerGames
 
             if (FamilySelectUI.Instance != null)
                 FamilySelectUI.OnCharactersSelected -= HandleCharactersSelected;
-
-            GameplayHudUI.OnDiaryClicked -= HandleDiaryClicked;
         }
 
         // -------------------------------------------------------------------------
@@ -179,23 +177,6 @@ namespace TheBunkerGames
                 }
             }
 
-            // Wire Diary button to open PlayerActionUI
-            GameplayHudUI.OnDiaryClicked -= HandleDiaryClicked;
-            GameplayHudUI.OnDiaryClicked += HandleDiaryClicked;
-        }
-
-        private void HandleDiaryClicked()
-        {
-            var playerActionUI = FindFirstObjectByType<PlayerActionUI>(FindObjectsInactive.Include);
-            if (playerActionUI != null)
-            {
-                playerActionUI.Show();
-                if (enableDebugLogs) Debug.Log("[MainMenuController] Diary opened — PlayerActionUI shown.");
-            }
-            else
-            {
-                Debug.LogWarning("[MainMenuController] PlayerActionUI not found in scene!");
-            }
         }
         
         // -------------------------------------------------------------------------
