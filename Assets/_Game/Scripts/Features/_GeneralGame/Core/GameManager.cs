@@ -67,7 +67,10 @@ namespace TheBunkerGames
         public PlaceManager Places;
         public QuestManager Quests;
         public StorytellerManager Storyteller;
-        
+        public ThemeSelectUI ThemeSelect;
+        public FamilySelectUI FamilySelect;
+        public InventoryDisplayUI InventoryDisplay;
+
         public StatusReviewManager StatusReview;
         public CityExplorationManager CityExploration;
 
@@ -128,7 +131,10 @@ namespace TheBunkerGames
             if (Places == null) Places = FindFirstObjectByType<PlaceManager>();
             if (Quests == null) Quests = FindFirstObjectByType<QuestManager>();
             if (Storyteller == null) Storyteller = FindFirstObjectByType<StorytellerManager>();
-            
+            if (ThemeSelect == null) ThemeSelect = FindFirstObjectByType<ThemeSelectUI>();
+            if (FamilySelect == null) FamilySelect = FindFirstObjectByType<FamilySelectUI>();
+            if (InventoryDisplay == null) InventoryDisplay = FindFirstObjectByType<InventoryDisplayUI>();
+
             if (StatusReview == null) StatusReview = FindFirstObjectByType<StatusReviewManager>();
             if (CityExploration == null) CityExploration = FindFirstObjectByType<CityExplorationManager>();
 
