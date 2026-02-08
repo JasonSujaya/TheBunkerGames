@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
+using TMPro;
 using System;
 using System.Collections.Generic;
 #if ODIN_INSPECTOR
@@ -38,6 +39,18 @@ namespace TheBunkerGames
         [SerializeField] private bool enableDebugLogs = false;
 
         // -------------------------------------------------------------------------
+        // Visual Assets (drag & drop in Inspector)
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Visual Assets")]
+        #endif
+        [SerializeField] private TMP_FontAsset titleFont;
+        [SerializeField] private TMP_FontAsset subtitleFont;
+        [SerializeField] private Sprite buttonSprite;
+        [SerializeField] private Sprite backgroundSprite;
+        [SerializeField] private Sprite arrowSprite;
+
+        // -------------------------------------------------------------------------
         // Style
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
@@ -70,10 +83,10 @@ namespace TheBunkerGames
         private RawImage videoImage;
         private VideoPlayer videoPlayer;
         private RenderTexture videoRenderTexture;
-        private Text cardTitleText;
-        private Text detailNameText;
-        private Text detailTraitsText;
-        private Text detailBioText;
+        private TMP_Text cardTitleText;
+        private TMP_Text detailNameText;
+        private TMP_Text detailTraitsText;
+        private TMP_Text detailBioText;
         private GameObject detailPanel;
 
         // -------------------------------------------------------------------------
@@ -161,6 +174,7 @@ namespace TheBunkerGames
 
             Image bg = bannerObj.AddComponent<Image>();
             bg.color = new Color(0.25f, 0.22f, 0.18f, 0.9f);
+            if (backgroundSprite != null) { bg.sprite = backgroundSprite; bg.type = Image.Type.Sliced; }
 
             GameObject textObj = new GameObject("TitleText");
             textObj.transform.SetParent(bannerObj.transform, false);
@@ -171,13 +185,13 @@ namespace TheBunkerGames
             textRect.offsetMin = new Vector2(20, 0);
             textRect.offsetMax = new Vector2(-20, 0);
 
-            Text text = textObj.AddComponent<Text>();
+            var text = textObj.AddComponent<TextMeshProUGUI>();
             text.text = "SCENARIO SELECTION";
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = 28;
-            text.alignment = TextAnchor.MiddleCenter;
+            text.alignment = TextAlignmentOptions.Center;
             text.color = Color.white;
-            text.fontStyle = FontStyle.Bold;
+            text.fontStyle = FontStyles.Bold;
+            if (titleFont != null) text.font = titleFont;
         }
 
         private void BuildThemeCard(Transform parent)
@@ -251,16 +265,17 @@ namespace TheBunkerGames
             ttRect.offsetMin = new Vector2(15, 0);
             ttRect.offsetMax = new Vector2(-15, 0);
 
-            cardTitleText = titleTextObj.AddComponent<Text>();
-            cardTitleText.text = "SCENARIO NAME";
-            cardTitleText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            cardTitleText.fontSize = 30;
-            cardTitleText.alignment = TextAnchor.MiddleCenter;
-            cardTitleText.color = Color.white;
-            cardTitleText.fontStyle = FontStyle.Bold;
-            cardTitleText.resizeTextForBestFit = true;
-            cardTitleText.resizeTextMinSize = 18;
-            cardTitleText.resizeTextMaxSize = 36;
+            var cardTitle = titleTextObj.AddComponent<TextMeshProUGUI>();
+            cardTitle.text = "SCENARIO NAME";
+            cardTitle.fontSize = 30;
+            cardTitle.alignment = TextAlignmentOptions.Center;
+            cardTitle.color = Color.white;
+            cardTitle.fontStyle = FontStyles.Bold;
+            cardTitle.enableAutoSizing = true;
+            cardTitle.fontSizeMin = 18;
+            cardTitle.fontSizeMax = 36;
+            if (titleFont != null) cardTitle.font = titleFont;
+            cardTitleText = cardTitle;
         }
 
         private void BuildDetailPanel(Transform parent)
@@ -276,6 +291,7 @@ namespace TheBunkerGames
 
             Image bg = detailPanel.AddComponent<Image>();
             bg.color = detailPanelBg;
+            if (backgroundSprite != null) { bg.sprite = backgroundSprite; bg.type = Image.Type.Sliced; }
 
             // Name
             GameObject nameObj = new GameObject("NameLabel");
@@ -287,13 +303,14 @@ namespace TheBunkerGames
             nameRect.offsetMin = Vector2.zero;
             nameRect.offsetMax = Vector2.zero;
 
-            detailNameText = nameObj.AddComponent<Text>();
-            detailNameText.text = "NAME:";
-            detailNameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            detailNameText.fontSize = 22;
-            detailNameText.alignment = TextAnchor.UpperLeft;
-            detailNameText.color = detailTextColor;
-            detailNameText.fontStyle = FontStyle.Bold;
+            var nameText = nameObj.AddComponent<TextMeshProUGUI>();
+            nameText.text = "NAME:";
+            nameText.fontSize = 22;
+            nameText.alignment = TextAlignmentOptions.TopLeft;
+            nameText.color = detailTextColor;
+            nameText.fontStyle = FontStyles.Bold;
+            if (titleFont != null) nameText.font = titleFont;
+            detailNameText = nameText;
 
             // Traits
             GameObject traitsObj = new GameObject("TraitsLabel");
@@ -305,13 +322,14 @@ namespace TheBunkerGames
             traitsRect.offsetMin = Vector2.zero;
             traitsRect.offsetMax = Vector2.zero;
 
-            detailTraitsText = traitsObj.AddComponent<Text>();
-            detailTraitsText.text = "TRAITS:";
-            detailTraitsText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            detailTraitsText.fontSize = 18;
-            detailTraitsText.alignment = TextAnchor.UpperLeft;
-            detailTraitsText.color = detailTextColor;
-            detailTraitsText.fontStyle = FontStyle.Bold;
+            var traitsText = traitsObj.AddComponent<TextMeshProUGUI>();
+            traitsText.text = "TRAITS:";
+            traitsText.fontSize = 18;
+            traitsText.alignment = TextAlignmentOptions.TopLeft;
+            traitsText.color = detailTextColor;
+            traitsText.fontStyle = FontStyles.Bold;
+            if (subtitleFont != null) traitsText.font = subtitleFont;
+            detailTraitsText = traitsText;
 
             // Bio header
             GameObject bioHeaderObj = new GameObject("BioHeader");
@@ -323,13 +341,13 @@ namespace TheBunkerGames
             bioHeaderRect.offsetMin = Vector2.zero;
             bioHeaderRect.offsetMax = Vector2.zero;
 
-            Text bioHeaderText = bioHeaderObj.AddComponent<Text>();
-            bioHeaderText.text = "BIO:";
-            bioHeaderText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            bioHeaderText.fontSize = 18;
-            bioHeaderText.alignment = TextAnchor.MiddleLeft;
-            bioHeaderText.color = detailTextColor;
-            bioHeaderText.fontStyle = FontStyle.Bold;
+            var bioHeader = bioHeaderObj.AddComponent<TextMeshProUGUI>();
+            bioHeader.text = "BIO:";
+            bioHeader.fontSize = 18;
+            bioHeader.alignment = TextAlignmentOptions.MidlineLeft;
+            bioHeader.color = detailTextColor;
+            bioHeader.fontStyle = FontStyles.Bold;
+            if (subtitleFont != null) bioHeader.font = subtitleFont;
 
             // Bio content
             GameObject bioObj = new GameObject("BioContent");
@@ -341,12 +359,13 @@ namespace TheBunkerGames
             bioRect.offsetMin = Vector2.zero;
             bioRect.offsetMax = Vector2.zero;
 
-            detailBioText = bioObj.AddComponent<Text>();
-            detailBioText.text = "";
-            detailBioText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            detailBioText.fontSize = 16;
-            detailBioText.alignment = TextAnchor.UpperLeft;
-            detailBioText.color = detailTextColor;
+            var bioText = bioObj.AddComponent<TextMeshProUGUI>();
+            bioText.text = "";
+            bioText.fontSize = 16;
+            bioText.alignment = TextAlignmentOptions.TopLeft;
+            bioText.color = detailTextColor;
+            if (subtitleFont != null) bioText.font = subtitleFont;
+            detailBioText = bioText;
         }
 
         private void BuildNavigationArrows(Transform parent)
@@ -363,6 +382,7 @@ namespace TheBunkerGames
 
             Image leftBg = leftBtn.AddComponent<Image>();
             leftBg.color = new Color(0.3f, 0.28f, 0.25f, 0.8f);
+            if (arrowSprite != null) { leftBg.sprite = arrowSprite; leftBg.type = Image.Type.Simple; leftBg.transform.localScale = new Vector3(-1, 1, 1); }
 
             Button leftButton = leftBtn.AddComponent<Button>();
             var lColors = leftButton.colors;
@@ -377,13 +397,13 @@ namespace TheBunkerGames
             ltRect.anchorMax = Vector2.one;
             ltRect.offsetMin = Vector2.zero;
             ltRect.offsetMax = Vector2.zero;
-            Text lt = leftText.AddComponent<Text>();
-            lt.text = "<";
-            lt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var lt = leftText.AddComponent<TextMeshProUGUI>();
+            lt.text = arrowSprite == null ? "<" : "";
             lt.fontSize = 36;
-            lt.alignment = TextAnchor.MiddleCenter;
+            lt.alignment = TextAlignmentOptions.Center;
             lt.color = Color.white;
-            lt.fontStyle = FontStyle.Bold;
+            lt.fontStyle = FontStyles.Bold;
+            if (titleFont != null) lt.font = titleFont;
 
             // Right arrow
             GameObject rightBtn = new GameObject("RightArrow");
@@ -397,6 +417,7 @@ namespace TheBunkerGames
 
             Image rightBg = rightBtn.AddComponent<Image>();
             rightBg.color = new Color(0.3f, 0.28f, 0.25f, 0.8f);
+            if (arrowSprite != null) { rightBg.sprite = arrowSprite; rightBg.type = Image.Type.Simple; }
 
             Button rightButton = rightBtn.AddComponent<Button>();
             var rColors = rightButton.colors;
@@ -411,13 +432,13 @@ namespace TheBunkerGames
             rtRect.anchorMax = Vector2.one;
             rtRect.offsetMin = Vector2.zero;
             rtRect.offsetMax = Vector2.zero;
-            Text rt = rightText.AddComponent<Text>();
-            rt.text = ">";
-            rt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            var rt = rightText.AddComponent<TextMeshProUGUI>();
+            rt.text = arrowSprite == null ? ">" : "";
             rt.fontSize = 36;
-            rt.alignment = TextAnchor.MiddleCenter;
+            rt.alignment = TextAlignmentOptions.Center;
             rt.color = Color.white;
-            rt.fontStyle = FontStyle.Bold;
+            rt.fontStyle = FontStyles.Bold;
+            if (titleFont != null) rt.font = titleFont;
         }
 
         private void BuildConfirmButton(Transform parent)
@@ -431,8 +452,9 @@ namespace TheBunkerGames
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
-            Image bg = btnObj.AddComponent<Image>();
-            bg.color = new Color(0.3f, 0.28f, 0.25f, 1f);
+            Image btnBg = btnObj.AddComponent<Image>();
+            btnBg.color = new Color(0.3f, 0.28f, 0.25f, 1f);
+            if (buttonSprite != null) { btnBg.sprite = buttonSprite; btnBg.type = Image.Type.Sliced; }
 
             Button btn = btnObj.AddComponent<Button>();
             var colors = btn.colors;
@@ -451,13 +473,13 @@ namespace TheBunkerGames
             textRect.offsetMin = Vector2.zero;
             textRect.offsetMax = Vector2.zero;
 
-            Text text = textObj.AddComponent<Text>();
+            var text = textObj.AddComponent<TextMeshProUGUI>();
             text.text = "CONFIRM";
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = 24;
-            text.alignment = TextAnchor.MiddleCenter;
+            text.alignment = TextAlignmentOptions.Center;
             text.color = Color.white;
-            text.fontStyle = FontStyle.Bold;
+            text.fontStyle = FontStyles.Bold;
+            if (titleFont != null) text.font = titleFont;
         }
 
         // -------------------------------------------------------------------------
@@ -510,16 +532,16 @@ namespace TheBunkerGames
 
                 Transform cardTitle = cardTransform.Find("CardTitle/Text");
                 if (cardTitle != null)
-                    cardTitleText = cardTitle.GetComponent<Text>();
+                    cardTitleText = cardTitle.GetComponent<TMP_Text>();
             }
 
             // Detail panel
             detailPanel = panel.transform.Find("DetailPanel")?.gameObject;
             if (detailPanel != null)
             {
-                detailNameText = detailPanel.transform.Find("NameLabel")?.GetComponent<Text>();
-                detailTraitsText = detailPanel.transform.Find("TraitsLabel")?.GetComponent<Text>();
-                detailBioText = detailPanel.transform.Find("BioContent")?.GetComponent<Text>();
+                detailNameText = detailPanel.transform.Find("NameLabel")?.GetComponent<TMP_Text>();
+                detailTraitsText = detailPanel.transform.Find("TraitsLabel")?.GetComponent<TMP_Text>();
+                detailBioText = detailPanel.transform.Find("BioContent")?.GetComponent<TMP_Text>();
             }
         }
 

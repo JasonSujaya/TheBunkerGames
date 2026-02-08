@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using System;
 using System.Collections.Generic;
 #if ODIN_INSPECTOR
@@ -40,6 +41,18 @@ namespace TheBunkerGames
         [SerializeField] private bool enableDebugLogs = false;
 
         // -------------------------------------------------------------------------
+        // Visual Assets (drag & drop in Inspector)
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Visual Assets")]
+        #endif
+        [SerializeField] private TMP_FontAsset titleFont;
+        [SerializeField] private TMP_FontAsset subtitleFont;
+        [SerializeField] private Sprite buttonSprite;
+        [SerializeField] private Sprite backgroundSprite;
+        [SerializeField] private Sprite portraitFrameSprite;
+
+        // -------------------------------------------------------------------------
         // Style
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
@@ -70,9 +83,9 @@ namespace TheBunkerGames
 
         // Runtime UI references (found after auto-setup)
         private Transform portraitGridContainer;
-        private Text detailNameText;
-        private Text detailTraitsText;
-        private Text detailBioText;
+        private TMP_Text detailNameText;
+        private TMP_Text detailTraitsText;
+        private TMP_Text detailBioText;
         private Image detailPortraitImage;
         private GameObject detailPanel;
 
@@ -151,6 +164,7 @@ namespace TheBunkerGames
 
             Image bg = bannerObj.AddComponent<Image>();
             bg.color = new Color(0.25f, 0.22f, 0.18f, 0.9f);
+            if (backgroundSprite != null) { bg.sprite = backgroundSprite; bg.type = Image.Type.Sliced; }
 
             // Title text
             GameObject textObj = new GameObject("TitleText");
@@ -162,13 +176,13 @@ namespace TheBunkerGames
             textRect.offsetMin = new Vector2(20, 0);
             textRect.offsetMax = new Vector2(-20, 0);
 
-            Text text = textObj.AddComponent<Text>();
+            var text = textObj.AddComponent<TextMeshProUGUI>();
             text.text = "CHARACTER SELECTION";
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = 28;
-            text.alignment = TextAnchor.MiddleCenter;
+            text.alignment = TextAlignmentOptions.Center;
             text.color = Color.white;
-            text.fontStyle = FontStyle.Bold;
+            text.fontStyle = FontStyles.Bold;
+            if (titleFont != null) text.font = titleFont;
         }
 
         private void BuildPortraitGrid(Transform parent)
@@ -242,6 +256,7 @@ namespace TheBunkerGames
 
             Image detailBg = detailPanel.AddComponent<Image>();
             detailBg.color = detailPanelBg;
+            if (backgroundSprite != null) { detailBg.sprite = backgroundSprite; detailBg.type = Image.Type.Sliced; }
 
             // Portrait preview (top of detail panel)
             GameObject portraitPreview = new GameObject("PortraitPreview");
@@ -267,13 +282,14 @@ namespace TheBunkerGames
             nameRect.offsetMin = Vector2.zero;
             nameRect.offsetMax = Vector2.zero;
 
-            detailNameText = nameLabel.AddComponent<Text>();
-            detailNameText.text = "NAME:";
-            detailNameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            detailNameText.fontSize = 22;
-            detailNameText.alignment = TextAnchor.MiddleLeft;
-            detailNameText.color = detailTextColor;
-            detailNameText.fontStyle = FontStyle.Bold;
+            var nameText = nameLabel.AddComponent<TextMeshProUGUI>();
+            nameText.text = "NAME:";
+            nameText.fontSize = 22;
+            nameText.alignment = TextAlignmentOptions.MidlineLeft;
+            nameText.color = detailTextColor;
+            nameText.fontStyle = FontStyles.Bold;
+            if (titleFont != null) nameText.font = titleFont;
+            detailNameText = nameText;
 
             // Traits label
             GameObject traitsLabel = new GameObject("TraitsLabel");
@@ -285,13 +301,14 @@ namespace TheBunkerGames
             traitsRect.offsetMin = Vector2.zero;
             traitsRect.offsetMax = Vector2.zero;
 
-            detailTraitsText = traitsLabel.AddComponent<Text>();
-            detailTraitsText.text = "TRAITS:";
-            detailTraitsText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            detailTraitsText.fontSize = 18;
-            detailTraitsText.alignment = TextAnchor.UpperLeft;
-            detailTraitsText.color = detailTextColor;
-            detailTraitsText.fontStyle = FontStyle.Bold;
+            var traitsText = traitsLabel.AddComponent<TextMeshProUGUI>();
+            traitsText.text = "TRAITS:";
+            traitsText.fontSize = 18;
+            traitsText.alignment = TextAlignmentOptions.TopLeft;
+            traitsText.color = detailTextColor;
+            traitsText.fontStyle = FontStyles.Bold;
+            if (subtitleFont != null) traitsText.font = subtitleFont;
+            detailTraitsText = traitsText;
 
             // Bio label
             GameObject bioHeader = new GameObject("BioHeader");
@@ -303,13 +320,13 @@ namespace TheBunkerGames
             bioHeaderRect.offsetMin = Vector2.zero;
             bioHeaderRect.offsetMax = Vector2.zero;
 
-            Text bioHeaderText = bioHeader.AddComponent<Text>();
-            bioHeaderText.text = "BIO:";
-            bioHeaderText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            bioHeaderText.fontSize = 18;
-            bioHeaderText.alignment = TextAnchor.MiddleLeft;
-            bioHeaderText.color = detailTextColor;
-            bioHeaderText.fontStyle = FontStyle.Bold;
+            var bioHeaderTmp = bioHeader.AddComponent<TextMeshProUGUI>();
+            bioHeaderTmp.text = "BIO:";
+            bioHeaderTmp.fontSize = 18;
+            bioHeaderTmp.alignment = TextAlignmentOptions.MidlineLeft;
+            bioHeaderTmp.color = detailTextColor;
+            bioHeaderTmp.fontStyle = FontStyles.Bold;
+            if (subtitleFont != null) bioHeaderTmp.font = subtitleFont;
 
             // Bio text
             GameObject bioContent = new GameObject("BioContent");
@@ -321,12 +338,13 @@ namespace TheBunkerGames
             bioContentRect.offsetMin = Vector2.zero;
             bioContentRect.offsetMax = Vector2.zero;
 
-            detailBioText = bioContent.AddComponent<Text>();
-            detailBioText.text = "";
-            detailBioText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            detailBioText.fontSize = 16;
-            detailBioText.alignment = TextAnchor.UpperLeft;
-            detailBioText.color = detailTextColor;
+            var bioText = bioContent.AddComponent<TextMeshProUGUI>();
+            bioText.text = "";
+            bioText.fontSize = 16;
+            bioText.alignment = TextAlignmentOptions.TopLeft;
+            bioText.color = detailTextColor;
+            if (subtitleFont != null) bioText.font = subtitleFont;
+            detailBioText = bioText;
 
             // Start with placeholder text
             ClearDetailPanel();
@@ -343,8 +361,9 @@ namespace TheBunkerGames
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
-            Image bg = btnObj.AddComponent<Image>();
-            bg.color = new Color(0.3f, 0.28f, 0.25f, 1f);
+            Image btnBg = btnObj.AddComponent<Image>();
+            btnBg.color = new Color(0.3f, 0.28f, 0.25f, 1f);
+            if (buttonSprite != null) { btnBg.sprite = buttonSprite; btnBg.type = Image.Type.Sliced; }
 
             Button btn = btnObj.AddComponent<Button>();
             var colors = btn.colors;
@@ -364,13 +383,13 @@ namespace TheBunkerGames
             textRect.offsetMin = Vector2.zero;
             textRect.offsetMax = Vector2.zero;
 
-            Text text = textObj.AddComponent<Text>();
+            var text = textObj.AddComponent<TextMeshProUGUI>();
             text.text = "CONFIRM";
-            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             text.fontSize = 24;
-            text.alignment = TextAnchor.MiddleCenter;
+            text.alignment = TextAlignmentOptions.Center;
             text.color = Color.white;
-            text.fontStyle = FontStyle.Bold;
+            text.fontStyle = FontStyles.Bold;
+            if (titleFont != null) text.font = titleFont;
         }
 
         // -------------------------------------------------------------------------
@@ -421,9 +440,9 @@ namespace TheBunkerGames
             if (detailPanel != null)
             {
                 detailPortraitImage = detailPanel.transform.Find("PortraitPreview")?.GetComponent<Image>();
-                detailNameText = detailPanel.transform.Find("NameLabel")?.GetComponent<Text>();
-                detailTraitsText = detailPanel.transform.Find("TraitsLabel")?.GetComponent<Text>();
-                detailBioText = detailPanel.transform.Find("BioContent")?.GetComponent<Text>();
+                detailNameText = detailPanel.transform.Find("NameLabel")?.GetComponent<TMP_Text>();
+                detailTraitsText = detailPanel.transform.Find("TraitsLabel")?.GetComponent<TMP_Text>();
+                detailBioText = detailPanel.transform.Find("BioContent")?.GetComponent<TMP_Text>();
             }
         }
 
@@ -466,6 +485,7 @@ namespace TheBunkerGames
             // Border / background
             Image borderImg = card.AddComponent<Image>();
             borderImg.color = portraitDefaultBorder;
+            if (portraitFrameSprite != null) { borderImg.sprite = portraitFrameSprite; borderImg.type = Image.Type.Sliced; }
 
             Button btn = card.AddComponent<Button>();
             var colors = btn.colors;
@@ -518,15 +538,15 @@ namespace TheBunkerGames
             nameTextRect.offsetMin = new Vector2(4, 0);
             nameTextRect.offsetMax = new Vector2(-4, 0);
 
-            Text nameText = nameTextObj.AddComponent<Text>();
+            var nameText = nameTextObj.AddComponent<TextMeshProUGUI>();
             nameText.text = charDef.CharacterName.ToUpper();
-            nameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
             nameText.fontSize = 12;
-            nameText.alignment = TextAnchor.MiddleCenter;
+            nameText.alignment = TextAlignmentOptions.Center;
             nameText.color = Color.white;
-            nameText.resizeTextForBestFit = true;
-            nameText.resizeTextMinSize = 8;
-            nameText.resizeTextMaxSize = 14;
+            nameText.enableAutoSizing = true;
+            nameText.fontSizeMin = 8;
+            nameText.fontSizeMax = 14;
+            if (subtitleFont != null) nameText.font = subtitleFont;
 
             return card;
         }
