@@ -12,12 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d17df5043c4449d38781492409155c7, type: 3}
   m_Name: Frostpunk
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.GameThemeSO
-  themeName: 
-  description: 
+  themeName: Frostpunk
+  description: Eternal winter has fallen. Resources are scarce, and the cold is your creative enemy. Surviving the generator failure is priority one.
   themeIcon: {fileID: 0}
-  themeColor: {r: 1, g: 1, b: 1, a: 1}
+  themeColor: {r: 0.2, g: 0.6, b: 0.8, a: 1}
   themeType: 2
-  traits: []
+  traits:
+  - Cold
+  - Scarce Resources
+  - Generator Failure
   previewVideo: {fileID: 32900000, guid: 60cae199c60a94264bc856238e56f56c, type: 3}
   eventSchedule: {fileID: 0}
   storyPrompt: {fileID: 0}

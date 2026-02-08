@@ -14,4 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.FamilyListSO
   DefaultFamilyMembers:
   - {fileID: 11400000, guid: 85c2d10aa0f214c6db1478c527484ad2, type: 2}
-  StartingItems: []
+  StartingItems:
+  - Item: {fileID: 11400000, guid: 2fd80d194305b484fb50aadc8d78e6f3, type: 2}
+    Quantity: 10
+  - Item: {fileID: 11400000, guid: 3525501b8f773461ea1351e792f68c4b, type: 2}
+    Quantity: 10

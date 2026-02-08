@@ -153,6 +153,14 @@ namespace TheBunkerGames
 
         private void StartGame()
         {
+            // If we are already in the target scene (or single-scene setup), skipping load prevents destroying FamilyManager
+            if (SceneManager.GetActiveScene().name == gameSceneName)
+            {
+                if (enableDebugLogs) Debug.Log($"[MainMenuController] Already in '{gameSceneName}'. Skipping load and starting flow directly.");
+                StartGameFlow();
+                return;
+            }
+
             if (Application.CanStreamedLevelBeLoaded(gameSceneName))
             {
                 SceneManager.LoadScene(gameSceneName);
@@ -160,23 +168,26 @@ namespace TheBunkerGames
             else
             {
                 Debug.LogWarning($"[MainMenuController] Scene '{gameSceneName}' cannot be loaded. Using single-scene fallback.");
+                StartGameFlow();
+            }
+        }
 
-                // Single-scene architecture: spawn family, then show HUD
-                var flow = FindFirstObjectByType<GameFlowController>();
-                if (flow != null)
-                {
-                    flow.StartNewGame();
-                    if (enableDebugLogs) Debug.Log("[MainMenuController] GameFlowController.StartNewGame() called — family spawned.");
-                }
-
-                // Show HUD and populate with the freshly spawned family
-                if (gameplayHUD != null)
-                {
-                    gameplayHUD.Show();
-                    if (enableDebugLogs) Debug.Log("[MainMenuController] Gameplay HUD shown and populated with family.");
-                }
+        private void StartGameFlow()
+        {
+            // Single-scene architecture: spawn family (if needed), then show HUD
+            var flow = FindFirstObjectByType<GameFlowController>();
+            if (flow != null)
+            {
+                flow.StartNewGame();
+                if (enableDebugLogs) Debug.Log("[MainMenuController] GameFlowController.StartNewGame() called.");
             }
 
+            // Show HUD and populate with the freshly spawned family
+            if (gameplayHUD != null)
+            {
+                gameplayHUD.Show();
+                if (enableDebugLogs) Debug.Log("[MainMenuController] Gameplay HUD shown.");
+            }
         }
         
         // -------------------------------------------------------------------------

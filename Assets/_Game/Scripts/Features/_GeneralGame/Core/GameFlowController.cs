@@ -56,7 +56,16 @@ namespace TheBunkerGames
             // Spawn Default Family & Items (One-time Setup)
             if (gameManager.Family != null)
             {
-                gameManager.Family.SpawnDefaultFamily();
+                // Only spawn default family if none exists (preserves FamilySelectUI selection)
+                if (gameManager.Family.AliveCount == 0)
+                {
+                    gameManager.Family.SpawnDefaultFamily();
+                }
+                else
+                {
+                    if (enableDebugLogs) Debug.Log($"[Sim] Family already populated ({gameManager.Family.AliveCount} members). Skipping default spawn.");
+                }
+
                 // Sync only family first
                 gameManager.SessionData.UpdateSync(gameManager.Family);
 

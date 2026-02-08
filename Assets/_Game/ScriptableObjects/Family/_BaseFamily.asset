@@ -10,12 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 45a3c03f07aec4bf29492f1663969fb1, type: 3}
-  m_Name: MortySanchezFamily
+  m_Name: _BaseFamily
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.FamilyListSO
-  DefaultFamilyMembers:
-  - {fileID: 11400000, guid: 488704143e1694fa981aa600f2f5004c, type: 2}
+  DefaultFamilyMembers: []
   StartingItems:
   - Item: {fileID: 11400000, guid: 2fd80d194305b484fb50aadc8d78e6f3, type: 2}
-    Quantity: 50
+    Quantity: 10
   - Item: {fileID: 11400000, guid: 3525501b8f773461ea1351e792f68c4b, type: 2}
-    Quantity: 50
+    Quantity: 10

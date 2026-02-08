@@ -1395,6 +1395,128 @@ MonoBehaviour:
         \"intensity\": 10,\n          \"target\": \"Morty Sanchex\"\n        },\n       
         {\n          \"effectType\": \"AddHunger\",\n          \"intensity\": 5,\n         
         \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Drink
+      Title: Contaminated Water
+      Description: Morty Sanchex drinks the contaminated water and immediately feels
+        nauseous. The water was indeed contaminated, and now Morty is feeling the
+        effects.
+      EffectCount: 2
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 18:28:01
+      FullEventJson: "{\n  \"title\": \"Contaminated Water\",\n  \"description\":
+        \"Morty Sanchex drinks the contaminated water and immediately feels nauseous.
+        The water was indeed contaminated, and now Morty is feeling the effects.\",\n 
+        \"effects\": [\n    {\n      \"effectType\": \"ReduceWater\",\n      \"intensity\":
+        5,\n      \"target\": \"\"\n    },\n    {\n      \"effectType\": \"InfectCharacter\",\n     
+        \"intensity\": 3,\n      \"target\": \"Morty Sanchex\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Use medical supplies to treat Morty\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"ReduceSupplies\",\n         
+        \"intensity\": 3,\n          \"target\": \"\"\n        },\n        {\n         
+        \"effectType\": \"CureCharacter\",\n          \"intensity\": 3,\n         
+        \"target\": \"Morty Sanchex\"\n        }\n      ]\n    },\n    {\n      \"text\":
+        \"Search for clean water sources\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"AddThirst\",\n          \"intensity\": 5,\n          \"target\":
+        \"Morty Sanchex\"\n        },\n        {\n          \"effectType\": \"AddWater\",\n         
+        \"intensity\": 10,\n          \"target\": \"\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Ignore the issue and hope for the best\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        5,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n 
+        ]\n}"
+    - PlayerAction: Clean the floor
+      Title: Ignored Pleas
+      Description: You decide to ignore the stranger's pleas and focus on cleaning
+        the bunker floor instead. The banging eventually stops, but you hear faint
+        cries for help throughout the day. The bunker is now cleaner, but you can't
+        help but feel a sense of guilt.
+      EffectCount: 2
+      ChoiceCount: 3
+      Category: Dilemma
+      Timestamp: 18:28:05
+      FullEventJson: "{\n  \"title\": \"Ignored Pleas\",\n  \"description\": \"You
+        decide to ignore the stranger's pleas and focus on cleaning the bunker floor
+        instead. The banging eventually stops, but you hear faint cries for help
+        throughout the day. The bunker is now cleaner, but you can't help but feel
+        a sense of guilt.\",\n  \"effects\": [\n    {\n      \"effectType\": \"AddSanity\",\n     
+        \"intensity\": 5,\n      \"target\": \"Morty Sanchex\"\n    },\n    {\n     
+        \"effectType\": \"ReduceSanity\",\n      \"intensity\": 10,\n      \"target\":
+        \"Morty Sanchex\"\n    }\n  ],\n  \"choices\": [\n    {\n      \"text\":
+        \"Investigate the source of the cries\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 5,\n         
+        \"target\": \"Morty Sanchex\"\n        },\n        {\n          \"effectType\":
+        \"ReduceHP\",\n          \"intensity\": 5,\n          \"target\": \"Morty
+        Sanchex\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Distract
+        yourself with a task\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 5,\n          \"target\": \"Morty
+        Sanchex\"\n        },\n        {\n          \"effectType\": \"ReduceHunger\",\n         
+        \"intensity\": 5,\n          \"target\": \"Morty Sanchex\"\n        }\n     
+        ]\n    },\n    {\n      \"text\": \"Try to sleep it off\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"AddHP\",\n          \"intensity\":
+        5,\n          \"target\": \"Morty Sanchex\"\n        },\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 5,\n         
+        \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Drink
+      Title: Unsuccessful Attempt
+      Description: Drinking doesn't help with opening the medicine cabinet. In fact,
+        drinking while frustrated only increases your thirst. You're going to need
+        a better approach to open this cabinet.
+      EffectCount: 2
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 18:37:01
+      FullEventJson: "{\n  \"title\": \"Unsuccessful Attempt\",\n  \"description\":
+        \"Drinking doesn't help with opening the medicine cabinet. In fact, drinking
+        while frustrated only increases your thirst. You're going to need a better
+        approach to open this cabinet.\",\n  \"effects\": [\n    {\n      \"effectType\":
+        \"AddThirst\",\n      \"intensity\": 10,\n      \"target\": \"Morty Sanchex\"\n   
+        },\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\":
+        5,\n      \"target\": \"Morty Sanchex\"\n    }\n  ],\n  \"choices\": [\n   
+        {\n      \"text\": \"Search for the combination\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        3,\n          \"target\": \"Morty Sanchex\"\n        },\n        {\n         
+        \"effectType\": \"AddSupplies\",\n          \"intensity\": 5,\n         
+        \"target\": \"\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Try
+        to break the lock\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceHP\",\n          \"intensity\": 5,\n          \"target\": \"Morty
+        Sanchex\"\n        },\n        {\n          \"effectType\": \"AddSupplies\",\n         
+        \"intensity\": 3,\n          \"target\": \"\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Ask Chef Ramsay for help\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        2,\n          \"target\": \"Chef Ramsay\"\n        },\n        {\n         
+        \"effectType\": \"AddSupplies\",\n          \"intensity\": 7,\n         
+        \"target\": \"\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Clean the floor
+      Title: Cleaning Distraction
+      Description: You decide to clean the floor to distract yourself from the stranger's
+        pleas. The bunker becomes more sanitary, but the noise outside continues,
+        causing stress and ignoring a potential crisis.
+      EffectCount: 3
+      ChoiceCount: 3
+      Category: Dilemma
+      Timestamp: 18:37:05
+      FullEventJson: "{\n  \"title\": \"Cleaning Distraction\",\n  \"description\":
+        \"You decide to clean the floor to distract yourself from the stranger's
+        pleas. The bunker becomes more sanitary, but the noise outside continues,
+        causing stress and ignoring a potential crisis.\",\n  \"effects\": [\n   
+        {\n      \"effectType\": \"AddSanity\",\n      \"intensity\": 5,\n      \"target\":
+        \"Morty Sanchex\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 10,\n      \"target\": \"Chef Ramsay\"\n    },\n    {\n     
+        \"effectType\": \"ReduceSupplies\",\n      \"intensity\": 3,\n      \"target\":
+        \"\"\n    }\n  ],\n  \"choices\": [\n    {\n      \"text\": \"Go back and
+        open the door\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceSanity\",\n          \"intensity\": 5,\n          \"target\": \"Morty
+        Sanchex\"\n        },\n        {\n          \"effectType\": \"AddHP\",\n         
+        \"intensity\": 10,\n          \"target\": \"Chef Ramsay\"\n        }\n     
+        ]\n    },\n    {\n      \"text\": \"Stay quiet and hope they go away\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 5,\n          \"target\": \"Chef Ramsay\"\n        },\n       
+        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        10,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Yell through the door to go away\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        5,\n          \"target\": \"Chef Ramsay\"\n        },\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 5,\n         
+        \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n  ]\n}"
   - DayNumber: 3
     Events:
     - PlayerAction: Search the city
@@ -1438,5 +1560,5 @@ MonoBehaviour:
         \"intensity\": 3,\n          \"target\": \"Father\"\n        },\n       
         {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 3,\n         
         \"target\": \"Mother\"\n        }\n      ]\n    }\n  ]\n}"
-  totalEvents: 41
-  lastUpdated: 2026-02-08 17:24:45
+  totalEvents: 45
+  lastUpdated: 2026-02-08 18:37:05

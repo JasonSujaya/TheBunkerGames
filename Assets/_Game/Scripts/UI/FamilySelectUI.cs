@@ -1003,6 +1003,8 @@ namespace TheBunkerGames
             if (FamilyManager.Instance != null)
             {
                 FamilyManager.Instance.ClearFamily();
+                // Workaround: Clear default profile so GameFlowController doesn't respawn it
+                FamilyManager.Instance.ClearDefaultProfile();
 
                 foreach (var charDef in selected)
                 {
