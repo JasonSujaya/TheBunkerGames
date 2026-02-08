@@ -52,6 +52,7 @@ namespace TheBunkerGames
         [SerializeField] private Sprite notesSprite;
         [SerializeField] private Sprite titleBannerSprite;
         [SerializeField] private Sprite arrowSprite;
+        [SerializeField] private Sprite videoFrameSprite;
 
         // -------------------------------------------------------------------------
         // Style
@@ -171,20 +172,14 @@ namespace TheBunkerGames
                 }
             }
 
-            // ---- Title Banner ----
-            BuildTitleBanner(panel.transform);
-
-            // ---- Theme Card (left side, large) ----
+            // ---- Theme Card (left side, large — includes title banner) ----
             BuildThemeCard(panel.transform);
 
-            // ---- Detail Panel / Notes (right side) ----
+            // ---- Detail Panel / Notes (right side — includes confirm button) ----
             BuildDetailPanel(panel.transform);
 
             // ---- Navigation Arrows ----
             BuildNavigationArrows(panel.transform);
-
-            // ---- Confirm Button ----
-            BuildConfirmButton(panel.transform);
 
             if (enableDebugLogs) Debug.Log("[ThemeSelectUI] Auto Setup complete.");
 
@@ -196,65 +191,20 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // UI Builders
         // -------------------------------------------------------------------------
-        private void BuildTitleBanner(Transform parent)
-        {
-            GameObject bannerObj = new GameObject("TitleBanner");
-            bannerObj.transform.SetParent(parent, false);
-
-            // Positioned above the card, left-aligned
-            RectTransform rect = bannerObj.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.08f, 0.88f);
-            rect.anchorMax = new Vector2(0.48f, 0.98f);
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-
-            Image bg = bannerObj.AddComponent<Image>();
-            if (titleBannerSprite != null)
-            {
-                bg.sprite = titleBannerSprite;
-                bg.type = Image.Type.Sliced;
-                bg.color = Color.white;
-            }
-            else
-            {
-                bg.color = new Color(0.25f, 0.22f, 0.18f, 0.9f);
-            }
-
-            GameObject textObj = new GameObject("TitleText");
-            textObj.transform.SetParent(bannerObj.transform, false);
-
-            RectTransform textRect = textObj.AddComponent<RectTransform>();
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = new Vector2(20, 0);
-            textRect.offsetMax = new Vector2(-20, 0);
-
-            var text = textObj.AddComponent<TextMeshProUGUI>();
-            text.text = "SCENARIO SELECTION";
-            text.fontSize = 48;
-            text.alignment = TextAlignmentOptions.Center;
-            text.color = Color.white;
-            text.fontStyle = FontStyles.Bold;
-            text.enableAutoSizing = true;
-            text.fontSizeMin = 24;
-            text.fontSizeMax = 56;
-            if (titleFont != null) text.font = titleFont;
-        }
-
         private void BuildThemeCard(Transform parent)
         {
-            // The card sits on the left ~60% of the screen
-            // Reference layout: card takes roughly left 62% of width, ~10%-85% height
+            // Card frame extends from bottom to near-top to encompass everything
+            // including the title banner which sits at the top of the card
             GameObject cardObj = new GameObject("ThemeCard");
             cardObj.transform.SetParent(parent, false);
 
             RectTransform cardRect = cardObj.AddComponent<RectTransform>();
-            cardRect.anchorMin = new Vector2(0.04f, 0.04f);
-            cardRect.anchorMax = new Vector2(0.58f, 0.87f);
+            cardRect.anchorMin = new Vector2(0.03f, 0.04f);
+            cardRect.anchorMax = new Vector2(0.57f, 0.96f);
             cardRect.offsetMin = Vector2.zero;
             cardRect.offsetMax = Vector2.zero;
 
-            // Card frame (polaroid style white border)
+            // Card frame (weathered paper texture)
             Image cardBorder = cardObj.AddComponent<Image>();
             if (cardFrameSprite != null)
             {
@@ -267,14 +217,77 @@ namespace TheBunkerGames
                 cardBorder.color = cardBorderColor;
             }
 
-            // --- Media area (video/image fills most of the card) ---
-            // In the reference: image takes up ~top 80% of card, name at bottom ~20%
+            // --- Title Banner (inside the card, at the top) ---
+            GameObject bannerObj = new GameObject("TitleBanner");
+            bannerObj.transform.SetParent(cardObj.transform, false);
+
+            RectTransform bannerRect = bannerObj.AddComponent<RectTransform>();
+            bannerRect.anchorMin = new Vector2(0.06f, 0.88f);
+            bannerRect.anchorMax = new Vector2(0.70f, 0.98f);
+            bannerRect.offsetMin = Vector2.zero;
+            bannerRect.offsetMax = Vector2.zero;
+
+            Image bannerBg = bannerObj.AddComponent<Image>();
+            if (titleBannerSprite != null)
+            {
+                bannerBg.sprite = titleBannerSprite;
+                bannerBg.type = Image.Type.Sliced;
+                bannerBg.color = Color.white;
+            }
+            else
+            {
+                bannerBg.color = new Color(0.25f, 0.22f, 0.18f, 0.9f);
+            }
+
+            GameObject bannerTextObj = new GameObject("TitleText");
+            bannerTextObj.transform.SetParent(bannerObj.transform, false);
+
+            RectTransform btRect = bannerTextObj.AddComponent<RectTransform>();
+            btRect.anchorMin = Vector2.zero;
+            btRect.anchorMax = Vector2.one;
+            btRect.offsetMin = new Vector2(15, 0);
+            btRect.offsetMax = new Vector2(-15, 0);
+
+            var bannerText = bannerTextObj.AddComponent<TextMeshProUGUI>();
+            bannerText.text = "SCENARIO SELECTION";
+            bannerText.fontSize = 48;
+            bannerText.alignment = TextAlignmentOptions.Center;
+            bannerText.color = Color.white;
+            bannerText.fontStyle = FontStyles.Bold;
+            bannerText.enableAutoSizing = true;
+            bannerText.fontSizeMin = 20;
+            bannerText.fontSizeMax = 48;
+            if (titleFont != null) bannerText.font = titleFont;
+
+            // --- White video frame (container for the video) ---
+            GameObject videoFrame = new GameObject("VideoFrame");
+            videoFrame.transform.SetParent(cardObj.transform, false);
+
+            RectTransform frameRect = videoFrame.AddComponent<RectTransform>();
+            frameRect.anchorMin = new Vector2(0.05f, 0.14f);
+            frameRect.anchorMax = new Vector2(0.95f, 0.86f);
+            frameRect.offsetMin = Vector2.zero;
+            frameRect.offsetMax = Vector2.zero;
+
+            Image frameImg = videoFrame.AddComponent<Image>();
+            if (videoFrameSprite != null)
+            {
+                frameImg.sprite = videoFrameSprite;
+                frameImg.type = Image.Type.Sliced;
+                frameImg.color = Color.white;
+            }
+            else
+            {
+                frameImg.color = Color.white;
+            }
+
+            // --- Media area (video/image inside the white frame) ---
             GameObject mediaArea = new GameObject("MediaArea");
-            mediaArea.transform.SetParent(cardObj.transform, false);
+            mediaArea.transform.SetParent(videoFrame.transform, false);
 
             RectTransform mediaRect = mediaArea.AddComponent<RectTransform>();
-            mediaRect.anchorMin = new Vector2(0.04f, 0.15f);
-            mediaRect.anchorMax = new Vector2(0.96f, 0.96f);
+            mediaRect.anchorMin = new Vector2(0.02f, 0.03f);
+            mediaRect.anchorMax = new Vector2(0.98f, 0.97f);
             mediaRect.offsetMin = Vector2.zero;
             mediaRect.offsetMax = Vector2.zero;
 
@@ -303,8 +316,8 @@ namespace TheBunkerGames
             titleArea.transform.SetParent(cardObj.transform, false);
 
             RectTransform titleRect = titleArea.AddComponent<RectTransform>();
-            titleRect.anchorMin = new Vector2(0.04f, 0.01f);
-            titleRect.anchorMax = new Vector2(0.96f, 0.15f);
+            titleRect.anchorMin = new Vector2(0.05f, 0.01f);
+            titleRect.anchorMax = new Vector2(0.95f, 0.14f);
             titleRect.offsetMin = Vector2.zero;
             titleRect.offsetMax = Vector2.zero;
 
@@ -331,14 +344,13 @@ namespace TheBunkerGames
 
         private void BuildDetailPanel(Transform parent)
         {
-            // Notes panel on the right side — notebook paper style
-            // Reference: right ~35% of screen, slightly overlapping vertically
+            // Notes panel on the right side — smaller notebook paper
             GameObject detailObj = new GameObject("DetailPanel");
             detailObj.transform.SetParent(parent, false);
 
             RectTransform detailRect = detailObj.AddComponent<RectTransform>();
-            detailRect.anchorMin = new Vector2(0.60f, 0.06f);
-            detailRect.anchorMax = new Vector2(0.97f, 0.92f);
+            detailRect.anchorMin = new Vector2(0.60f, 0.04f);
+            detailRect.anchorMax = new Vector2(0.97f, 0.88f);
             detailRect.offsetMin = Vector2.zero;
             detailRect.offsetMax = Vector2.zero;
 
@@ -354,12 +366,12 @@ namespace TheBunkerGames
                 detailBg.color = detailPanelBg;
             }
 
-            // Content container with padding
+            // Content container with padding (above confirm button)
             GameObject contentObj = new GameObject("Content");
             contentObj.transform.SetParent(detailObj.transform, false);
 
             RectTransform contentRect = contentObj.AddComponent<RectTransform>();
-            contentRect.anchorMin = new Vector2(0.08f, 0.05f);
+            contentRect.anchorMin = new Vector2(0.08f, 0.14f);
             contentRect.anchorMax = new Vector2(0.92f, 0.95f);
             contentRect.offsetMin = Vector2.zero;
             contentRect.offsetMax = Vector2.zero;
@@ -375,22 +387,25 @@ namespace TheBunkerGames
             vlg.padding = new RectOffset(5, 5, 10, 10);
 
             // --- NAME Section ---
-            BuildDetailLabel(contentObj.transform, "NameLabel", "NAME:", 32);
-            BuildDetailValue(contentObj.transform, "NameValue", "ZOMBIE APOCALYPSE", 28, 45);
+            BuildDetailLabel(contentObj.transform, "NameLabel", "NAME:", 30);
+            BuildDetailValue(contentObj.transform, "NameValue", "ZOMBIE APOCALYPSE", 26, 40);
 
             // Spacer
-            BuildSpacer(contentObj.transform, 10);
+            BuildSpacer(contentObj.transform, 8);
 
             // --- TRAITS Section ---
-            BuildDetailLabel(contentObj.transform, "TraitsLabel", "TRAITS:", 32);
-            BuildDetailValue(contentObj.transform, "TraitsValue", "SCAVENGER\nMELEE EXPERT", 26, 100);
+            BuildDetailLabel(contentObj.transform, "TraitsLabel", "TRAITS:", 30);
+            BuildDetailValue(contentObj.transform, "TraitsValue", "SCAVENGER\nMELEE EXPERT", 24, 70);
 
             // Spacer
-            BuildSpacer(contentObj.transform, 10);
+            BuildSpacer(contentObj.transform, 8);
 
             // --- BIO Section ---
-            BuildDetailLabel(contentObj.transform, "BioLabel", "BIO:", 32);
-            BuildDetailValue(contentObj.transform, "BioValue", "Theme description goes here.", 24, 250);
+            BuildDetailLabel(contentObj.transform, "BioLabel", "BIO:", 30);
+            BuildDetailValue(contentObj.transform, "BioValue", "Theme description goes here.", 22, 200);
+
+            // --- Confirm Button (inside the notes panel, at the bottom) ---
+            BuildConfirmButton(detailObj.transform);
         }
 
         private void BuildDetailLabel(Transform parent, string name, string labelText, float fontSize)
@@ -496,8 +511,8 @@ namespace TheBunkerGames
             btnObj.transform.SetParent(parent, false);
 
             RectTransform rect = btnObj.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.78f, 0.01f);
-            rect.anchorMax = new Vector2(0.97f, 0.07f);
+            rect.anchorMin = new Vector2(0.25f, 0.02f);
+            rect.anchorMax = new Vector2(0.85f, 0.12f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
@@ -556,7 +571,7 @@ namespace TheBunkerGames
             WireCardButtons();
             DisplayCurrentTheme();
 
-            UIBuilderUtils.SetButtonInteractable(panel, "ConfirmButton", false);
+            SetConfirmButtonInteractable( false);
 
             if (enableDebugLogs) Debug.Log($"[ThemeSelectUI] Shown with {availableThemes.Count} themes.");
         }
@@ -579,7 +594,8 @@ namespace TheBunkerGames
             Transform cardTransform = panel.transform.Find("ThemeCard");
             if (cardTransform == null) return;
 
-            Transform mediaArea = cardTransform.Find("MediaArea");
+            Transform videoFrame = cardTransform.Find("VideoFrame");
+            Transform mediaArea = videoFrame?.Find("MediaArea");
             Transform videoDisplay = mediaArea?.Find("VideoDisplay");
             videoImage = videoDisplay?.GetComponent<RawImage>();
             cardMediaImage = mediaArea?.GetComponent<Image>();
@@ -693,7 +709,7 @@ namespace TheBunkerGames
 
             // Auto-select the displayed theme
             selectedTheme = theme;
-            UIBuilderUtils.SetButtonInteractable(panel, "ConfirmButton", true);
+            SetConfirmButtonInteractable( true);
 
             if (enableDebugLogs) Debug.Log($"[ThemeSelectUI] Displaying: {theme.ThemeName} ({currentIndex + 1}/{availableThemes.Count})");
         }
@@ -742,13 +758,22 @@ namespace TheBunkerGames
                 rightBtn.onClick.AddListener(NavigateRight);
             }
 
-            // Confirm button
-            Button confirmBtn = UIBuilderUtils.FindButton(panel, "ConfirmButton");
+            // Confirm button (inside DetailPanel)
+            Transform detailPanel = panel.transform.Find("DetailPanel");
+            Button confirmBtn = detailPanel != null ? UIBuilderUtils.FindButton(detailPanel.gameObject, "ConfirmButton") : null;
             if (confirmBtn != null)
             {
                 confirmBtn.onClick.RemoveAllListeners();
                 confirmBtn.onClick.AddListener(OnConfirm);
             }
+        }
+
+        private void SetConfirmButtonInteractable(bool interactable)
+        {
+            if (panel == null) return;
+            Transform dp = panel.transform.Find("DetailPanel");
+            if (dp != null)
+                UIBuilderUtils.SetButtonInteractable(dp.gameObject, "ConfirmButton", interactable);
         }
 
         // -------------------------------------------------------------------------
