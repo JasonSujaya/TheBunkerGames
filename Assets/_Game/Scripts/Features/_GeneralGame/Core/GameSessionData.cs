@@ -30,6 +30,15 @@ namespace TheBunkerGames
         public bool IsGameOver;
         public GameThemeSO SelectedTheme;
         
+        // -------------------------------------------------------------------------
+        // Item Restore Values (how much stats are restored when consuming items)
+        // -------------------------------------------------------------------------
+        [Space]
+        [Header("Item Restore Values")]
+        public float FoodRestoreAmount = 5f;
+        public float WaterRestoreAmount = 5f;
+        public float MedsRestoreAmount = 5f;
+        
         [Space]
         public GameplayHudUI GameplayHud;
 

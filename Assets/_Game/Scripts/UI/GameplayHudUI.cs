@@ -854,6 +854,11 @@ namespace TheBunkerGames
 
             if (removed)
             {
+                // Get restore amounts from GameSessionData (fallback to 5 if not available)
+                float foodRestore = GameSessionData.Instance != null ? GameSessionData.Instance.FoodRestoreAmount : 5f;
+                float waterRestore = GameSessionData.Instance != null ? GameSessionData.Instance.WaterRestoreAmount : 5f;
+                float medsRestore = GameSessionData.Instance != null ? GameSessionData.Instance.MedsRestoreAmount : 5f;
+
                 // Animation punch on icon
                 StartCoroutine(PunchAnimate(row.icon.rectTransform));
 
@@ -861,18 +866,18 @@ namespace TheBunkerGames
                 switch (type)
                 {
                     case ItemType.Food:
-                        selectedCharacter.ModifyHunger(2f); // +2 Food
-                        if (enableDebugLogs) Debug.Log($"[GameplayHudUI] Restored Hunger for {selectedCharacter.Name}");
+                        selectedCharacter.ModifyHunger(foodRestore);
+                        if (enableDebugLogs) Debug.Log($"[GameplayHudUI] Restored {foodRestore} Hunger for {selectedCharacter.Name}");
                         if (detailHungerFill != null) StartCoroutine(PunchAnimate(detailHungerFill.rectTransform.parent as RectTransform));
                         break;
                     case ItemType.Water:
-                        selectedCharacter.ModifyThirst(2f); // +2 Water
-                        if (enableDebugLogs) Debug.Log($"[GameplayHudUI] Restored Thirst for {selectedCharacter.Name}");
+                        selectedCharacter.ModifyThirst(waterRestore);
+                        if (enableDebugLogs) Debug.Log($"[GameplayHudUI] Restored {waterRestore} Thirst for {selectedCharacter.Name}");
                         if (detailThirstFill != null) StartCoroutine(PunchAnimate(detailThirstFill.rectTransform.parent as RectTransform));
                         break;
                     case ItemType.Meds:
-                        selectedCharacter.ModifyHealth(2f); // +2 Health
-                        if (enableDebugLogs) Debug.Log($"[GameplayHudUI] Restored Health for {selectedCharacter.Name}");
+                        selectedCharacter.ModifyHealth(medsRestore);
+                        if (enableDebugLogs) Debug.Log($"[GameplayHudUI] Restored {medsRestore} Health for {selectedCharacter.Name}");
                         if (detailHealthFill != null) StartCoroutine(PunchAnimate(detailHealthFill.rectTransform.parent as RectTransform));
                         break;
                 }
