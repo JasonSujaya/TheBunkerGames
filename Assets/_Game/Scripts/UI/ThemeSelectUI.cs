@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Video;
 using System;
 using System.Collections.Generic;
 #if ODIN_INSPECTOR
@@ -9,9 +10,10 @@ using Sirenix.OdinInspector;
 namespace TheBunkerGames
 {
     /// <summary>
-    /// UI manager for theme/scenario selection.
-    /// Has its own auto-setup that creates a Canvas root with a selection panel.
-    /// Each GameThemeSO is displayed as a selectable button.
+    /// UI manager for scenario/theme selection.
+    /// Displays one full-screen theme card at a time with a 9:16 preview video,
+    /// plus a detail panel (name, traits, bio) on the right side.
+    /// Left/Right arrows cycle through available themes.
     /// </summary>
     public class ThemeSelectUI : MonoBehaviour
     {
@@ -36,6 +38,17 @@ namespace TheBunkerGames
         [SerializeField] private bool enableDebugLogs = false;
 
         // -------------------------------------------------------------------------
+        // Style
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Style")]
+        #endif
+        [SerializeField] private Color panelBgColor = new Color(0.1f, 0.1f, 0.1f, 0.95f);
+        [SerializeField] private Color cardBorderColor = new Color(0.35f, 0.32f, 0.28f, 1f);
+        [SerializeField] private Color detailPanelBg = new Color(0.9f, 0.87f, 0.8f, 0.95f);
+        [SerializeField] private Color detailTextColor = new Color(0.15f, 0.12f, 0.1f, 1f);
+
+        // -------------------------------------------------------------------------
         // Generated References (populated by AutoSetup)
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
@@ -48,8 +61,20 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Runtime State
         // -------------------------------------------------------------------------
+        private int currentIndex = 0;
         private GameThemeSO selectedTheme;
         public GameThemeSO SelectedTheme => selectedTheme;
+
+        // Runtime UI references
+        private Image cardImage;
+        private RawImage videoImage;
+        private VideoPlayer videoPlayer;
+        private RenderTexture videoRenderTexture;
+        private Text cardTitleText;
+        private Text detailNameText;
+        private Text detailTraitsText;
+        private Text detailBioText;
+        private GameObject detailPanel;
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -62,6 +87,15 @@ namespace TheBunkerGames
                 return;
             }
             Instance = this;
+        }
+
+        private void OnDestroy()
+        {
+            if (videoRenderTexture != null)
+            {
+                videoRenderTexture.Release();
+                DestroyImmediate(videoRenderTexture);
+            }
         }
 
         // -------------------------------------------------------------------------
@@ -86,18 +120,23 @@ namespace TheBunkerGames
             canvasRoot = UIBuilderUtils.CreateCanvasRoot(transform, "ThemeSelectCanvas", canvasSortOrder);
             UIBuilderUtils.EnsureEventSystem();
 
-            // Panel
-            panel = UIBuilderUtils.CreatePanel(canvasRoot.transform, "ThemeSelectPanel", new Color(0.12f, 0.12f, 0.18f, 0.95f));
+            // Main panel (full screen)
+            panel = UIBuilderUtils.CreatePanel(canvasRoot.transform, "ThemeSelectPanel", panelBgColor);
 
-            // Title
-            UIBuilderUtils.CreateTitle(panel.transform, "Choose Your Theme");
+            // ---- Title Banner ----
+            BuildTitleBanner(panel.transform);
 
-            // Scroll content
-            GameObject scrollContent = UIBuilderUtils.CreateScrollArea(panel.transform);
-            scrollContent.name = "Content";
+            // ---- Theme Card (left/center, big) ----
+            BuildThemeCard(panel.transform);
 
-            // Confirm button
-            UIBuilderUtils.CreateButton(panel.transform, "Confirm", "ConfirmButton");
+            // ---- Detail Panel (right side) ----
+            BuildDetailPanel(panel.transform);
+
+            // ---- Navigation Arrows ----
+            BuildNavigationArrows(panel.transform);
+
+            // ---- Confirm Button ----
+            BuildConfirmButton(panel.transform);
 
             if (enableDebugLogs) Debug.Log("[ThemeSelectUI] Auto Setup complete.");
 
@@ -107,73 +146,557 @@ namespace TheBunkerGames
         }
 
         // -------------------------------------------------------------------------
+        // UI Builders
+        // -------------------------------------------------------------------------
+        private void BuildTitleBanner(Transform parent)
+        {
+            GameObject bannerObj = new GameObject("TitleBanner");
+            bannerObj.transform.SetParent(parent, false);
+
+            RectTransform rect = bannerObj.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.05f, 0.88f);
+            rect.anchorMax = new Vector2(0.62f, 0.96f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            Image bg = bannerObj.AddComponent<Image>();
+            bg.color = new Color(0.25f, 0.22f, 0.18f, 0.9f);
+
+            GameObject textObj = new GameObject("TitleText");
+            textObj.transform.SetParent(bannerObj.transform, false);
+
+            RectTransform textRect = textObj.AddComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = new Vector2(20, 0);
+            textRect.offsetMax = new Vector2(-20, 0);
+
+            Text text = textObj.AddComponent<Text>();
+            text.text = "SCENARIO SELECTION";
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.fontSize = 28;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.color = Color.white;
+            text.fontStyle = FontStyle.Bold;
+        }
+
+        private void BuildThemeCard(Transform parent)
+        {
+            // Card border / frame
+            GameObject cardObj = new GameObject("ThemeCard");
+            cardObj.transform.SetParent(parent, false);
+
+            RectTransform cardRect = cardObj.AddComponent<RectTransform>();
+            cardRect.anchorMin = new Vector2(0.05f, 0.08f);
+            cardRect.anchorMax = new Vector2(0.62f, 0.86f);
+            cardRect.offsetMin = Vector2.zero;
+            cardRect.offsetMax = Vector2.zero;
+
+            Image cardBorder = cardObj.AddComponent<Image>();
+            cardBorder.color = cardBorderColor;
+
+            // Video / Image area (inset from border, 9:16 ratio maintained via AspectRatioFitter)
+            GameObject mediaArea = new GameObject("MediaArea");
+            mediaArea.transform.SetParent(cardObj.transform, false);
+
+            RectTransform mediaRect = mediaArea.AddComponent<RectTransform>();
+            mediaRect.anchorMin = new Vector2(0.03f, 0.1f);
+            mediaRect.anchorMax = new Vector2(0.97f, 0.88f);
+            mediaRect.offsetMin = Vector2.zero;
+            mediaRect.offsetMax = Vector2.zero;
+
+            // Fallback static image
+            cardImage = mediaArea.AddComponent<Image>();
+            cardImage.color = new Color(0.3f, 0.3f, 0.3f, 1f);
+            cardImage.preserveAspect = true;
+
+            // Video overlay (RawImage on top of the static image)
+            GameObject videoObj = new GameObject("VideoDisplay");
+            videoObj.transform.SetParent(mediaArea.transform, false);
+
+            RectTransform videoRect = videoObj.AddComponent<RectTransform>();
+            videoRect.anchorMin = Vector2.zero;
+            videoRect.anchorMax = Vector2.one;
+            videoRect.offsetMin = Vector2.zero;
+            videoRect.offsetMax = Vector2.zero;
+
+            videoImage = videoObj.AddComponent<RawImage>();
+            videoImage.color = Color.white;
+            videoImage.enabled = false;
+
+            // AspectRatioFitter for 9:16 ratio
+            AspectRatioFitter aspect = videoObj.AddComponent<AspectRatioFitter>();
+            aspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
+            aspect.aspectRatio = 9f / 16f;
+
+            // Theme title (bottom of card)
+            GameObject titleArea = new GameObject("CardTitle");
+            titleArea.transform.SetParent(cardObj.transform, false);
+
+            RectTransform titleRect = titleArea.AddComponent<RectTransform>();
+            titleRect.anchorMin = new Vector2(0, 0);
+            titleRect.anchorMax = new Vector2(1, 0.1f);
+            titleRect.offsetMin = Vector2.zero;
+            titleRect.offsetMax = Vector2.zero;
+
+            Image titleBg = titleArea.AddComponent<Image>();
+            titleBg.color = new Color(0, 0, 0, 0.7f);
+
+            GameObject titleTextObj = new GameObject("Text");
+            titleTextObj.transform.SetParent(titleArea.transform, false);
+
+            RectTransform ttRect = titleTextObj.AddComponent<RectTransform>();
+            ttRect.anchorMin = Vector2.zero;
+            ttRect.anchorMax = Vector2.one;
+            ttRect.offsetMin = new Vector2(15, 0);
+            ttRect.offsetMax = new Vector2(-15, 0);
+
+            cardTitleText = titleTextObj.AddComponent<Text>();
+            cardTitleText.text = "SCENARIO NAME";
+            cardTitleText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            cardTitleText.fontSize = 30;
+            cardTitleText.alignment = TextAnchor.MiddleCenter;
+            cardTitleText.color = Color.white;
+            cardTitleText.fontStyle = FontStyle.Bold;
+            cardTitleText.resizeTextForBestFit = true;
+            cardTitleText.resizeTextMinSize = 18;
+            cardTitleText.resizeTextMaxSize = 36;
+        }
+
+        private void BuildDetailPanel(Transform parent)
+        {
+            detailPanel = new GameObject("DetailPanel");
+            detailPanel.transform.SetParent(parent, false);
+
+            RectTransform detailRect = detailPanel.AddComponent<RectTransform>();
+            detailRect.anchorMin = new Vector2(0.65f, 0.14f);
+            detailRect.anchorMax = new Vector2(0.95f, 0.96f);
+            detailRect.offsetMin = Vector2.zero;
+            detailRect.offsetMax = Vector2.zero;
+
+            Image bg = detailPanel.AddComponent<Image>();
+            bg.color = detailPanelBg;
+
+            // Name
+            GameObject nameObj = new GameObject("NameLabel");
+            nameObj.transform.SetParent(detailPanel.transform, false);
+
+            RectTransform nameRect = nameObj.AddComponent<RectTransform>();
+            nameRect.anchorMin = new Vector2(0.05f, 0.78f);
+            nameRect.anchorMax = new Vector2(0.95f, 0.95f);
+            nameRect.offsetMin = Vector2.zero;
+            nameRect.offsetMax = Vector2.zero;
+
+            detailNameText = nameObj.AddComponent<Text>();
+            detailNameText.text = "NAME:";
+            detailNameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            detailNameText.fontSize = 22;
+            detailNameText.alignment = TextAnchor.UpperLeft;
+            detailNameText.color = detailTextColor;
+            detailNameText.fontStyle = FontStyle.Bold;
+
+            // Traits
+            GameObject traitsObj = new GameObject("TraitsLabel");
+            traitsObj.transform.SetParent(detailPanel.transform, false);
+
+            RectTransform traitsRect = traitsObj.AddComponent<RectTransform>();
+            traitsRect.anchorMin = new Vector2(0.05f, 0.5f);
+            traitsRect.anchorMax = new Vector2(0.95f, 0.76f);
+            traitsRect.offsetMin = Vector2.zero;
+            traitsRect.offsetMax = Vector2.zero;
+
+            detailTraitsText = traitsObj.AddComponent<Text>();
+            detailTraitsText.text = "TRAITS:";
+            detailTraitsText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            detailTraitsText.fontSize = 18;
+            detailTraitsText.alignment = TextAnchor.UpperLeft;
+            detailTraitsText.color = detailTextColor;
+            detailTraitsText.fontStyle = FontStyle.Bold;
+
+            // Bio header
+            GameObject bioHeaderObj = new GameObject("BioHeader");
+            bioHeaderObj.transform.SetParent(detailPanel.transform, false);
+
+            RectTransform bioHeaderRect = bioHeaderObj.AddComponent<RectTransform>();
+            bioHeaderRect.anchorMin = new Vector2(0.05f, 0.42f);
+            bioHeaderRect.anchorMax = new Vector2(0.95f, 0.5f);
+            bioHeaderRect.offsetMin = Vector2.zero;
+            bioHeaderRect.offsetMax = Vector2.zero;
+
+            Text bioHeaderText = bioHeaderObj.AddComponent<Text>();
+            bioHeaderText.text = "BIO:";
+            bioHeaderText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            bioHeaderText.fontSize = 18;
+            bioHeaderText.alignment = TextAnchor.MiddleLeft;
+            bioHeaderText.color = detailTextColor;
+            bioHeaderText.fontStyle = FontStyle.Bold;
+
+            // Bio content
+            GameObject bioObj = new GameObject("BioContent");
+            bioObj.transform.SetParent(detailPanel.transform, false);
+
+            RectTransform bioRect = bioObj.AddComponent<RectTransform>();
+            bioRect.anchorMin = new Vector2(0.05f, 0.08f);
+            bioRect.anchorMax = new Vector2(0.95f, 0.42f);
+            bioRect.offsetMin = Vector2.zero;
+            bioRect.offsetMax = Vector2.zero;
+
+            detailBioText = bioObj.AddComponent<Text>();
+            detailBioText.text = "";
+            detailBioText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            detailBioText.fontSize = 16;
+            detailBioText.alignment = TextAnchor.UpperLeft;
+            detailBioText.color = detailTextColor;
+        }
+
+        private void BuildNavigationArrows(Transform parent)
+        {
+            // Left arrow
+            GameObject leftBtn = new GameObject("LeftArrow");
+            leftBtn.transform.SetParent(parent, false);
+
+            RectTransform leftRect = leftBtn.AddComponent<RectTransform>();
+            leftRect.anchorMin = new Vector2(0.01f, 0.42f);
+            leftRect.anchorMax = new Vector2(0.05f, 0.58f);
+            leftRect.offsetMin = Vector2.zero;
+            leftRect.offsetMax = Vector2.zero;
+
+            Image leftBg = leftBtn.AddComponent<Image>();
+            leftBg.color = new Color(0.3f, 0.28f, 0.25f, 0.8f);
+
+            Button leftButton = leftBtn.AddComponent<Button>();
+            var lColors = leftButton.colors;
+            lColors.highlightedColor = new Color(0.45f, 0.4f, 0.35f, 1f);
+            lColors.pressedColor = new Color(0.2f, 0.18f, 0.15f, 1f);
+            leftButton.colors = lColors;
+
+            GameObject leftText = new GameObject("Text");
+            leftText.transform.SetParent(leftBtn.transform, false);
+            RectTransform ltRect = leftText.AddComponent<RectTransform>();
+            ltRect.anchorMin = Vector2.zero;
+            ltRect.anchorMax = Vector2.one;
+            ltRect.offsetMin = Vector2.zero;
+            ltRect.offsetMax = Vector2.zero;
+            Text lt = leftText.AddComponent<Text>();
+            lt.text = "<";
+            lt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            lt.fontSize = 36;
+            lt.alignment = TextAnchor.MiddleCenter;
+            lt.color = Color.white;
+            lt.fontStyle = FontStyle.Bold;
+
+            // Right arrow
+            GameObject rightBtn = new GameObject("RightArrow");
+            rightBtn.transform.SetParent(parent, false);
+
+            RectTransform rightRect = rightBtn.AddComponent<RectTransform>();
+            rightRect.anchorMin = new Vector2(0.62f, 0.42f);
+            rightRect.anchorMax = new Vector2(0.645f, 0.58f);
+            rightRect.offsetMin = Vector2.zero;
+            rightRect.offsetMax = Vector2.zero;
+
+            Image rightBg = rightBtn.AddComponent<Image>();
+            rightBg.color = new Color(0.3f, 0.28f, 0.25f, 0.8f);
+
+            Button rightButton = rightBtn.AddComponent<Button>();
+            var rColors = rightButton.colors;
+            rColors.highlightedColor = new Color(0.45f, 0.4f, 0.35f, 1f);
+            rColors.pressedColor = new Color(0.2f, 0.18f, 0.15f, 1f);
+            rightButton.colors = rColors;
+
+            GameObject rightText = new GameObject("Text");
+            rightText.transform.SetParent(rightBtn.transform, false);
+            RectTransform rtRect = rightText.AddComponent<RectTransform>();
+            rtRect.anchorMin = Vector2.zero;
+            rtRect.anchorMax = Vector2.one;
+            rtRect.offsetMin = Vector2.zero;
+            rtRect.offsetMax = Vector2.zero;
+            Text rt = rightText.AddComponent<Text>();
+            rt.text = ">";
+            rt.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            rt.fontSize = 36;
+            rt.alignment = TextAnchor.MiddleCenter;
+            rt.color = Color.white;
+            rt.fontStyle = FontStyle.Bold;
+        }
+
+        private void BuildConfirmButton(Transform parent)
+        {
+            GameObject btnObj = new GameObject("ConfirmButton");
+            btnObj.transform.SetParent(parent, false);
+
+            RectTransform rect = btnObj.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.65f, 0.04f);
+            rect.anchorMax = new Vector2(0.95f, 0.12f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            Image bg = btnObj.AddComponent<Image>();
+            bg.color = new Color(0.3f, 0.28f, 0.25f, 1f);
+
+            Button btn = btnObj.AddComponent<Button>();
+            var colors = btn.colors;
+            colors.highlightedColor = new Color(0.4f, 0.35f, 0.3f, 1f);
+            colors.pressedColor = new Color(0.2f, 0.18f, 0.15f, 1f);
+            colors.disabledColor = new Color(0.25f, 0.25f, 0.25f, 0.5f);
+            btn.colors = colors;
+            btn.interactable = false;
+
+            GameObject textObj = new GameObject("Text");
+            textObj.transform.SetParent(btnObj.transform, false);
+
+            RectTransform textRect = textObj.AddComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+
+            Text text = textObj.AddComponent<Text>();
+            text.text = "CONFIRM";
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.fontSize = 24;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.color = Color.white;
+            text.fontStyle = FontStyle.Bold;
+        }
+
+        // -------------------------------------------------------------------------
         // Show / Hide
         // -------------------------------------------------------------------------
         public void Show()
         {
             if (canvasRoot == null) return;
             canvasRoot.SetActive(true);
+            currentIndex = 0;
             selectedTheme = null;
-            PopulateThemeButtons();
-            UIBuilderUtils.SetButtonInteractable(panel, "ConfirmButton", false);
 
-            // Wire confirm button
-            Button confirmBtn = UIBuilderUtils.FindButton(panel, "ConfirmButton");
-            if (confirmBtn != null)
-            {
-                confirmBtn.onClick.RemoveAllListeners();
-                confirmBtn.onClick.AddListener(OnConfirm);
-            }
+            CacheUIReferences();
+            SetupVideoPlayer();
+            WireButtons();
+
+            if (availableThemes.Count > 0)
+                DisplayTheme(0);
+            else
+                ClearDisplay();
 
             if (enableDebugLogs) Debug.Log($"[ThemeSelectUI] Shown with {availableThemes.Count} themes.");
         }
 
         public void Hide()
         {
+            StopVideo();
             if (canvasRoot != null) canvasRoot.SetActive(false);
         }
 
         // -------------------------------------------------------------------------
-        // Population
+        // Cache UI References
         // -------------------------------------------------------------------------
-        private void PopulateThemeButtons()
+        private void CacheUIReferences()
         {
-            Transform content = UIBuilderUtils.FindScrollContent(panel);
-            if (content == null) return;
+            if (panel == null) return;
 
-            UIBuilderUtils.ClearChildren(content);
-
-            foreach (var theme in availableThemes)
+            // Card elements
+            Transform cardTransform = panel.transform.Find("ThemeCard");
+            if (cardTransform != null)
             {
-                if (theme == null) continue;
-                var capturedTheme = theme;
-                UIBuilderUtils.CreateSelectionButton(content, theme.ThemeName, theme.Description, () => SelectTheme(capturedTheme));
+                Transform mediaArea = cardTransform.Find("MediaArea");
+                if (mediaArea != null)
+                {
+                    cardImage = mediaArea.GetComponent<Image>();
+                    Transform videoDisplay = mediaArea.Find("VideoDisplay");
+                    if (videoDisplay != null)
+                        videoImage = videoDisplay.GetComponent<RawImage>();
+                }
+
+                Transform cardTitle = cardTransform.Find("CardTitle/Text");
+                if (cardTitle != null)
+                    cardTitleText = cardTitle.GetComponent<Text>();
+            }
+
+            // Detail panel
+            detailPanel = panel.transform.Find("DetailPanel")?.gameObject;
+            if (detailPanel != null)
+            {
+                detailNameText = detailPanel.transform.Find("NameLabel")?.GetComponent<Text>();
+                detailTraitsText = detailPanel.transform.Find("TraitsLabel")?.GetComponent<Text>();
+                detailBioText = detailPanel.transform.Find("BioContent")?.GetComponent<Text>();
             }
         }
 
-        private void SelectTheme(GameThemeSO theme)
+        // -------------------------------------------------------------------------
+        // Video Player Setup
+        // -------------------------------------------------------------------------
+        private void SetupVideoPlayer()
         {
+            // Create RenderTexture for video output
+            if (videoRenderTexture == null)
+            {
+                videoRenderTexture = new RenderTexture(540, 960, 0); // 9:16 ratio
+                videoRenderTexture.Create();
+            }
+
+            // Get or create VideoPlayer on this GameObject
+            videoPlayer = GetComponent<VideoPlayer>();
+            if (videoPlayer == null)
+                videoPlayer = gameObject.AddComponent<VideoPlayer>();
+
+            videoPlayer.playOnAwake = false;
+            videoPlayer.renderMode = VideoRenderMode.RenderTexture;
+            videoPlayer.targetTexture = videoRenderTexture;
+            videoPlayer.isLooping = true;
+            videoPlayer.audioOutputMode = VideoAudioOutputMode.None;
+
+            if (videoImage != null)
+                videoImage.texture = videoRenderTexture;
+        }
+
+        private void PlayVideo(VideoClip clip)
+        {
+            if (videoPlayer == null || clip == null)
+            {
+                StopVideo();
+                return;
+            }
+
+            videoPlayer.clip = clip;
+            videoPlayer.Play();
+
+            if (videoImage != null)
+                videoImage.enabled = true;
+        }
+
+        private void StopVideo()
+        {
+            if (videoPlayer != null && videoPlayer.isPlaying)
+                videoPlayer.Stop();
+
+            if (videoImage != null)
+                videoImage.enabled = false;
+        }
+
+        // -------------------------------------------------------------------------
+        // Button Wiring
+        // -------------------------------------------------------------------------
+        private void WireButtons()
+        {
+            // Left arrow
+            Button leftBtn = panel.transform.Find("LeftArrow")?.GetComponent<Button>();
+            if (leftBtn != null)
+            {
+                leftBtn.onClick.RemoveAllListeners();
+                leftBtn.onClick.AddListener(PreviousTheme);
+            }
+
+            // Right arrow
+            Button rightBtn = panel.transform.Find("RightArrow")?.GetComponent<Button>();
+            if (rightBtn != null)
+            {
+                rightBtn.onClick.RemoveAllListeners();
+                rightBtn.onClick.AddListener(NextTheme);
+            }
+
+            // Confirm
+            Button confirmBtn = UIBuilderUtils.FindButton(panel, "ConfirmButton");
+            if (confirmBtn != null)
+            {
+                confirmBtn.onClick.RemoveAllListeners();
+                confirmBtn.onClick.AddListener(OnConfirm);
+            }
+            UIBuilderUtils.SetButtonInteractable(panel, "ConfirmButton", false);
+        }
+
+        // -------------------------------------------------------------------------
+        // Navigation
+        // -------------------------------------------------------------------------
+        private void NextTheme()
+        {
+            if (availableThemes.Count == 0) return;
+            currentIndex = (currentIndex + 1) % availableThemes.Count;
+            DisplayTheme(currentIndex);
+        }
+
+        private void PreviousTheme()
+        {
+            if (availableThemes.Count == 0) return;
+            currentIndex = (currentIndex - 1 + availableThemes.Count) % availableThemes.Count;
+            DisplayTheme(currentIndex);
+        }
+
+        // -------------------------------------------------------------------------
+        // Display Theme
+        // -------------------------------------------------------------------------
+        private void DisplayTheme(int index)
+        {
+            if (index < 0 || index >= availableThemes.Count) return;
+
+            GameThemeSO theme = availableThemes[index];
+            if (theme == null) return;
+
             selectedTheme = theme;
             UIBuilderUtils.SetButtonInteractable(panel, "ConfirmButton", true);
 
-            // Highlight selected
-            Transform content = UIBuilderUtils.FindScrollContent(panel);
-            if (content != null)
+            // Card image (fallback when no video)
+            if (cardImage != null)
             {
-                foreach (Transform child in content)
+                if (theme.ThemeIcon != null)
                 {
-                    Image bg = child.GetComponent<Image>();
-                    if (bg != null)
-                    {
-                        bool isSelected = child.name == "SelectBtn_" + theme.ThemeName;
-                        bg.color = isSelected
-                            ? new Color(theme.ThemeColor.r * 0.5f, theme.ThemeColor.g * 0.5f, theme.ThemeColor.b * 0.5f, 1f)
-                            : new Color(0.2f, 0.2f, 0.3f, 0.9f);
-                    }
+                    cardImage.sprite = theme.ThemeIcon;
+                    cardImage.color = Color.white;
+                    cardImage.preserveAspect = true;
+                }
+                else
+                {
+                    cardImage.sprite = null;
+                    cardImage.color = new Color(0.3f, 0.3f, 0.3f, 1f);
                 }
             }
 
-            if (enableDebugLogs) Debug.Log($"[ThemeSelectUI] Selected: {theme.ThemeName}");
+            // Video
+            if (theme.PreviewVideo != null)
+            {
+                PlayVideo(theme.PreviewVideo);
+            }
+            else
+            {
+                StopVideo();
+            }
+
+            // Card title
+            if (cardTitleText != null)
+                cardTitleText.text = theme.ThemeName.ToUpper();
+
+            // Detail panel
+            if (detailNameText != null)
+                detailNameText.text = $"NAME:\n{theme.ThemeName.ToUpper()}";
+
+            if (detailTraitsText != null)
+            {
+                string traits = "TRAITS:\n";
+                if (theme.Traits != null)
+                {
+                    foreach (var trait in theme.Traits)
+                    {
+                        if (!string.IsNullOrEmpty(trait))
+                            traits += trait.ToUpper() + "\n";
+                    }
+                }
+                detailTraitsText.text = traits.TrimEnd('\n');
+            }
+
+            if (detailBioText != null)
+                detailBioText.text = !string.IsNullOrEmpty(theme.Description) ? theme.Description : "No description available.";
+
+            if (enableDebugLogs) Debug.Log($"[ThemeSelectUI] Displaying: {theme.ThemeName} ({index + 1}/{availableThemes.Count})");
+        }
+
+        private void ClearDisplay()
+        {
+            if (cardImage != null) { cardImage.sprite = null; cardImage.color = new Color(0.3f, 0.3f, 0.3f, 1f); }
+            if (cardTitleText != null) cardTitleText.text = "NO SCENARIOS";
+            if (detailNameText != null) detailNameText.text = "NAME:";
+            if (detailTraitsText != null) detailTraitsText.text = "TRAITS:";
+            if (detailBioText != null) detailBioText.text = "No scenarios available.";
+            StopVideo();
         }
 
         // -------------------------------------------------------------------------
@@ -183,7 +706,6 @@ namespace TheBunkerGames
         {
             if (selectedTheme == null) return;
 
-            // Apply theme event schedule
             if (selectedTheme.EventSchedule != null)
             {
                 PreScriptedEventScheduleSO.SetInstance(selectedTheme.EventSchedule);
@@ -206,6 +728,12 @@ namespace TheBunkerGames
 
         [Button("Hide", ButtonSizes.Medium)]
         private void Debug_Hide() => Hide();
+
+        [Button("Next", ButtonSizes.Small)]
+        private void Debug_Next() => NextTheme();
+
+        [Button("Previous", ButtonSizes.Small)]
+        private void Debug_Previous() => PreviousTheme();
         #endif
     }
 }
