@@ -35,6 +35,7 @@ namespace TheBunkerGames
         [Title("Configuration")]
         #endif
         [SerializeField] private List<GameThemeSO> availableThemes = new List<GameThemeSO>();
+        [SerializeField] private GameSessionData gameSessionData;
         [SerializeField] private int canvasSortOrder = 100;
         [SerializeField] private bool enableDebugLogs = false;
 
@@ -787,6 +788,13 @@ namespace TheBunkerGames
             {
                 PreScriptedEventScheduleSO.SetInstance(selectedTheme.EventSchedule);
                 if (enableDebugLogs) Debug.Log($"[ThemeSelectUI] Applied event schedule: {selectedTheme.EventSchedule.name}");
+            }
+
+            // Store selected theme in game session data
+            if (gameSessionData != null)
+            {
+                gameSessionData.SelectedTheme = selectedTheme;
+                if (enableDebugLogs) Debug.Log($"[ThemeSelectUI] Set GameSessionData.SelectedTheme: {selectedTheme.ThemeName}");
             }
 
             Hide();

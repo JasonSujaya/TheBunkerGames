@@ -10,6 +10,7 @@ namespace TheBunkerGames
         public int FamilyCount;
         public float AverageHealth;
         public bool IsGameOver;
+        public GameThemeSO SelectedTheme;
 
         [Space]
         public System.Collections.Generic.List<CharacterData> DebugFamilySnapshot = new System.Collections.Generic.List<CharacterData>();
@@ -38,6 +39,7 @@ namespace TheBunkerGames
             IsGameOver = false;
             FamilyCount = 4;
             AverageHealth = 100f;
+            SelectedTheme = null;
             DebugFamilySnapshot.Clear();
             InventorySnapshot.Clear();
         }
