@@ -45,7 +45,7 @@ namespace TheBunkerGames
         [Title("Configuration")]
         #endif
         [SerializeField] private int canvasSortOrder = 50;
-        [SerializeField] private bool enableDebugLogs = false;
+        [SerializeField] private bool enableDebugLogs = true;
 
         #if ODIN_INSPECTOR
         [Title("UI References")]
@@ -86,6 +86,9 @@ namespace TheBunkerGames
         [SerializeField] private Sprite iconMeds;               // Icon_Medecine.png
         [SerializeField] private Sprite iconTools;              // Icon_Tools.png
         [SerializeField] private Sprite iconJunk;               // Icon_Thrash.png
+        
+        [Space]
+        [SerializeField] private Sprite barFillSprite;          // Solid white sprite for bars
 
         // -------------------------------------------------------------------------
         // Style
@@ -174,6 +177,16 @@ namespace TheBunkerGames
         private void Start()
         {
             if (enableDebugLogs) Debug.Log("[GameplayHudUI] Start() - Self-initializing...");
+            
+            // Generate fallback sprite if needed
+            if (barFillSprite == null) barFillSprite = UIBuilderUtils.CreateWhiteSprite();
+
+            // Patch existing detail bars if they have no sprite (fixes "Always Full" bug)
+            if (detailHealthFill != null && detailHealthFill.sprite == null) detailHealthFill.sprite = barFillSprite;
+            if (detailHungerFill != null && detailHungerFill.sprite == null) detailHungerFill.sprite = barFillSprite;
+            if (detailThirstFill != null && detailThirstFill.sprite == null) detailThirstFill.sprite = barFillSprite;
+            if (detailSanityFill != null && detailSanityFill.sprite == null) detailSanityFill.sprite = barFillSprite;
+
             WireButtons();
             PopulateCharacterList();
             RefreshFamilyBodies();
@@ -448,6 +461,7 @@ namespace TheBunkerGames
             var hpFill = MakeRect(hpBar, "Fill", Vector2.zero, Vector2.one);
             hpFill.pivot = new Vector2(0, 0.5f);
             refs.healthFill = hpFill.gameObject.AddComponent<Image>();
+            refs.healthFill.sprite     = barFillSprite;
             refs.healthFill.color      = healthColor;
             refs.healthFill.type       = Image.Type.Filled;
             refs.healthFill.fillMethod = Image.FillMethod.Horizontal;
@@ -614,10 +628,10 @@ namespace TheBunkerGames
             bgRT.offsetMin = new Vector2(20, bgRT.offsetMin.y); // 20px left margin for icon
             bgRT.gameObject.AddComponent<Image>().color = barBgColor;
 
-            // fill
             var fRT = MakeRect(bgRT, "Fill", Vector2.zero, Vector2.one);
             fRT.pivot = new Vector2(0, 0.5f);
             var fImg = fRT.gameObject.AddComponent<Image>();
+            fImg.sprite     = barFillSprite;
             fImg.color      = fillColor;
             fImg.type       = Image.Type.Filled;
             fImg.fillMethod = Image.FillMethod.Horizontal;
@@ -1083,8 +1097,18 @@ namespace TheBunkerGames
             }
 
             UpdateDetailCard();
+            UpdateDetailCard();
             UpdateResourceDisplay();
+
+            if (enableDebugLogs && UnityEngine.Time.time > nextLogTime && thumbs.Count > 0 && thumbs[0].character != null)
+            {
+                nextLogTime = UnityEngine.Time.time + 2f;
+                var c = thumbs[0].character;
+                Debug.Log($"[GameplayHudUI] RefreshLiveData: FirstChar={c.Name} HP={c.Health} Fill={c.Health/100f}. DetailChar={selectedCharacter?.Name} HP={selectedCharacter?.Health}");
+            }
         }
+
+        private float nextLogTime;
 
         // =====================================================================
         //  Public API — for game logic to read/drive the HUD
@@ -1111,6 +1135,31 @@ namespace TheBunkerGames
         {
             if (GameManager.Instance != null && dayText != null)
                 dayText.text = $"DAY {GameManager.Instance.CurrentDay}";
+        }
+
+        /// <summary>
+        /// Full refresh of the entire HUD. 
+        /// Called by GameFlowController after game state changes (e.g. New Game, Advance Day).
+        /// </summary>
+        public void RefreshAll()
+        {
+            if (enableDebugLogs) Debug.Log("[GameplayHudUI] RefreshAll() called.");
+            
+            PopulateCharacterList();
+            RefreshFamilyBodies();
+            UpdateResourceDisplay();
+            UpdateDayDisplay();
+
+            // Ensure detail card is consistent if selection was lost or changed
+            if (selectedCharacter == null && thumbs.Count > 0)
+            {
+                SelectCharacter(0);
+            }
+            else if (selectedCharacter != null)
+            {
+                // re-select to refresh highlighting
+                SelectCharacter(selectedIndex);
+            }
         }
 
         /// <summary>Set the day text directly (e.g. "DAY 5").</summary>

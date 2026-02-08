@@ -45,6 +45,7 @@ namespace TheBunkerGames
             if (gameManager.SessionData != null)
             {
                 gameManager.SessionData.ResetData();
+                gameManager.SessionData.UpdateSync(gameManager.Family, gameManager.Inventory); // Early sync for inspector
             }
 
             // Start locally at Day 0 so AdvanceDay() brings us to Day 1
@@ -76,6 +77,13 @@ namespace TheBunkerGames
                     }
                     if (enableDebugLogs) Debug.Log($"[Sim] Added starting items from {profile.name}");
                 }
+            }
+
+            // Refresh HUD now that family is spawned
+            var hud = gameManager.GameplayHud != null ? gameManager.GameplayHud : GameplayHudUI.Instance;
+            if (hud != null)
+            {
+                hud.RefreshAll();
             }
                 
             // Now advance to Day 1 which triggers all refreshes, events, and action preparation
@@ -159,10 +167,11 @@ namespace TheBunkerGames
                     gameManager.Actions.PrepareDailyActions(gameManager.CurrentDay);
                 }
 
-                // Refresh HUD with family body images from SO data (mirrors StartNewGame logic)
-                if (gameManager.GameplayHud != null)
+                // Refresh HUD completely (characters, bodies, resources)
+                var hud = gameManager.GameplayHud != null ? gameManager.GameplayHud : GameplayHudUI.Instance;
+                if (hud != null)
                 {
-                    gameManager.GameplayHud.RefreshFamilyBodies();
+                    hud.RefreshAll();
                 }
 
                 // 3. Sync Data for Visualization

@@ -403,5 +403,16 @@ namespace TheBunkerGames
             for (int i = parent.childCount - 1; i >= 0; i--)
                 Object.DestroyImmediate(parent.GetChild(i).gameObject);
         }
+        /// <summary>
+        /// Creates a simple 2x2 white sprite for use in UI Images (e.g. for filling bars).
+        /// </summary>
+        public static Sprite CreateWhiteSprite()
+        {
+            var texture = new Texture2D(2, 2);
+            var white = Color.white;
+            texture.SetPixels(new Color[] { white, white, white, white });
+            texture.Apply();
+            return Sprite.Create(texture, new Rect(0, 0, 2, 2), new Vector2(0.5f, 0.5f));
+        }
     }
 }

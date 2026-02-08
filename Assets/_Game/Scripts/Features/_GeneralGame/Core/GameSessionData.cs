@@ -11,6 +11,9 @@ namespace TheBunkerGames
         public float AverageHealth;
         public bool IsGameOver;
         public GameThemeSO SelectedTheme;
+        
+        [Space]
+        public GameplayHudUI GameplayHud;
 
         [Space]
         public System.Collections.Generic.List<CharacterData> DebugFamilySnapshot = new System.Collections.Generic.List<CharacterData>();
@@ -19,6 +22,22 @@ namespace TheBunkerGames
         public System.Collections.Generic.List<string> InventorySnapshot = new System.Collections.Generic.List<string>();
 
         #if ODIN_INSPECTOR
+        [Sirenix.OdinInspector.Button("Force HUD Refresh", Sirenix.OdinInspector.ButtonSizes.Medium)]
+        [Sirenix.OdinInspector.GUIColor(0.2f, 1f, 0.4f)]
+        private void Debug_ForceRefreshHUD()
+        {
+            var hud = GameplayHud != null ? GameplayHud : GameplayHudUI.Instance;
+            if (hud != null)
+            {
+                hud.RefreshAll();
+                Debug.Log("[GameSessionData] Forced HUD Refresh via Inspector.");
+            }
+            else
+            {
+                Debug.LogWarning("[GameSessionData] No GameplayHudUI found to refresh.");
+            }
+        }
+
         [Sirenix.OdinInspector.Button("Select Inventory Manager", Sirenix.OdinInspector.ButtonSizes.Medium)]
         [Sirenix.OdinInspector.GUIColor(0.2f, 0.6f, 1f)]
         private void Debug_SelectInventory()
@@ -84,9 +103,10 @@ namespace TheBunkerGames
             }
 
             // Refresh the HUD so it picks up any stat/inventory changes
-            if (GameplayHudUI.Instance != null && GameplayHudUI.Instance.IsVisible)
+            var hud = GameplayHud != null ? GameplayHud : GameplayHudUI.Instance;
+            if (hud != null && hud.IsVisible)
             {
-                GameplayHudUI.Instance.UpdateDayDisplay();
+                hud.RefreshAll();
             }
         }
     }
