@@ -9,10 +9,7 @@
 **Entropy's Watch** (formerly "AI Survival Bunker") drops players into a post-apocalyptic underground bunker managed by **A.N.G.E.L.** (Autonomous Neural Guard & Emergency Logistics). As the outside world collapses, A.N.G.E.L.'s logic filters decay, forcing players to argue for resources, explore the void, and make impossible choices to keep their family alive.
 
 ### Core Features
-- **A.N.G.E.L.'s Voice**: Full Text-to-Speech interaction with emotional depth.
-- **Dynamic Narrative**: Powered by LLMs for an organic story that reacts to every player failure.
-- **Visceral Aesthetics**: Gritty CRT visuals, scanlines, and glitchy AI-generated imagery.
-- **High Stakes**: Every day demands a sacrifice. Manage Hunger, Thirst, Sanity, and Health.
+Bringing an AI-native twist to the classic survival RPG. Face off against a dynamic AI storyteller with unique characters in unpredictable scenarios.
 
 ---
 
