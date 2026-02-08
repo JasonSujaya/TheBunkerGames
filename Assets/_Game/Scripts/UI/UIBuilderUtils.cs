@@ -16,26 +16,43 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
 
         /// <summary>
-        /// Creates a Canvas root as a child of the given parent.
-        /// Includes CanvasScaler (1920x1080 ScaleWithScreenSize) and GraphicRaycaster.
+        /// Creates a UI root as a child of the given parent.
+        /// If the parent is already inside a Canvas, creates a stretched RectTransform container.
+        /// If the parent is NOT inside a Canvas, creates a new Canvas (ScreenSpace-Overlay, 1920x1080).
         /// </summary>
         public static GameObject CreateCanvasRoot(Transform parent, string canvasName, int sortOrder = 0)
         {
-            GameObject canvasObj = new GameObject(canvasName);
-            canvasObj.transform.SetParent(parent, false);
+            GameObject rootObj = new GameObject(canvasName);
+            rootObj.transform.SetParent(parent, false);
 
-            Canvas canvas = canvasObj.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = sortOrder;
+            // Check if we're already inside a Canvas
+            Canvas parentCanvas = parent.GetComponentInParent<Canvas>();
 
-            CanvasScaler scaler = canvasObj.AddComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920, 1080);
-            scaler.matchWidthOrHeight = 0.5f;
+            if (parentCanvas != null)
+            {
+                // Already inside a Canvas — just create a stretched RectTransform container
+                RectTransform rect = rootObj.AddComponent<RectTransform>();
+                rect.anchorMin = Vector2.zero;
+                rect.anchorMax = Vector2.one;
+                rect.offsetMin = Vector2.zero;
+                rect.offsetMax = Vector2.zero;
+            }
+            else
+            {
+                // No parent Canvas — create a standalone Canvas
+                Canvas canvas = rootObj.AddComponent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                canvas.sortingOrder = sortOrder;
 
-            canvasObj.AddComponent<GraphicRaycaster>();
+                CanvasScaler scaler = rootObj.AddComponent<CanvasScaler>();
+                scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+                scaler.referenceResolution = new Vector2(1920, 1080);
+                scaler.matchWidthOrHeight = 0.5f;
 
-            return canvasObj;
+                rootObj.AddComponent<GraphicRaycaster>();
+            }
+
+            return rootObj;
         }
 
         /// <summary>
