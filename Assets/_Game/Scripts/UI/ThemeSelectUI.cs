@@ -12,9 +12,9 @@ namespace TheBunkerGames
 {
     /// <summary>
     /// UI manager for scenario/theme selection.
-    /// Displays a 2-column grid of theme cards, each showing a looping video
-    /// inside a polaroid-style card frame with the scenario name below.
-    /// Click a card to select it, then confirm.
+    /// Displays a single large polaroid-style card with looping video on the left,
+    /// and a notebook-style detail panel on the right showing Name, Traits, and Bio.
+    /// Left/right arrows navigate between available themes.
     /// </summary>
     public class ThemeSelectUI : MonoBehaviour
     {
@@ -79,13 +79,19 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         private GameThemeSO selectedTheme;
         public GameThemeSO SelectedTheme => selectedTheme;
+        private int currentIndex = 0;
 
-        // Video players for each card
-        private List<VideoPlayer> cardVideoPlayers = new List<VideoPlayer>();
-        private List<RenderTexture> cardRenderTextures = new List<RenderTexture>();
-        private List<RawImage> cardVideoImages = new List<RawImage>();
-        private List<GameObject> cardObjects = new List<GameObject>();
-        private GameObject selectedHighlight;
+        // Single video player for the displayed card
+        private VideoPlayer videoPlayer;
+        private RenderTexture renderTexture;
+        private RawImage videoImage;
+
+        // Runtime text references for updating when navigating
+        private TextMeshProUGUI scenarioNameText;
+        private TextMeshProUGUI detailNameText;
+        private TextMeshProUGUI detailTraitsText;
+        private TextMeshProUGUI detailBioText;
+        private Image cardMediaImage;
 
         // -------------------------------------------------------------------------
         // Unity Lifecycle
@@ -109,22 +115,23 @@ namespace TheBunkerGames
 
         private void OnDestroy()
         {
-            CleanupVideoPlayers();
+            CleanupVideoPlayer();
         }
 
-        private void CleanupVideoPlayers()
+        private void CleanupVideoPlayer()
         {
-            foreach (var rt in cardRenderTextures)
+            if (renderTexture != null)
             {
-                if (rt != null)
-                {
-                    rt.Release();
-                    DestroyImmediate(rt);
-                }
+                renderTexture.Release();
+                DestroyImmediate(renderTexture);
+                renderTexture = null;
             }
-            cardRenderTextures.Clear();
-            cardVideoPlayers.Clear();
-            cardVideoImages.Clear();
+            if (videoPlayer != null)
+            {
+                videoPlayer.Stop();
+                Destroy(videoPlayer);
+                videoPlayer = null;
+            }
         }
 
         // -------------------------------------------------------------------------
@@ -167,8 +174,14 @@ namespace TheBunkerGames
             // ---- Title Banner ----
             BuildTitleBanner(panel.transform);
 
-            // ---- Card Grid ----
-            BuildCardGrid(panel.transform);
+            // ---- Theme Card (left side, large) ----
+            BuildThemeCard(panel.transform);
+
+            // ---- Detail Panel / Notes (right side) ----
+            BuildDetailPanel(panel.transform);
+
+            // ---- Navigation Arrows ----
+            BuildNavigationArrows(panel.transform);
 
             // ---- Confirm Button ----
             BuildConfirmButton(panel.transform);
@@ -190,8 +203,8 @@ namespace TheBunkerGames
 
             // Centered at top
             RectTransform rect = bannerObj.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.15f, 0.88f);
-            rect.anchorMax = new Vector2(0.85f, 0.98f);
+            rect.anchorMin = new Vector2(0.10f, 0.89f);
+            rect.anchorMax = new Vector2(0.55f, 0.99f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
@@ -228,46 +241,20 @@ namespace TheBunkerGames
             if (titleFont != null) text.font = titleFont;
         }
 
-        private void BuildCardGrid(Transform parent)
+        private void BuildThemeCard(Transform parent)
         {
-            // Grid container — below title, above confirm button
-            GameObject gridObj = new GameObject("CardGrid");
-            gridObj.transform.SetParent(parent, false);
-
-            RectTransform gridRect = gridObj.AddComponent<RectTransform>();
-            gridRect.anchorMin = new Vector2(0.03f, 0.08f);
-            gridRect.anchorMax = new Vector2(0.97f, 0.86f);
-            gridRect.offsetMin = Vector2.zero;
-            gridRect.offsetMax = Vector2.zero;
-
-            // GridLayoutGroup with calculated cell sizes
-            // Reference canvas: 1920x1080. Grid area ~94% x 78% = ~1804 x 842
-            // 2 cols: (1804 - 40 padding - 30 spacing) / 2 = ~867 per cell width
-            // 2 rows: (842 - 20 padding - 30 spacing) / 2 = ~396 per cell height
-            GridLayoutGroup grid = gridObj.AddComponent<GridLayoutGroup>();
-            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            grid.constraintCount = 2;
-            grid.cellSize = new Vector2(860, 390);
-            grid.spacing = new Vector2(30, 30);
-            grid.padding = new RectOffset(20, 20, 10, 10);
-            grid.childAlignment = TextAnchor.MiddleCenter;
-
-            // Build individual cards for each theme
-            for (int i = 0; i < availableThemes.Count; i++)
-            {
-                BuildThemeCardInGrid(gridObj.transform, availableThemes[i], i);
-            }
-        }
-
-        private void BuildThemeCardInGrid(Transform gridParent, GameThemeSO theme, int index)
-        {
-            // Card wrapper — the clickable card (sized by GridLayoutGroup)
-            GameObject cardObj = new GameObject($"ThemeCard_{index}");
-            cardObj.transform.SetParent(gridParent, false);
+            // The card sits on the left ~60% of the screen
+            // Reference layout: card takes roughly left 62% of width, ~10%-85% height
+            GameObject cardObj = new GameObject("ThemeCard");
+            cardObj.transform.SetParent(parent, false);
 
             RectTransform cardRect = cardObj.AddComponent<RectTransform>();
+            cardRect.anchorMin = new Vector2(0.03f, 0.06f);
+            cardRect.anchorMax = new Vector2(0.62f, 0.88f);
+            cardRect.offsetMin = Vector2.zero;
+            cardRect.offsetMax = Vector2.zero;
 
-            // Card frame background
+            // Card frame (polaroid style white border)
             Image cardBorder = cardObj.AddComponent<Image>();
             if (cardFrameSprite != null)
             {
@@ -280,35 +267,24 @@ namespace TheBunkerGames
                 cardBorder.color = cardBorderColor;
             }
 
-            // Make it clickable
-            Button cardButton = cardObj.AddComponent<Button>();
-            var btnColors = cardButton.colors;
-            btnColors.highlightedColor = new Color(0.9f, 0.9f, 0.85f, 1f);
-            btnColors.pressedColor = new Color(0.7f, 0.7f, 0.65f, 1f);
-            cardButton.colors = btnColors;
-
-            // --- Media area (video/image inside card frame) ---
+            // --- Media area (video/image fills most of the card) ---
+            // In the reference: image takes up ~top 80% of card, name at bottom ~20%
             GameObject mediaArea = new GameObject("MediaArea");
             mediaArea.transform.SetParent(cardObj.transform, false);
 
             RectTransform mediaRect = mediaArea.AddComponent<RectTransform>();
-            mediaRect.anchorMin = new Vector2(0.04f, 0.18f);
+            mediaRect.anchorMin = new Vector2(0.04f, 0.15f);
             mediaRect.anchorMax = new Vector2(0.96f, 0.96f);
             mediaRect.offsetMin = Vector2.zero;
             mediaRect.offsetMax = Vector2.zero;
 
-            // Static image fallback
+            // Static image fallback (dark bg)
             Image mediaImg = mediaArea.AddComponent<Image>();
-            mediaImg.color = new Color(0.25f, 0.25f, 0.25f, 1f);
+            mediaImg.color = new Color(0.2f, 0.2f, 0.2f, 1f);
             mediaImg.type = Image.Type.Simple;
             mediaImg.preserveAspect = false;
-            if (theme != null && theme.ThemeIcon != null)
-            {
-                mediaImg.sprite = theme.ThemeIcon;
-                mediaImg.color = Color.white;
-            }
 
-            // Video overlay (RawImage)
+            // Video overlay (RawImage) — fills the media area
             GameObject videoObj = new GameObject("VideoDisplay");
             videoObj.transform.SetParent(mediaArea.transform, false);
 
@@ -328,50 +304,190 @@ namespace TheBunkerGames
 
             RectTransform titleRect = titleArea.AddComponent<RectTransform>();
             titleRect.anchorMin = new Vector2(0.04f, 0.01f);
-            titleRect.anchorMax = new Vector2(0.96f, 0.18f);
+            titleRect.anchorMax = new Vector2(0.96f, 0.15f);
             titleRect.offsetMin = Vector2.zero;
             titleRect.offsetMax = Vector2.zero;
 
-            // No black bg — let the card frame show through, just text
             GameObject titleTextObj = new GameObject("Text");
             titleTextObj.transform.SetParent(titleArea.transform, false);
 
             RectTransform ttRect = titleTextObj.AddComponent<RectTransform>();
             ttRect.anchorMin = Vector2.zero;
             ttRect.anchorMax = Vector2.one;
-            ttRect.offsetMin = new Vector2(5, 0);
-            ttRect.offsetMax = new Vector2(-5, 0);
+            ttRect.offsetMin = new Vector2(10, 0);
+            ttRect.offsetMax = new Vector2(-10, 0);
 
-            string themeName = theme != null ? theme.ThemeName.ToUpper() : "UNKNOWN";
             var cardTitle = titleTextObj.AddComponent<TextMeshProUGUI>();
-            cardTitle.text = themeName;
-            cardTitle.fontSize = 32;
+            cardTitle.text = "SCENARIO NAME";
+            cardTitle.fontSize = 44;
             cardTitle.alignment = TextAlignmentOptions.Center;
             cardTitle.color = detailTextColor;
             cardTitle.fontStyle = FontStyles.Bold;
             cardTitle.enableAutoSizing = true;
-            cardTitle.fontSizeMin = 16;
-            cardTitle.fontSizeMax = 40;
+            cardTitle.fontSizeMin = 24;
+            cardTitle.fontSizeMax = 52;
             if (titleFont != null) cardTitle.font = titleFont;
+        }
 
-            // --- Selection highlight (hidden by default) ---
-            GameObject highlight = new GameObject("SelectionHighlight");
-            highlight.transform.SetParent(cardObj.transform, false);
+        private void BuildDetailPanel(Transform parent)
+        {
+            // Notes panel on the right side — notebook paper style
+            // Reference: right ~35% of screen, slightly overlapping vertically
+            GameObject detailObj = new GameObject("DetailPanel");
+            detailObj.transform.SetParent(parent, false);
 
-            RectTransform hlRect = highlight.AddComponent<RectTransform>();
-            hlRect.anchorMin = Vector2.zero;
-            hlRect.anchorMax = Vector2.one;
-            hlRect.offsetMin = new Vector2(-4, -4);
-            hlRect.offsetMax = new Vector2(4, 4);
+            RectTransform detailRect = detailObj.AddComponent<RectTransform>();
+            detailRect.anchorMin = new Vector2(0.62f, 0.10f);
+            detailRect.anchorMax = new Vector2(0.97f, 0.88f);
+            detailRect.offsetMin = Vector2.zero;
+            detailRect.offsetMax = Vector2.zero;
 
-            Image hlImg = highlight.AddComponent<Image>();
-            hlImg.color = new Color(1f, 0.85f, 0.2f, 0.6f);
-            hlImg.type = Image.Type.Sliced;
-            hlImg.raycastTarget = false;
-            highlight.SetActive(false);
+            Image detailBg = detailObj.AddComponent<Image>();
+            if (notesSprite != null)
+            {
+                detailBg.sprite = notesSprite;
+                detailBg.type = Image.Type.Sliced;
+                detailBg.color = Color.white;
+            }
+            else
+            {
+                detailBg.color = detailPanelBg;
+            }
 
-            // Ensure highlight renders behind card content
-            highlight.transform.SetAsFirstSibling();
+            // Content container with padding
+            GameObject contentObj = new GameObject("Content");
+            contentObj.transform.SetParent(detailObj.transform, false);
+
+            RectTransform contentRect = contentObj.AddComponent<RectTransform>();
+            contentRect.anchorMin = new Vector2(0.08f, 0.05f);
+            contentRect.anchorMax = new Vector2(0.92f, 0.95f);
+            contentRect.offsetMin = Vector2.zero;
+            contentRect.offsetMax = Vector2.zero;
+
+            // Vertical layout for the text sections
+            VerticalLayoutGroup vlg = contentObj.AddComponent<VerticalLayoutGroup>();
+            vlg.childAlignment = TextAnchor.UpperLeft;
+            vlg.spacing = 8;
+            vlg.childControlWidth = true;
+            vlg.childControlHeight = false;
+            vlg.childForceExpandWidth = true;
+            vlg.childForceExpandHeight = false;
+            vlg.padding = new RectOffset(5, 5, 10, 10);
+
+            // --- NAME Section ---
+            BuildDetailLabel(contentObj.transform, "NameLabel", "NAME:", 32);
+            BuildDetailValue(contentObj.transform, "NameValue", "ZOMBIE APOCALYPSE", 28, 50);
+
+            // Spacer
+            BuildSpacer(contentObj.transform, 10);
+
+            // --- TRAITS Section ---
+            BuildDetailLabel(contentObj.transform, "TraitsLabel", "TRAITS:", 32);
+            BuildDetailValue(contentObj.transform, "TraitsValue", "SCAVENGER\nMELEE EXPERT", 26, 80);
+
+            // Spacer
+            BuildSpacer(contentObj.transform, 10);
+
+            // --- BIO Section ---
+            BuildDetailLabel(contentObj.transform, "BioLabel", "BIO:", 32);
+            BuildDetailValue(contentObj.transform, "BioValue", "Theme description goes here.", 24, 180);
+        }
+
+        private void BuildDetailLabel(Transform parent, string name, string labelText, float fontSize)
+        {
+            GameObject labelObj = new GameObject(name);
+            labelObj.transform.SetParent(parent, false);
+
+            RectTransform rect = labelObj.AddComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(0, 36);
+
+            var text = labelObj.AddComponent<TextMeshProUGUI>();
+            text.text = labelText;
+            text.fontSize = fontSize;
+            text.fontStyle = FontStyles.Bold;
+            text.color = detailTextColor;
+            text.alignment = TextAlignmentOptions.TopLeft;
+            text.enableAutoSizing = false;
+            if (titleFont != null) text.font = titleFont;
+        }
+
+        private void BuildDetailValue(Transform parent, string name, string valueText, float fontSize, float height)
+        {
+            GameObject valueObj = new GameObject(name);
+            valueObj.transform.SetParent(parent, false);
+
+            RectTransform rect = valueObj.AddComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(0, height);
+
+            var text = valueObj.AddComponent<TextMeshProUGUI>();
+            text.text = valueText;
+            text.fontSize = fontSize;
+            text.fontStyle = FontStyles.Normal;
+            text.color = detailTextColor;
+            text.alignment = TextAlignmentOptions.TopLeft;
+            text.enableWordWrapping = true;
+            text.overflowMode = TextOverflowModes.Ellipsis;
+            text.enableAutoSizing = false;
+            if (subtitleFont != null) text.font = subtitleFont;
+        }
+
+        private void BuildSpacer(Transform parent, float height)
+        {
+            GameObject spacer = new GameObject("Spacer");
+            spacer.transform.SetParent(parent, false);
+
+            RectTransform rect = spacer.AddComponent<RectTransform>();
+            rect.sizeDelta = new Vector2(0, height);
+
+            LayoutElement le = spacer.AddComponent<LayoutElement>();
+            le.minHeight = height;
+            le.preferredHeight = height;
+        }
+
+        private void BuildNavigationArrows(Transform parent)
+        {
+            // Left arrow — positioned on the left edge of the card area
+            BuildArrow(parent, "LeftArrow", new Vector2(0.01f, 0.40f), new Vector2(0.05f, 0.60f), true);
+
+            // Right arrow — positioned between card and detail panel
+            BuildArrow(parent, "RightArrow", new Vector2(0.58f, 0.40f), new Vector2(0.62f, 0.60f), false);
+        }
+
+        private void BuildArrow(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, bool flipHorizontal)
+        {
+            GameObject arrowObj = new GameObject(name);
+            arrowObj.transform.SetParent(parent, false);
+
+            RectTransform rect = arrowObj.AddComponent<RectTransform>();
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            Image arrowImg = arrowObj.AddComponent<Image>();
+            if (arrowSprite != null)
+            {
+                arrowImg.sprite = arrowSprite;
+                arrowImg.type = Image.Type.Simple;
+                arrowImg.preserveAspect = true;
+                arrowImg.color = Color.white;
+            }
+            else
+            {
+                arrowImg.color = new Color(0.9f, 0.9f, 0.9f, 0.8f);
+            }
+
+            // Flip left arrow horizontally
+            if (flipHorizontal)
+            {
+                rect.localScale = new Vector3(-1f, 1f, 1f);
+            }
+
+            Button btn = arrowObj.AddComponent<Button>();
+            var colors = btn.colors;
+            colors.highlightedColor = new Color(1f, 1f, 1f, 1f);
+            colors.pressedColor = new Color(0.7f, 0.7f, 0.7f, 1f);
+            btn.colors = colors;
         }
 
         private void BuildConfirmButton(Transform parent)
@@ -380,8 +496,8 @@ namespace TheBunkerGames
             btnObj.transform.SetParent(parent, false);
 
             RectTransform rect = btnObj.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.35f, 0.01f);
-            rect.anchorMax = new Vector2(0.65f, 0.06f);
+            rect.anchorMin = new Vector2(0.72f, 0.02f);
+            rect.anchorMax = new Vector2(0.95f, 0.09f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
@@ -434,18 +550,11 @@ namespace TheBunkerGames
             if (canvasRoot == null) return;
             canvasRoot.SetActive(true);
             selectedTheme = null;
+            currentIndex = 0;
 
-            SetupAllVideoPlayers();
-            WireCardButtons();
-
-            // Start all videos playing
-            for (int i = 0; i < availableThemes.Count; i++)
-            {
-                if (i < cardVideoPlayers.Count && availableThemes[i] != null)
-                {
-                    PlayCardVideo(i, availableThemes[i].PreviewVideo);
-                }
-            }
+            SetupVideoPlayer();
+            WireButtons();
+            DisplayCurrentTheme();
 
             UIBuilderUtils.SetButtonInteractable(panel, "ConfirmButton", false);
 
@@ -454,109 +563,183 @@ namespace TheBunkerGames
 
         public void Hide()
         {
-            StopAllVideos();
+            StopVideo();
             if (canvasRoot != null) canvasRoot.SetActive(false);
         }
 
         // -------------------------------------------------------------------------
-        // Video Player Setup (one per card)
+        // Video Player Setup (single player for the displayed card)
         // -------------------------------------------------------------------------
-        private void SetupAllVideoPlayers()
+        private void SetupVideoPlayer()
         {
-            CleanupVideoPlayers();
-            cardObjects.Clear();
+            CleanupVideoPlayer();
 
             if (panel == null) return;
 
-            Transform gridTransform = panel.transform.Find("CardGrid");
-            if (gridTransform == null) return;
+            Transform cardTransform = panel.transform.Find("ThemeCard");
+            if (cardTransform == null) return;
 
-            for (int i = 0; i < availableThemes.Count; i++)
+            Transform mediaArea = cardTransform.Find("MediaArea");
+            Transform videoDisplay = mediaArea?.Find("VideoDisplay");
+            videoImage = videoDisplay?.GetComponent<RawImage>();
+            cardMediaImage = mediaArea?.GetComponent<Image>();
+
+            // Find text references
+            Transform titleTextTransform = cardTransform.Find("CardTitle/Text");
+            scenarioNameText = titleTextTransform?.GetComponent<TextMeshProUGUI>();
+
+            Transform detailPanel = panel.transform.Find("DetailPanel/Content");
+            if (detailPanel != null)
             {
-                Transform cardTransform = gridTransform.Find($"ThemeCard_{i}");
-                if (cardTransform == null) continue;
+                Transform nameVal = detailPanel.Find("NameValue");
+                detailNameText = nameVal?.GetComponent<TextMeshProUGUI>();
 
-                cardObjects.Add(cardTransform.gameObject);
+                Transform traitsVal = detailPanel.Find("TraitsValue");
+                detailTraitsText = traitsVal?.GetComponent<TextMeshProUGUI>();
 
-                Transform mediaArea = cardTransform.Find("MediaArea");
-                Transform videoDisplay = mediaArea?.Find("VideoDisplay");
-                RawImage videoImg = videoDisplay?.GetComponent<RawImage>();
+                Transform bioVal = detailPanel.Find("BioValue");
+                detailBioText = bioVal?.GetComponent<TextMeshProUGUI>();
+            }
 
-                // Create RenderTexture + VideoPlayer for this card
-                RenderTexture rt = new RenderTexture(832, 464, 0);
-                rt.Create();
-                cardRenderTextures.Add(rt);
+            // Create RenderTexture + VideoPlayer
+            renderTexture = new RenderTexture(832, 464, 0);
+            renderTexture.Create();
 
-                VideoPlayer vp = gameObject.AddComponent<VideoPlayer>();
-                vp.playOnAwake = false;
-                vp.renderMode = VideoRenderMode.RenderTexture;
-                vp.targetTexture = rt;
-                vp.isLooping = true;
-                vp.audioOutputMode = VideoAudioOutputMode.None;
-                cardVideoPlayers.Add(vp);
+            videoPlayer = gameObject.AddComponent<VideoPlayer>();
+            videoPlayer.playOnAwake = false;
+            videoPlayer.renderMode = VideoRenderMode.RenderTexture;
+            videoPlayer.targetTexture = renderTexture;
+            videoPlayer.isLooping = true;
+            videoPlayer.audioOutputMode = VideoAudioOutputMode.None;
 
-                if (videoImg != null)
+            if (videoImage != null)
+                videoImage.texture = renderTexture;
+        }
+
+        private void PlayVideo(VideoClip clip)
+        {
+            if (videoPlayer == null || clip == null) return;
+
+            videoPlayer.clip = clip;
+            videoPlayer.isLooping = true;
+            videoPlayer.Play();
+
+            if (videoImage != null)
+                videoImage.enabled = true;
+        }
+
+        private void StopVideo()
+        {
+            if (videoPlayer != null && videoPlayer.isPlaying)
+                videoPlayer.Stop();
+
+            if (videoImage != null)
+                videoImage.enabled = false;
+        }
+
+        // -------------------------------------------------------------------------
+        // Display Current Theme
+        // -------------------------------------------------------------------------
+        private void DisplayCurrentTheme()
+        {
+            if (availableThemes.Count == 0) return;
+            if (currentIndex < 0 || currentIndex >= availableThemes.Count)
+                currentIndex = 0;
+
+            GameThemeSO theme = availableThemes[currentIndex];
+            if (theme == null) return;
+
+            // Update card title
+            if (scenarioNameText != null)
+                scenarioNameText.text = theme.ThemeName.ToUpper();
+
+            // Update card media (static image fallback)
+            if (cardMediaImage != null)
+            {
+                if (theme.ThemeIcon != null)
                 {
-                    videoImg.texture = rt;
-                    cardVideoImages.Add(videoImg);
+                    cardMediaImage.sprite = theme.ThemeIcon;
+                    cardMediaImage.color = Color.white;
+                    cardMediaImage.preserveAspect = false;
                 }
                 else
                 {
-                    cardVideoImages.Add(null);
+                    cardMediaImage.sprite = null;
+                    cardMediaImage.color = new Color(0.2f, 0.2f, 0.2f, 1f);
                 }
             }
-        }
 
-        private void PlayCardVideo(int index, VideoClip clip)
-        {
-            if (index >= cardVideoPlayers.Count || clip == null) return;
+            // Update detail panel
+            if (detailNameText != null)
+                detailNameText.text = theme.ThemeName.ToUpper();
 
-            VideoPlayer vp = cardVideoPlayers[index];
-            vp.clip = clip;
-            vp.isLooping = true;
-            vp.Play();
-
-            if (index < cardVideoImages.Count && cardVideoImages[index] != null)
-                cardVideoImages[index].enabled = true;
-        }
-
-        private void StopAllVideos()
-        {
-            foreach (var vp in cardVideoPlayers)
+            if (detailTraitsText != null)
             {
-                if (vp != null && vp.isPlaying)
-                    vp.Stop();
+                if (theme.Traits != null && theme.Traits.Length > 0)
+                    detailTraitsText.text = string.Join("\n", theme.Traits).ToUpper();
+                else
+                    detailTraitsText.text = "NONE";
             }
 
-            foreach (var img in cardVideoImages)
-            {
-                if (img != null)
-                    img.enabled = false;
-            }
+            if (detailBioText != null)
+                detailBioText.text = !string.IsNullOrEmpty(theme.Description)
+                    ? theme.Description
+                    : "No description available.";
+
+            // Play video
+            StopVideo();
+            if (theme.PreviewVideo != null)
+                PlayVideo(theme.PreviewVideo);
+
+            // Auto-select the displayed theme
+            selectedTheme = theme;
+            UIBuilderUtils.SetButtonInteractable(panel, "ConfirmButton", true);
+
+            if (enableDebugLogs) Debug.Log($"[ThemeSelectUI] Displaying: {theme.ThemeName} ({currentIndex + 1}/{availableThemes.Count})");
+        }
+
+        // -------------------------------------------------------------------------
+        // Navigation
+        // -------------------------------------------------------------------------
+        private void NavigateLeft()
+        {
+            if (availableThemes.Count == 0) return;
+            currentIndex--;
+            if (currentIndex < 0)
+                currentIndex = availableThemes.Count - 1;
+            DisplayCurrentTheme();
+        }
+
+        private void NavigateRight()
+        {
+            if (availableThemes.Count == 0) return;
+            currentIndex++;
+            if (currentIndex >= availableThemes.Count)
+                currentIndex = 0;
+            DisplayCurrentTheme();
         }
 
         // -------------------------------------------------------------------------
         // Button Wiring
         // -------------------------------------------------------------------------
-        private void WireCardButtons()
+        private void WireButtons()
         {
             if (panel == null) return;
 
-            Transform gridTransform = panel.transform.Find("CardGrid");
-            if (gridTransform == null) return;
-
-            for (int i = 0; i < availableThemes.Count; i++)
+            // Left arrow
+            Button leftBtn = UIBuilderUtils.FindButton(panel, "LeftArrow");
+            if (leftBtn != null)
             {
-                Transform cardTransform = gridTransform.Find($"ThemeCard_{i}");
-                if (cardTransform == null) continue;
+                leftBtn.onClick.RemoveAllListeners();
+                leftBtn.onClick.AddListener(NavigateLeft);
+            }
 
-                Button cardBtn = cardTransform.GetComponent<Button>();
-                if (cardBtn != null)
-                {
-                    int capturedIndex = i;
-                    cardBtn.onClick.RemoveAllListeners();
-                    cardBtn.onClick.AddListener(() => OnCardSelected(capturedIndex));
-                }
+            // Right arrow
+            Button rightBtn = UIBuilderUtils.FindButton(panel, "RightArrow");
+            if (rightBtn != null)
+            {
+                rightBtn.onClick.RemoveAllListeners();
+                rightBtn.onClick.AddListener(NavigateRight);
             }
 
             // Confirm button
@@ -565,40 +748,6 @@ namespace TheBunkerGames
             {
                 confirmBtn.onClick.RemoveAllListeners();
                 confirmBtn.onClick.AddListener(OnConfirm);
-            }
-        }
-
-        // -------------------------------------------------------------------------
-        // Card Selection
-        // -------------------------------------------------------------------------
-        private void OnCardSelected(int index)
-        {
-            if (index < 0 || index >= availableThemes.Count) return;
-
-            selectedTheme = availableThemes[index];
-            UIBuilderUtils.SetButtonInteractable(panel, "ConfirmButton", true);
-
-            // Update selection highlight
-            UpdateSelectionHighlight(index);
-
-            if (enableDebugLogs) Debug.Log($"[ThemeSelectUI] Selected: {selectedTheme.ThemeName}");
-        }
-
-        private void UpdateSelectionHighlight(int selectedIndex)
-        {
-            if (panel == null) return;
-
-            Transform gridTransform = panel.transform.Find("CardGrid");
-            if (gridTransform == null) return;
-
-            for (int i = 0; i < availableThemes.Count; i++)
-            {
-                Transform cardTransform = gridTransform.Find($"ThemeCard_{i}");
-                if (cardTransform == null) continue;
-
-                Transform highlight = cardTransform.Find("SelectionHighlight");
-                if (highlight != null)
-                    highlight.gameObject.SetActive(i == selectedIndex);
             }
         }
 
