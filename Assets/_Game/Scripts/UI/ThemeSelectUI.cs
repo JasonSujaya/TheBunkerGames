@@ -201,10 +201,10 @@ namespace TheBunkerGames
             GameObject bannerObj = new GameObject("TitleBanner");
             bannerObj.transform.SetParent(parent, false);
 
-            // Centered at top
+            // Positioned above the card, left-aligned
             RectTransform rect = bannerObj.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.10f, 0.89f);
-            rect.anchorMax = new Vector2(0.55f, 0.99f);
+            rect.anchorMin = new Vector2(0.08f, 0.88f);
+            rect.anchorMax = new Vector2(0.48f, 0.98f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
@@ -249,8 +249,8 @@ namespace TheBunkerGames
             cardObj.transform.SetParent(parent, false);
 
             RectTransform cardRect = cardObj.AddComponent<RectTransform>();
-            cardRect.anchorMin = new Vector2(0.03f, 0.06f);
-            cardRect.anchorMax = new Vector2(0.62f, 0.88f);
+            cardRect.anchorMin = new Vector2(0.04f, 0.04f);
+            cardRect.anchorMax = new Vector2(0.58f, 0.87f);
             cardRect.offsetMin = Vector2.zero;
             cardRect.offsetMax = Vector2.zero;
 
@@ -337,8 +337,8 @@ namespace TheBunkerGames
             detailObj.transform.SetParent(parent, false);
 
             RectTransform detailRect = detailObj.AddComponent<RectTransform>();
-            detailRect.anchorMin = new Vector2(0.62f, 0.10f);
-            detailRect.anchorMax = new Vector2(0.97f, 0.88f);
+            detailRect.anchorMin = new Vector2(0.60f, 0.06f);
+            detailRect.anchorMax = new Vector2(0.97f, 0.92f);
             detailRect.offsetMin = Vector2.zero;
             detailRect.offsetMax = Vector2.zero;
 
@@ -367,7 +367,7 @@ namespace TheBunkerGames
             // Vertical layout for the text sections
             VerticalLayoutGroup vlg = contentObj.AddComponent<VerticalLayoutGroup>();
             vlg.childAlignment = TextAnchor.UpperLeft;
-            vlg.spacing = 8;
+            vlg.spacing = 12;
             vlg.childControlWidth = true;
             vlg.childControlHeight = false;
             vlg.childForceExpandWidth = true;
@@ -376,21 +376,21 @@ namespace TheBunkerGames
 
             // --- NAME Section ---
             BuildDetailLabel(contentObj.transform, "NameLabel", "NAME:", 32);
-            BuildDetailValue(contentObj.transform, "NameValue", "ZOMBIE APOCALYPSE", 28, 50);
+            BuildDetailValue(contentObj.transform, "NameValue", "ZOMBIE APOCALYPSE", 28, 45);
 
             // Spacer
             BuildSpacer(contentObj.transform, 10);
 
             // --- TRAITS Section ---
             BuildDetailLabel(contentObj.transform, "TraitsLabel", "TRAITS:", 32);
-            BuildDetailValue(contentObj.transform, "TraitsValue", "SCAVENGER\nMELEE EXPERT", 26, 80);
+            BuildDetailValue(contentObj.transform, "TraitsValue", "SCAVENGER\nMELEE EXPERT", 26, 100);
 
             // Spacer
             BuildSpacer(contentObj.transform, 10);
 
             // --- BIO Section ---
             BuildDetailLabel(contentObj.transform, "BioLabel", "BIO:", 32);
-            BuildDetailValue(contentObj.transform, "BioValue", "Theme description goes here.", 24, 180);
+            BuildDetailValue(contentObj.transform, "BioValue", "Theme description goes here.", 24, 250);
         }
 
         private void BuildDetailLabel(Transform parent, string name, string labelText, float fontSize)
@@ -446,11 +446,11 @@ namespace TheBunkerGames
 
         private void BuildNavigationArrows(Transform parent)
         {
-            // Left arrow — positioned on the left edge of the card area
-            BuildArrow(parent, "LeftArrow", new Vector2(0.01f, 0.40f), new Vector2(0.05f, 0.60f), true);
+            // Left arrow — overlaid on left edge of the card
+            BuildArrow(parent, "LeftArrow", new Vector2(0.04f, 0.38f), new Vector2(0.08f, 0.56f), true);
 
-            // Right arrow — positioned between card and detail panel
-            BuildArrow(parent, "RightArrow", new Vector2(0.58f, 0.40f), new Vector2(0.62f, 0.60f), false);
+            // Right arrow — overlaid on right edge of the card
+            BuildArrow(parent, "RightArrow", new Vector2(0.54f, 0.38f), new Vector2(0.58f, 0.56f), false);
         }
 
         private void BuildArrow(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax, bool flipHorizontal)
@@ -496,8 +496,8 @@ namespace TheBunkerGames
             btnObj.transform.SetParent(parent, false);
 
             RectTransform rect = btnObj.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.72f, 0.02f);
-            rect.anchorMax = new Vector2(0.95f, 0.09f);
+            rect.anchorMin = new Vector2(0.78f, 0.01f);
+            rect.anchorMax = new Vector2(0.97f, 0.07f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
