@@ -582,7 +582,7 @@ namespace TheBunkerGames
             WireCardButtons();
             DisplayCurrentTheme();
 
-            SetConfirmButtonInteractable( false);
+
 
             if (enableDebugLogs) Debug.Log($"[ThemeSelectUI] Shown with {availableThemes.Count} themes.");
         }
