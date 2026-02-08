@@ -219,7 +219,8 @@ namespace TheBunkerGames
 
         private void BuildThemeCard(Transform parent)
         {
-            // Card border / frame
+            // Card border / frame (white card — polaroid style)
+            // The card occupies the lower portion; the media overflows upward
             GameObject cardObj = new GameObject("ThemeCard");
             cardObj.transform.SetParent(parent, false);
 
@@ -241,13 +242,15 @@ namespace TheBunkerGames
                 cardBorder.color = cardBorderColor;
             }
 
-            // Video / Image area (inset from border, 9:16 ratio maintained via AspectRatioFitter)
+            // Video / Image area — sits ON TOP of the card frame, overflowing upward
+            // Anchored from 18% to 102% of the card height (extends above the card boundary)
+            // No Mask on the card, so the overflow is visible
             GameObject mediaArea = new GameObject("MediaArea");
             mediaArea.transform.SetParent(cardObj.transform, false);
 
             RectTransform mediaRect = mediaArea.AddComponent<RectTransform>();
-            mediaRect.anchorMin = new Vector2(0.03f, 0.1f);
-            mediaRect.anchorMax = new Vector2(0.97f, 0.88f);
+            mediaRect.anchorMin = new Vector2(0.04f, 0.18f);
+            mediaRect.anchorMax = new Vector2(0.96f, 1.02f);
             mediaRect.offsetMin = Vector2.zero;
             mediaRect.offsetMax = Vector2.zero;
 
@@ -275,18 +278,19 @@ namespace TheBunkerGames
             aspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
             aspect.aspectRatio = 9f / 16f;
 
-            // Theme title (bottom of card)
+            // Theme title — sits ON the white card frame area at the bottom, with black bg
+            // Anchored at bottom 18% of card (the white frame area below the media)
             GameObject titleArea = new GameObject("CardTitle");
             titleArea.transform.SetParent(cardObj.transform, false);
 
             RectTransform titleRect = titleArea.AddComponent<RectTransform>();
-            titleRect.anchorMin = new Vector2(0, 0);
-            titleRect.anchorMax = new Vector2(1, 0.1f);
+            titleRect.anchorMin = new Vector2(0.04f, 0.02f);
+            titleRect.anchorMax = new Vector2(0.96f, 0.18f);
             titleRect.offsetMin = Vector2.zero;
             titleRect.offsetMax = Vector2.zero;
 
             Image titleBg = titleArea.AddComponent<Image>();
-            titleBg.color = new Color(0, 0, 0, 0.7f);
+            titleBg.color = new Color(0, 0, 0, 0.85f);
 
             GameObject titleTextObj = new GameObject("Text");
             titleTextObj.transform.SetParent(titleArea.transform, false);
@@ -410,18 +414,19 @@ namespace TheBunkerGames
 
         private void BuildNavigationArrows(Transform parent)
         {
-            // Left arrow
+            // Left arrow — wider and taller for better touch/click target
             GameObject leftBtn = new GameObject("LeftArrow");
             leftBtn.transform.SetParent(parent, false);
 
             RectTransform leftRect = leftBtn.AddComponent<RectTransform>();
-            leftRect.anchorMin = new Vector2(0.01f, 0.42f);
-            leftRect.anchorMax = new Vector2(0.05f, 0.58f);
+            leftRect.anchorMin = new Vector2(0.005f, 0.38f);
+            leftRect.anchorMax = new Vector2(0.05f, 0.62f);
             leftRect.offsetMin = Vector2.zero;
             leftRect.offsetMax = Vector2.zero;
 
             Image leftBg = leftBtn.AddComponent<Image>();
             leftBg.color = new Color(0.3f, 0.28f, 0.25f, 0.8f);
+            leftBg.preserveAspect = true;
             if (arrowSprite != null) { leftBg.sprite = arrowSprite; leftBg.type = Image.Type.Simple; leftBg.transform.localScale = new Vector3(-1, 1, 1); }
 
             Button leftButton = leftBtn.AddComponent<Button>();
@@ -445,18 +450,19 @@ namespace TheBunkerGames
             lt.fontStyle = FontStyles.Bold;
             if (titleFont != null) lt.font = titleFont;
 
-            // Right arrow
+            // Right arrow — wider and taller to match left arrow
             GameObject rightBtn = new GameObject("RightArrow");
             rightBtn.transform.SetParent(parent, false);
 
             RectTransform rightRect = rightBtn.AddComponent<RectTransform>();
-            rightRect.anchorMin = new Vector2(0.62f, 0.42f);
-            rightRect.anchorMax = new Vector2(0.645f, 0.58f);
+            rightRect.anchorMin = new Vector2(0.615f, 0.38f);
+            rightRect.anchorMax = new Vector2(0.66f, 0.62f);
             rightRect.offsetMin = Vector2.zero;
             rightRect.offsetMax = Vector2.zero;
 
             Image rightBg = rightBtn.AddComponent<Image>();
             rightBg.color = new Color(0.3f, 0.28f, 0.25f, 0.8f);
+            rightBg.preserveAspect = true;
             if (arrowSprite != null) { rightBg.sprite = arrowSprite; rightBg.type = Image.Type.Simple; }
 
             Button rightButton = rightBtn.AddComponent<Button>();
