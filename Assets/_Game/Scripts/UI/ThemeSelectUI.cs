@@ -48,6 +48,9 @@ namespace TheBunkerGames
         [SerializeField] private TMP_FontAsset subtitleFont;
         [SerializeField] private Sprite buttonSprite;
         [SerializeField] private Sprite backgroundSprite;
+        [SerializeField] private Sprite cardFrameSprite;
+        [SerializeField] private Sprite notesSprite;
+        [SerializeField] private Sprite titleBannerSprite;
         [SerializeField] private Sprite arrowSprite;
 
         // -------------------------------------------------------------------------
@@ -136,6 +139,18 @@ namespace TheBunkerGames
             // Main panel (full screen)
             panel = UIBuilderUtils.CreatePanel(canvasRoot.transform, "ThemeSelectPanel", panelBgColor);
 
+            // Apply background sprite to main panel if assigned
+            if (backgroundSprite != null)
+            {
+                Image panelImg = panel.GetComponent<Image>();
+                if (panelImg != null)
+                {
+                    panelImg.sprite = backgroundSprite;
+                    panelImg.type = Image.Type.Sliced;
+                    panelImg.color = Color.white;
+                }
+            }
+
             // ---- Title Banner ----
             BuildTitleBanner(panel.transform);
 
@@ -173,8 +188,16 @@ namespace TheBunkerGames
             rect.offsetMax = Vector2.zero;
 
             Image bg = bannerObj.AddComponent<Image>();
-            bg.color = new Color(0.25f, 0.22f, 0.18f, 0.9f);
-            if (backgroundSprite != null) { bg.sprite = backgroundSprite; bg.type = Image.Type.Sliced; }
+            if (titleBannerSprite != null)
+            {
+                bg.sprite = titleBannerSprite;
+                bg.type = Image.Type.Sliced;
+                bg.color = Color.white;
+            }
+            else
+            {
+                bg.color = new Color(0.25f, 0.22f, 0.18f, 0.9f);
+            }
 
             GameObject textObj = new GameObject("TitleText");
             textObj.transform.SetParent(bannerObj.transform, false);
@@ -207,7 +230,16 @@ namespace TheBunkerGames
             cardRect.offsetMax = Vector2.zero;
 
             Image cardBorder = cardObj.AddComponent<Image>();
-            cardBorder.color = cardBorderColor;
+            if (cardFrameSprite != null)
+            {
+                cardBorder.sprite = cardFrameSprite;
+                cardBorder.type = Image.Type.Sliced;
+                cardBorder.color = Color.white;
+            }
+            else
+            {
+                cardBorder.color = cardBorderColor;
+            }
 
             // Video / Image area (inset from border, 9:16 ratio maintained via AspectRatioFitter)
             GameObject mediaArea = new GameObject("MediaArea");
@@ -290,8 +322,16 @@ namespace TheBunkerGames
             detailRect.offsetMax = Vector2.zero;
 
             Image bg = detailPanel.AddComponent<Image>();
-            bg.color = detailPanelBg;
-            if (backgroundSprite != null) { bg.sprite = backgroundSprite; bg.type = Image.Type.Sliced; }
+            if (notesSprite != null)
+            {
+                bg.sprite = notesSprite;
+                bg.type = Image.Type.Sliced;
+                bg.color = Color.white;
+            }
+            else
+            {
+                bg.color = detailPanelBg;
+            }
 
             // Name
             GameObject nameObj = new GameObject("NameLabel");
