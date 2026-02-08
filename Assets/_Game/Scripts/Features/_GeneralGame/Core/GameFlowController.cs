@@ -45,40 +45,41 @@ namespace TheBunkerGames
             {
                 gameManager.SessionData.ResetData();
             }
-            
-            if (enableDebugLogs) Debug.Log($"[Sim] GAME START | Day: {gameManager.CurrentDay} | Family: {gameManager.SessionData.FamilyCount} | Health: {gameManager.SessionData.AverageHealth}%");
-            
-                // Spawn Default Family & Items
-                if (gameManager.Family != null)
-                {
-                    gameManager.Family.SpawnDefaultFamily();
-                    // Sync only family first
-                    gameManager.SessionData.UpdateSync(gameManager.Family);
 
-                    // Add Starting Items from profile
-                    var profile = gameManager.Family.DefaultFamilyProfile;
-                    if (profile != null && gameManager.Inventory != null)
+            // Start locally at Day 0 so AdvanceDay() brings us to Day 1
+            gameManager.CurrentDay = 0;
+            
+            if (enableDebugLogs) Debug.Log($"[Sim] GAME INITIALIZATION | Family: {gameManager.SessionData.FamilyCount}");
+            
+            // Spawn Default Family & Items (One-time Setup)
+            if (gameManager.Family != null)
+            {
+                gameManager.Family.SpawnDefaultFamily();
+                // Sync only family first
+                gameManager.SessionData.UpdateSync(gameManager.Family);
+
+                // Add Starting Items from profile
+                var profile = gameManager.Family.DefaultFamilyProfile;
+                if (profile != null && gameManager.Inventory != null)
+                {
+                    gameManager.Inventory.ClearInventory();
+                    if (profile.StartingItems != null)
                     {
-                        gameManager.Inventory.ClearInventory();
-                        if (profile.StartingItems != null)
+                        foreach (var entry in profile.StartingItems)
                         {
-                            foreach (var entry in profile.StartingItems)
+                            if (entry.Item != null && entry.Quantity > 0)
                             {
-                                if (entry.Item != null && entry.Quantity > 0)
-                                {
-                                    gameManager.Inventory.AddItem(entry.Item, entry.Quantity);
-                                }
+                                gameManager.Inventory.AddItem(entry.Item, entry.Quantity);
                             }
                         }
-                        if (enableDebugLogs) Debug.Log($"[Sim] Added starting items from {profile.name}");
                     }
+                    if (enableDebugLogs) Debug.Log($"[Sim] Added starting items from {profile.name}");
                 }
-                
-                // Full Sync (Family + Inventory)
-                gameManager.SessionData.UpdateSync(gameManager.Family, gameManager.Inventory);
-
-                GameManager.FireDayStart();
             }
+                
+            // Now advance to Day 1 which triggers all refreshes, events, and action preparation
+            AdvanceDay();
+        }
 
             public void SetState(GameState newState)
             {
@@ -100,13 +101,32 @@ namespace TheBunkerGames
             {
                 if (gameManager == null) return;
 
+                // Submit current day's actions before advancing
+                if (gameManager.Actions != null && gameManager.CurrentDay > 0)
+                {
+                    gameManager.Actions.SubmitAllActions();
+                    if (enableDebugLogs) Debug.Log($"[GameFlow] Submitted actions for Day {gameManager.CurrentDay}");
+                }
+
                 // Increment Day
                 gameManager.CurrentDay++;
                 
                 // 1. Fire Day Start Event (Triggers SurvivalManager decay, etc)
                 GameManager.FireDayStart();
 
-                // 2. Sync Data for Visualization
+                // 2. Prepare Daily Actions for the new day
+                if (gameManager.Actions != null)
+                {
+                    gameManager.Actions.PrepareDailyActions(gameManager.CurrentDay);
+                }
+
+                // Refresh HUD with family body images from SO data (mirrors StartNewGame logic)
+                if (gameManager.GameplayHud != null)
+                {
+                    gameManager.GameplayHud.RefreshFamilyBodies();
+                }
+
+                // 3. Sync Data for Visualization
                 if (gameManager.SessionData != null)
                 {
                     // Sync with Family Manager & Inventory if available

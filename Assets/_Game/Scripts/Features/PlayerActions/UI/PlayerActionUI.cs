@@ -196,6 +196,16 @@ namespace TheBunkerGames
             HideAll();
         }
 
+        private void Start()
+        {
+            // Catch up if actions are already ready (e.g. game started before UI enabled)
+            if (PlayerActionManager.Instance != null && PlayerActionManager.Instance.CurrentDayState != null)
+            {
+                if (enableDebugLogs) Debug.Log("[PlayerActionUI] Found existing daily state on Start - catching up.");
+                HandleDailyActionsReady(PlayerActionManager.Instance.CurrentDayState);
+            }
+        }
+
         private void OnEnable()
         {
             PlayerActionManager.OnDailyActionsReady += HandleDailyActionsReady;
@@ -536,18 +546,38 @@ namespace TheBunkerGames
 
         private void OnSaveClicked()
         {
-            if (!currentlyViewingCategory.HasValue) return;
+            if (enableDebugLogs) Debug.Log("[PlayerActionUI] Save button clicked.");
+
+            if (!currentlyViewingCategory.HasValue)
+            {
+                if (enableDebugLogs) Debug.LogWarning("[PlayerActionUI] Save clicked but no category is currently viewed.");
+                return;
+            }
 
             var panel = GetPanel(currentlyViewingCategory.Value);
-            if (panel == null || panel.IsSaved) return;
+            if (panel == null)
+            {
+                if (enableDebugLogs) Debug.LogError($"[PlayerActionUI] Could not find panel for {currentlyViewingCategory.Value}");
+                return;
+            }
+
+            if (panel.IsSaved)
+            {
+                if (enableDebugLogs) Debug.Log("[PlayerActionUI] Panel is already saved. Ignoring click.");
+                return;
+            }
 
             // Sync latest input
             if (detailInputField != null)
+            {
+                if (enableDebugLogs) Debug.Log($"[PlayerActionUI] Syncing input: '{detailInputField.text}'");
                 panel.SetInputText(detailInputField.text);
+            }
 
             // Validate
             if (!panel.ValidateInput())
             {
+                if (enableDebugLogs) Debug.Log("[PlayerActionUI] Validation failed.");
                 if (detailStatusText != null)
                     detailStatusText.text = panel.Category == PlayerActionCategory.Dilemma
                         ? "You must respond to the dilemma!"
@@ -556,8 +586,9 @@ namespace TheBunkerGames
             }
 
             // Show confirmation popup
-            if (confirmationPopup != null)
+            if (confirmationPopup != null && confirmationPopup.gameObject.activeInHierarchy) // Check activeInHierarchy purely for safety if root is disabled
             {
+                if (enableDebugLogs) Debug.Log("[PlayerActionUI] Showing confirmation popup.");
                 confirmationPopup.Show(
                     "Are you sure you want to save your response?\nOnce saved, it cannot be edited until the next day.",
                     OnSaveConfirmed,
@@ -567,6 +598,7 @@ namespace TheBunkerGames
             }
             else
             {
+                if (enableDebugLogs) Debug.Log("[PlayerActionUI] No confirmation popup assigned or active. Saving directly.");
                 // No popup — just save directly
                 OnSaveConfirmed();
             }
@@ -574,7 +606,13 @@ namespace TheBunkerGames
 
         private void OnSaveConfirmed()
         {
-            if (!currentlyViewingCategory.HasValue) return;
+            if (enableDebugLogs) Debug.Log("[PlayerActionUI] Save confirmed.");
+
+            if (!currentlyViewingCategory.HasValue) 
+            {
+                 if (enableDebugLogs) Debug.LogWarning("[PlayerActionUI] Lost category context during save.");
+                 return;
+            }
 
             var category = currentlyViewingCategory.Value;
             var panel = GetPanel(category);
@@ -729,6 +767,7 @@ namespace TheBunkerGames
 
         public void Show()
         {
+            gameObject.SetActive(true);
             if (rootPanel != null)
                 rootPanel.SetActive(true);
         }
@@ -771,6 +810,18 @@ namespace TheBunkerGames
             if (familyRequestPanel != null) familyRequestPanel.ResetPanel();
 
             savedCategories.Clear();
+
+            // Advance to next day
+            var flow = FindFirstObjectByType<GameFlowController>();
+            if (flow != null)
+            {
+                if (enableDebugLogs) Debug.Log("[PlayerActionUI] Calling AdvanceDay()...");
+                flow.AdvanceDay();
+            }
+            else
+            {
+                if (enableDebugLogs) Debug.LogWarning("[PlayerActionUI] Could not find GameFlowController to advance day!");
+            }
         }
 
         // -------------------------------------------------------------------------

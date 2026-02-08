@@ -1,6 +1,7 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System.Collections.Generic;
 #if ODIN_INSPECTOR
 using Sirenix.OdinInspector;
 #endif
@@ -75,6 +76,11 @@ namespace TheBunkerGames
         [SerializeField] private Button continueButton;
         [SerializeField] private TMP_InputField inputField;
 
+        [Header("Navigation")]
+        [SerializeField] private Button previousButton;
+        [SerializeField] private Button nextButton;
+        [SerializeField] private TextMeshProUGUI pageIndicator;
+
         #if ODIN_INSPECTOR
         [Title("Effect Display")]
         #endif
@@ -86,14 +92,22 @@ namespace TheBunkerGames
         [Header("Settings")]
         [SerializeField] private bool autoToggleVisibility = true;
 
+        // -------------------------------------------------------------------------
+        // State
+        // -------------------------------------------------------------------------
+        private List<LLMStoryEventData> eventQueue = new List<LLMStoryEventData>();
+        private int currentEventIndex = 0;
+
         private void Awake()
         {
             // Start hidden
             if (contentParent != null) contentParent.SetActive(false);
             ClearText();
             
-            // Setup default listeners if needed (optional, logic might be handled by controller)
+            // Setup default listeners
             if (closeButton != null) closeButton.onClick.AddListener(Hide);
+            if (previousButton != null) previousButton.onClick.AddListener(ShowPreviousEvent);
+            if (nextButton != null) nextButton.onClick.AddListener(ShowNextEvent);
         }
 
         private void OnEnable()
@@ -116,27 +130,108 @@ namespace TheBunkerGames
         /// </summary>
         public void ShowEvent(LLMStoryEventData storyEvent)
         {
-            if (storyEvent != null)
+            if (storyEvent == null)
             {
-                // Clear previous effect entries when a new event arrives
-                ClearEffectEntries();
+                Hide();
+                return;
+            }
 
-                if (titleText != null)
-                    titleText.text = storyEvent.Title;
-                else
-                    Debug.LogWarning("[StorytellerUI] TitleText is missing!");
-
-                if (descriptionText != null)
-                    descriptionText.text = storyEvent.Description;
-                else
-                    Debug.LogWarning("[StorytellerUI] DescriptionText is missing!");
-
+            // Add to queue
+            eventQueue.Add(storyEvent);
+            
+            // Only auto-display if this is the first event
+            if (eventQueue.Count == 1)
+            {
+                currentEventIndex = 0;
+                DisplayCurrentEvent();
+                
                 if (contentParent != null && autoToggleVisibility)
                     contentParent.SetActive(true);
             }
             else
             {
-                Hide();
+                // Just update navigation to show there are more events
+                UpdateNavigationUI();
+            }
+        }
+
+        /// <summary>
+        /// Clear the event queue (call at start of new day).
+        /// </summary>
+        public void ClearEventQueue()
+        {
+            eventQueue.Clear();
+            currentEventIndex = 0;
+            ClearEffectEntries();
+            UpdateNavigationUI();
+        }
+
+        /// <summary>
+        /// Navigate to previous event.
+        /// </summary>
+        public void ShowPreviousEvent()
+        {
+            if (currentEventIndex > 0)
+            {
+                currentEventIndex--;
+                DisplayCurrentEvent();
+            }
+        }
+
+        /// <summary>
+        /// Navigate to next event.
+        /// </summary>
+        public void ShowNextEvent()
+        {
+            if (currentEventIndex < eventQueue.Count - 1)
+            {
+                currentEventIndex++;
+                DisplayCurrentEvent();
+            }
+        }
+
+        private void DisplayCurrentEvent()
+        {
+            if (eventQueue.Count == 0) return;
+
+            var storyEvent = eventQueue[currentEventIndex];
+            ClearEffectEntries();
+
+            if (titleText != null)
+                titleText.text = storyEvent.Title;
+            else
+                Debug.LogWarning("[StorytellerUI] TitleText is missing!");
+
+            if (descriptionText != null)
+                descriptionText.text = storyEvent.Description;
+            else
+                Debug.LogWarning("[StorytellerUI] DescriptionText is missing!");
+
+            UpdateNavigationUI();
+        }
+
+        private void UpdateNavigationUI()
+        {
+            bool hasMultiple = eventQueue.Count > 1;
+            bool canGoPrev = currentEventIndex > 0;
+            bool canGoNext = currentEventIndex < eventQueue.Count - 1;
+
+            // Hide Previous if only 1 event OR if we're on the first event
+            if (previousButton != null)
+            {
+                previousButton.gameObject.SetActive(hasMultiple && canGoPrev);
+            }
+
+            // Hide Next if only 1 event OR if we're on the last event
+            if (nextButton != null)
+            {
+                nextButton.gameObject.SetActive(hasMultiple && canGoNext);
+            }
+
+            if (pageIndicator != null)
+            {
+                pageIndicator.gameObject.SetActive(hasMultiple);
+                pageIndicator.text = $"{currentEventIndex + 1} / {eventQueue.Count}";
             }
         }
 
@@ -474,6 +569,120 @@ namespace TheBunkerGames
                 effectIconDatabase = UnityEngine.Resources.Load<EffectIconDatabaseSO>("EffectIconDatabaseSO");
                 if (effectIconDatabase != null)
                     Debug.Log("[StorytellerUI] Auto-loaded EffectIconDatabaseSO from Resources.");
+            }
+
+            // 9. Ensure Previous Button
+            if (previousButton == null)
+            {
+                var btnTransform = contentParent.transform.Find("Previous_Button");
+                if (btnTransform == null)
+                {
+                    var go = new GameObject("Previous_Button");
+                    go.transform.SetParent(contentParent.transform, false);
+                    var img = go.AddComponent<Image>();
+                    img.color = new Color(0.3f, 0.3f, 0.3f, 1f);
+                    
+                    var btn = go.AddComponent<Button>();
+                    
+                    var r = go.GetComponent<RectTransform>();
+                    r.anchorMin = new Vector2(0.02f, 0.02f);
+                    r.anchorMax = new Vector2(0.12f, 0.08f);
+                    r.offsetMin = Vector2.zero;
+                    r.offsetMax = Vector2.zero;
+                    
+                    // Text
+                    var textGO = new GameObject("Text");
+                    textGO.transform.SetParent(go.transform, false);
+                    var text = textGO.AddComponent<TextMeshProUGUI>();
+                    text.text = "< Prev";
+                    text.fontSize = 12;
+                    text.color = Color.white;
+                    if (titleFont != null) text.font = titleFont;
+                    text.alignment = TextAlignmentOptions.Center;
+                    text.rectTransform.anchorMin = Vector2.zero;
+                    text.rectTransform.anchorMax = Vector2.one;
+                    text.rectTransform.offsetMin = Vector2.zero;
+                    text.rectTransform.offsetMax = Vector2.zero;
+
+                    previousButton = btn;
+                    go.SetActive(false); // Start hidden
+                }
+                else
+                {
+                    previousButton = btnTransform.GetComponent<Button>();
+                }
+            }
+
+            // 10. Ensure Next Button
+            if (nextButton == null)
+            {
+                var btnTransform = contentParent.transform.Find("Next_Button");
+                if (btnTransform == null)
+                {
+                    var go = new GameObject("Next_Button");
+                    go.transform.SetParent(contentParent.transform, false);
+                    var img = go.AddComponent<Image>();
+                    img.color = new Color(0.3f, 0.3f, 0.3f, 1f);
+                    
+                    var btn = go.AddComponent<Button>();
+                    
+                    var r = go.GetComponent<RectTransform>();
+                    r.anchorMin = new Vector2(0.88f, 0.02f);
+                    r.anchorMax = new Vector2(0.98f, 0.08f);
+                    r.offsetMin = Vector2.zero;
+                    r.offsetMax = Vector2.zero;
+                    
+                    // Text
+                    var textGO = new GameObject("Text");
+                    textGO.transform.SetParent(go.transform, false);
+                    var text = textGO.AddComponent<TextMeshProUGUI>();
+                    text.text = "Next >";
+                    text.fontSize = 12;
+                    text.color = Color.white;
+                    if (titleFont != null) text.font = titleFont;
+                    text.alignment = TextAlignmentOptions.Center;
+                    text.rectTransform.anchorMin = Vector2.zero;
+                    text.rectTransform.anchorMax = Vector2.one;
+                    text.rectTransform.offsetMin = Vector2.zero;
+                    text.rectTransform.offsetMax = Vector2.zero;
+
+                    nextButton = btn;
+                    go.SetActive(false); // Start hidden
+                }
+                else
+                {
+                    nextButton = btnTransform.GetComponent<Button>();
+                }
+            }
+
+            // 11. Ensure Page Indicator
+            if (pageIndicator == null)
+            {
+                var indicatorTransform = contentParent.transform.Find("Page_Indicator");
+                if (indicatorTransform == null)
+                {
+                    var go = new GameObject("Page_Indicator");
+                    go.transform.SetParent(contentParent.transform, false);
+                    var txt = go.AddComponent<TextMeshProUGUI>();
+                    txt.text = "1 / 1";
+                    txt.fontSize = 14;
+                    txt.alignment = TextAlignmentOptions.Center;
+                    txt.color = Color.white;
+                    if (bodyFont != null) txt.font = bodyFont;
+                    
+                    var r = txt.rectTransform;
+                    r.anchorMin = new Vector2(0.4f, 0.02f);
+                    r.anchorMax = new Vector2(0.6f, 0.08f);
+                    r.offsetMin = Vector2.zero;
+                    r.offsetMax = Vector2.zero;
+                    
+                    pageIndicator = txt;
+                    go.SetActive(false); // Start hidden
+                }
+                else
+                {
+                    pageIndicator = indicatorTransform.GetComponent<TextMeshProUGUI>();
+                }
             }
 
             Debug.Log("[StorytellerUI] Auto-Setup Complete.");

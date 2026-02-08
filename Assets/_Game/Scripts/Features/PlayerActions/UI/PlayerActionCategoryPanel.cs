@@ -273,7 +273,11 @@ namespace TheBunkerGames
         /// </summary>
         public void SaveInput()
         {
-            if (isSaved) return;
+            if (isSaved) 
+            {
+                Debug.LogWarning($"[PlayerActionCategoryPanel] SaveInput called but panel is already saved! Ignoring.");
+                return;
+            }
 
             isSaved = true;
 
@@ -289,7 +293,14 @@ namespace TheBunkerGames
 
             // Sync to manager
             if (PlayerActionManager.Instance != null)
+            {
+                Debug.Log($"[PlayerActionCategoryPanel] Saving to Manager: {category}");
                 PlayerActionManager.Instance.SaveAction(category, (playerInputText ?? "").Trim(), GetSelectedItems());
+            }
+            else
+            {
+                Debug.LogError("[PlayerActionCategoryPanel] PlayerActionManager instance is null!");
+            }
         }
 
         /// <summary>

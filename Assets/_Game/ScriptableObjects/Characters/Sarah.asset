@@ -19,7 +19,7 @@ MonoBehaviour:
     leader who keeps everyone calm and organized. Surprisingly tough when pushed
     to her limits.
   portrait: {fileID: 5057424907196188666, guid: 6725221c79431450da28d939a1c64efb, type: 3}
-  bodyImage: {fileID: 6934592387818362049, guid: a4f079fd3c0b64f60bd979e16431364f, type: 3}
+  bodyImage: {fileID: 21300000, guid: a4f079fd3c0b64f60bd979e16431364f, type: 3}
   maxHealth: 85
   maxHunger: 80
   maxThirst: 80

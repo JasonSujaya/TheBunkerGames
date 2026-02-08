@@ -156,6 +156,18 @@ namespace TheBunkerGames
             Instance = this;
         }
 
+        private void Start()
+        {
+            // Use same initialization as Show() to ensure we are ready
+            if (enableDebugLogs) Debug.Log("[GameplayHudUI] Start() - Self-initializing...");
+            CacheReferences();
+            WireButtons();
+            PopulateCharacterList();
+            RefreshFamilyBodies();
+            UpdateDayDisplay();
+            UpdateResourceDisplay();
+        }
+
         private void LateUpdate()
         {
             if (canvasRoot == null || !canvasRoot.activeSelf) return;
@@ -187,6 +199,14 @@ namespace TheBunkerGames
 
             // populate preview portraits from FamilyManager in scene (editor mode)
             PopulateEditorPreview();
+
+            // Auto-assign button refs
+            if (panel != null)
+            {
+                diaryButton     = UIBuilderUtils.FindButton(panel, "DiaryBtn");
+                endDayButton    = UIBuilderUtils.FindButton(panel, "EndDayBtn");
+                ourThingsButton = UIBuilderUtils.FindButton(panel, "OurThingsBtn");
+            }
 
             if (enableDebugLogs) Debug.Log("[GameplayHudUI] Auto Setup complete.");
             #if UNITY_EDITOR
@@ -830,30 +850,71 @@ namespace TheBunkerGames
         // =====================================================================
         //  Wire Buttons
         // =====================================================================
+        // -------------------------------------------------------------------------
+        // UI References (Buttons)
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Buttons")]
+        #endif
+        [SerializeField] private Button diaryButton;
+        [SerializeField] private Button endDayButton;
+        [SerializeField] private Button ourThingsButton;
+
+        // ... existing code ...
+
+        // =====================================================================
+        //  Wire Buttons
+        // =====================================================================
         private void WireButtons()
         {
-            if (panel == null) return;
+            // Auto-find PlayerActionUI if not assigned
+            if (playerActionUI == null)
+                playerActionUI = FindFirstObjectByType<PlayerActionUI>(FindObjectsInactive.Include);
 
-            Wire("OurThingsBtn", () => { OnOurThingsClicked?.Invoke(); });
-            Wire("EndDayBtn",    () => { OnEndDayClicked?.Invoke(); });
-            Wire("DiaryBtn",     () =>
+            if (ourThingsButton != null)
             {
-                OnDiaryClicked?.Invoke();
-                if (playerActionUI != null) playerActionUI.Show();
-            });
-        }
+                ourThingsButton.onClick.RemoveAllListeners();
+                ourThingsButton.onClick.AddListener(() => OnOurThingsClicked?.Invoke());
+            }
 
+            if (endDayButton != null)
+            {
+                endDayButton.onClick.RemoveAllListeners();
+                endDayButton.onClick.AddListener(() => OnEndDayClicked?.Invoke());
+            }
+
+            if (diaryButton != null)
+            {
+                diaryButton.onClick.RemoveAllListeners();
+                diaryButton.onClick.AddListener(() =>
+                {
+                    OnDiaryClicked?.Invoke();
+                    
+                    if (enableDebugLogs) Debug.Log("[GameplayHudUI] Diary clicked!");
+
+                    // Lazy find if needed
+                    if (playerActionUI == null)
+                        playerActionUI = FindFirstObjectByType<PlayerActionUI>(FindObjectsInactive.Include);
+
+                    if (playerActionUI != null)
+                    {
+                        playerActionUI.Show();
+                        if (enableDebugLogs) Debug.Log("[GameplayHudUI] Showing PlayerActionUI.");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[GameplayHudUI] PlayerActionUI not found!");
+                    }
+                });
+            }
+        }
+        
+        // Removed string-based Wire() method as it's no longer needed for main buttons
         private void WireChild(Transform parent, string childName, UnityEngine.Events.UnityAction action)
         {
             var child = parent.Find(childName);
             if (child == null) return;
             var btn = child.GetComponent<Button>();
-            if (btn != null) { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(action); }
-        }
-
-        private void Wire(string name, UnityEngine.Events.UnityAction action)
-        {
-            var btn = UIBuilderUtils.FindButton(panel, name);
             if (btn != null) { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(action); }
         }
 

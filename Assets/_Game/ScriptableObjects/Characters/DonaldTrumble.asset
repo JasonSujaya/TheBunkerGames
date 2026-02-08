@@ -20,7 +20,7 @@ MonoBehaviour:
     better bunker. His negotiation skills are questionable, but his confidence is
     unmatched.
   portrait: {fileID: 7712413129018869235, guid: e05b48df5cbb34825939a4c0f9ed1ed6, type: 3}
-  bodyImage: {fileID: -3602947885828017697, guid: df1214528021d48fcb88c27b1ddae81c, type: 3}
+  bodyImage: {fileID: 21300000, guid: df1214528021d48fcb88c27b1ddae81c, type: 3}
   maxHealth: 75
   maxHunger: 75
   maxThirst: 75

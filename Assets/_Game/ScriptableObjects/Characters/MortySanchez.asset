@@ -20,7 +20,7 @@ MonoBehaviour:
     knack for stumbling into the right solution at the worst possible time. Just
     wants things to be normal again.
   portrait: {fileID: 7350673588825939993, guid: ccbe0250a13064a2c82ecb6d49964fb5, type: 3}
-  bodyImage: {fileID: -7307031032129093211, guid: ce8f759de3cb44f1a87c5d54e5f3fb73, type: 3}
+  bodyImage: {fileID: 21300000, guid: ce8f759de3cb44f1a87c5d54e5f3fb73, type: 3}
   maxHealth: 75
   maxHunger: 80
   maxThirst: 80
