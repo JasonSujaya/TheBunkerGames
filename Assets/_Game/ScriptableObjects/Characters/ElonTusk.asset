@@ -19,7 +19,8 @@ MonoBehaviour:
     stop talking about colonizing Mars as Plan B. Keeps trying to automate everything
     with scrap electronics. Sleeps four hours a night and posts bunker updates on
     a dead social network.
-  portrait: {fileID: 0}
+  portrait: {fileID: -835532059487295024, guid: aff42e461b2874dfc81dfa7f0bebee66, type: 3}
+  bodyImage: {fileID: 0}
   maxHealth: 70
   maxHunger: 65
   maxThirst: 65

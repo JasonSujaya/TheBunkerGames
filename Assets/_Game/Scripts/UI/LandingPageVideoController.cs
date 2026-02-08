@@ -17,9 +17,12 @@ namespace TheBunkerGames
         [Title("Settings")]
 #endif
         [SerializeField] private VideoPlayer videoPlayer;
+        // Audio handled by AudioManager
+        [SerializeField] private List<AudioClip> musicClips = new List<AudioClip>();
         [SerializeField] private List<VideoClip> videoClips = new List<VideoClip>();
         [SerializeField] private bool loopPlaylist = true;
         [SerializeField] private bool playOnAwake = true;
+        [SerializeField] private bool shuffleMusic = false;
 
         // -------------------------------------------------------------------------
         // State
@@ -38,9 +41,13 @@ namespace TheBunkerGames
 
             videoPlayer.loopPointReached += OnVideoEnd;
 
-            if (playOnAwake && videoClips.Count > 0)
+            if (playOnAwake)
             {
-                PlayVideo(0);
+                 if (videoClips.Count > 0)
+                 {
+                     PlayVideo(0);
+                 }
+                 PlayMusic();
             }
         }
 
@@ -55,6 +62,14 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Public Methods
         // -------------------------------------------------------------------------
+        public void PlayMusic()
+        {
+            if (musicClips.Count > 0 && AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlayMusicList(musicClips, shuffleMusic);
+            }
+        }
+
         public void PlayVideo(int index)
         {
             if (videoClips.Count == 0)
@@ -118,16 +133,22 @@ namespace TheBunkerGames
         // Debug / Editor Buttons
         // -------------------------------------------------------------------------
 #if ODIN_INSPECTOR
-        [Button("Play Next", ButtonSizes.Medium)]
+        [Button("Play Next Video", ButtonSizes.Medium)]
         private void Debug_PlayNext()
         {
             PlayNextVideo();
         }
 
-        [Button("Play Random", ButtonSizes.Medium)]
+        [Button("Play Random Video", ButtonSizes.Medium)]
         private void Debug_PlayRandom()
         {
             PlayRandomVideo();
+        }
+
+        [Button("Play Music (Via Manager)", ButtonSizes.Medium)]
+        private void Debug_PlayMusic()
+        {
+            PlayMusic();
         }
 #endif
     }

@@ -22,6 +22,7 @@ MonoBehaviour:
         of dust and dirt. The air is stale, and the room is in disarray.
       EffectCount: 5
       ChoiceCount: 3
+      Category: 
       Timestamp: 15:51:55
       FullEventJson: "{\n  \"title\": \"Dusty Discoveries\",\n  \"description\":
         \"While searching the storage room, the family finds some old boxes. They
@@ -67,6 +68,7 @@ MonoBehaviour:
         lit.
       EffectCount: 5
       ChoiceCount: 3
+      Category: 
       Timestamp: 15:55:56
       FullEventJson: "{\n  \"title\": \"Dusty Discoveries\",\n  \"description\":
         \"While searching the storage room, the family finds some old boxes. They
@@ -113,6 +115,7 @@ MonoBehaviour:
         and stale air cause everyone to cough and feel a bit thirstier.
       EffectCount: 5
       ChoiceCount: 3
+      Category: 
       Timestamp: 15:56:28
       FullEventJson: "{\n  \"title\": \"Dusty Discoveries\",\n  \"description\":
         \"While searching the storage room, the family finds some old canned food
@@ -154,6 +157,7 @@ MonoBehaviour:
         a coughing fit among the family members.
       EffectCount: 5
       ChoiceCount: 2
+      Category: 
       Timestamp: 15:57:29
       FullEventJson: "{\n  \"title\": \"Dusty Discoveries\",\n  \"description\":
         \"While searching the storage room, the family finds some old canned food
@@ -193,6 +197,7 @@ MonoBehaviour:
         spirits but also reminds them of what they've lost.
       EffectCount: 4
       ChoiceCount: 3
+      Category: 
       Timestamp: 16:08:58
       FullEventJson: "{\n  \"title\": \"A Glimpse of the Past\",\n  \"description\":
         \"While searching the storage room, the family finds a box of old family
@@ -234,6 +239,7 @@ MonoBehaviour:
         to survive.
       EffectCount: 2
       ChoiceCount: 3
+      Category: 
       Timestamp: 17:00:38
       FullEventJson: "{\n  \"title\": \"A Difficult Discovery\",\n  \"description\":
         \"While searching the storage room, the family finds a locked box. After
@@ -269,6 +275,7 @@ MonoBehaviour:
         also instills a sense of unease.
       EffectCount: 5
       ChoiceCount: 3
+      Category: 
       Timestamp: 17:01:30
       FullEventJson: "{\n  \"title\": \"A Beacon of Hope\",\n  \"description\": \"While
         searching the storage room, the family discovers an old radio. As they turn
@@ -305,6 +312,7 @@ MonoBehaviour:
         among the family members.'
       EffectCount: 6
       ChoiceCount: 3
+      Category: 
       Timestamp: 17:27:50
       FullEventJson: "{\n  \"title\": \"Unexpected Broadcast\",\n  \"description\":
         \"While searching the storage room, the family finds a stash of canned food
@@ -342,6 +350,7 @@ MonoBehaviour:
         the family confused and slightly unnerved.'
       EffectCount: 2
       ChoiceCount: 3
+      Category: 
       Timestamp: 17:48:16
       FullEventJson: "{\n  \"title\": \"Mysterious Broadcast\",\n  \"description\":
         \"While searching the storage room, the family discovers a hidden radio.
@@ -374,6 +383,7 @@ MonoBehaviour:
         seems to trigger a strange noise from the bunker''s ventilation system.'
       EffectCount: 2
       ChoiceCount: 3
+      Category: 
       Timestamp: 17:52:50
       FullEventJson: "{\n  \"title\": \"Mysterious Broadcast\",\n  \"description\":
         \"While searching the storage room, the family finds a working radio. Suddenly,
@@ -406,6 +416,7 @@ MonoBehaviour:
         depriving someone else of them, but they desperately need resources to survive.
       EffectCount: 4
       ChoiceCount: 3
+      Category: 
       Timestamp: 18:00:37
       FullEventJson: "{\n  \"title\": \"A Mysterious Broadcast and a Difficult Discovery\",\n 
         \"description\": \"While searching the storage room, the family finds a hidden
@@ -440,6 +451,175 @@ MonoBehaviour:
         10,\n          \"target\": \"Daughter\"\n        },\n        {\n         
         \"effectType\": \"AddSanity\",\n          \"intensity\": 10,\n          \"target\":
         \"Son\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Search the storage room for supplies
+      Title: Government Broadcast Interrupts Search
+      Description: As the family searches the storage room, a sudden government broadcast
+        crackles through the bunker's radio. The message is cryptic, repeating 'VERY
+        VERY GOOD LUCK' over and over, causing confusion and tension among the family
+        members. The Father wants to ignore it and continue searching, while the
+        Mother insists they should try to decipher the message.
+      EffectCount: 2
+      ChoiceCount: 3
+      Category: 
+      Timestamp: 18:03:23
+      FullEventJson: "{\n  \"title\": \"Government Broadcast Interrupts Search\",\n 
+        \"description\": \"As the family searches the storage room, a sudden government
+        broadcast crackles through the bunker's radio. The message is cryptic, repeating
+        'VERY VERY GOOD LUCK' over and over, causing confusion and tension among
+        the family members. The Father wants to ignore it and continue searching,
+        while the Mother insists they should try to decipher the message.\",\n  \"effects\":
+        [\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\": 5,\n     
+        \"target\": \"Father\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 5,\n      \"target\": \"Mother\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Continue searching for supplies\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"AddSupplies\",\n          \"intensity\":
+        8,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"ReduceSanity\",\n          \"intensity\": 3,\n          \"target\": \"Mother\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Try to decipher the government
+        message\",\n      \"effects\": [\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 5,\n          \"target\": \"Father\"\n        },\n       
+        {\n          \"effectType\": \"ReduceHunger\",\n          \"intensity\":
+        4,\n          \"target\": \"\"\n        }\n      ]\n    },\n    {\n     
+        \"text\": \"Argue about the next course of action\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        7,\n          \"target\": \"Father\"\n        },\n        {\n          \"effectType\":
+        \"ReduceSanity\",\n          \"intensity\": 7,\n          \"target\": \"Mother\"\n       
+        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Explore the city
+      Title: Generator Gambit
+      Description: You venture into the city, finding a replacement part for the
+        generator. However, the journey was perilous, and you return with minor injuries
+        and a sense of unease. The generator is now running, but at what cost?
+      EffectCount: 5
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 19:37:34
+      FullEventJson: "{\n  \"title\": \"Generator Gambit\",\n  \"description\": \"You
+        venture into the city, finding a replacement part for the generator. However,
+        the journey was perilous, and you return with minor injuries and a sense
+        of unease. The generator is now running, but at what cost?\",\n  \"effects\":
+        [\n    {\n      \"effectType\": \"AddSupplies\",\n      \"intensity\": 3,\n     
+        \"target\": \"\"\n    },\n    {\n      \"effectType\": \"ReduceHP\",\n     
+        \"intensity\": 10,\n      \"target\": \"Father\"\n    },\n    {\n      \"effectType\":
+        \"ReduceSanity\",\n      \"intensity\": 5,\n      \"target\": \"Mother\"\n   
+        },\n    {\n      \"effectType\": \"ReduceHunger\",\n      \"intensity\":
+        15,\n      \"target\": \"Daughter\"\n    },\n    {\n      \"effectType\":
+        \"ReduceThirst\",\n      \"intensity\": 20,\n      \"target\": \"Son\"\n   
+        }\n  ],\n  \"choices\": [\n    {\n      \"text\": \"Search for more supplies
+        in the city\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceHP\",\n          \"intensity\": 15,\n          \"target\": \"Father\"\n       
+        },\n        {\n          \"effectType\": \"AddSupplies\",\n          \"intensity\":
+        5,\n          \"target\": \"\"\n        }\n      ]\n    },\n    {\n     
+        \"text\": \"Rest and recover in the bunker\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"AddHP\",\n          \"intensity\": 10,\n         
+        \"target\": \"Father\"\n        },\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 5,\n          \"target\": \"Mother\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Ration food and water to conserve
+        resources\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceHunger\",\n          \"intensity\": 5,\n          \"target\": \"Daughter\"\n       
+        },\n        {\n          \"effectType\": \"ReduceThirst\",\n          \"intensity\":
+        5,\n          \"target\": \"Son\"\n        },\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 3,\n          \"target\": \"Mother\"\n       
+        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Search the city for more stuff
+      Title: Scavenging the Ruins
+      Description: The family ventures into the ruined city, finding some additional
+        supplies but also encountering dangers. The search takes a toll on everyone's
+        sanity and uses up some of their water reserves.
+      EffectCount: 6
+      ChoiceCount: 3
+      Category: Dilemma
+      Timestamp: 19:57:51
+      FullEventJson: "{\n  \"title\": \"Scavenging the Ruins\",\n  \"description\":
+        \"The family ventures into the ruined city, finding some additional supplies
+        but also encountering dangers. The search takes a toll on everyone's sanity
+        and uses up some of their water reserves.\",\n  \"effects\": [\n    {\n     
+        \"effectType\": \"ReduceSanity\",\n      \"intensity\": 5,\n      \"target\":
+        \"Daughter\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 5,\n      \"target\": \"Father\"\n    },\n    {\n      \"effectType\":
+        \"ReduceSanity\",\n      \"intensity\": 5,\n      \"target\": \"Mother\"\n   
+        },\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\":
+        5,\n      \"target\": \"Son\"\n    },\n    {\n      \"effectType\": \"ReduceWater\",\n     
+        \"intensity\": 10,\n      \"target\": \"\"\n    },\n    {\n      \"effectType\":
+        \"AddSupplies\",\n      \"intensity\": 8,\n      \"target\": \"\"\n    }\n 
+        ],\n  \"choices\": [\n    {\n      \"text\": \"Rest for a while to recover
+        sanity\",\n      \"effects\": [\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 3,\n          \"target\": \"Daughter\"\n        },\n       
+        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 3,\n         
+        \"target\": \"Father\"\n        },\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 3,\n          \"target\": \"Mother\"\n       
+        },\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
+        3,\n          \"target\": \"Son\"\n        },\n        {\n          \"effectType\":
+        \"ReduceHunger\",\n          \"intensity\": 5,\n          \"target\": \"\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Continue searching for more
+        supplies\",\n      \"effects\": [\n        {\n          \"effectType\": \"ReduceSanity\",\n         
+        \"intensity\": 7,\n          \"target\": \"Daughter\"\n        },\n       
+        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        7,\n          \"target\": \"Father\"\n        },\n        {\n          \"effectType\":
+        \"ReduceSanity\",\n          \"intensity\": 7,\n          \"target\": \"Mother\"\n       
+        },\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        7,\n          \"target\": \"Son\"\n        },\n        {\n          \"effectType\":
+        \"AddSupplies\",\n          \"intensity\": 5,\n          \"target\": \"\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Head back to the bunker immediately\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 2,\n          \"target\": \"Daughter\"\n        },\n       
+        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 2,\n         
+        \"target\": \"Father\"\n        },\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 2,\n          \"target\": \"Mother\"\n       
+        },\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
+        2,\n          \"target\": \"Son\"\n        },\n        {\n          \"effectType\":
+        \"ReduceWater\",\n          \"intensity\": 5,\n          \"target\": \"\"\n       
+        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Eat a peanut butter
+      Title: Confusion and Hunger
+      Description: Eating a peanut butter sandwich doesn't solve the flooded room
+        problem. The family is confused by this action and now hungrier, but at least
+        their morale is slightly boosted by the snack.
+      EffectCount: 9
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 19:57:52
+      FullEventJson: "{\n  \"title\": \"Confusion and Hunger\",\n  \"description\":
+        \"Eating a peanut butter sandwich doesn't solve the flooded room problem.
+        The family is confused by this action and now hungrier, but at least their
+        morale is slightly boosted by the snack.\",\n  \"effects\": [\n    {\n     
+        \"effectType\": \"ReduceFood\",\n      \"intensity\": 2,\n      \"target\":
+        \"\"\n    },\n    {\n      \"effectType\": \"AddHunger\",\n      \"intensity\":
+        10,\n      \"target\": \"Daughter\"\n    },\n    {\n      \"effectType\":
+        \"AddHunger\",\n      \"intensity\": 10,\n      \"target\": \"Father\"\n   
+        },\n    {\n      \"effectType\": \"AddHunger\",\n      \"intensity\": 10,\n     
+        \"target\": \"Mother\"\n    },\n    {\n      \"effectType\": \"AddHunger\",\n     
+        \"intensity\": 10,\n      \"target\": \"Son\"\n    },\n    {\n      \"effectType\":
+        \"AddSanity\",\n      \"intensity\": 5,\n      \"target\": \"Daughter\"\n   
+        },\n    {\n      \"effectType\": \"AddSanity\",\n      \"intensity\": 5,\n     
+        \"target\": \"Father\"\n    },\n    {\n      \"effectType\": \"AddSanity\",\n     
+        \"intensity\": 5,\n      \"target\": \"Mother\"\n    },\n    {\n      \"effectType\":
+        \"AddSanity\",\n      \"intensity\": 5,\n      \"target\": \"Son\"\n    }\n 
+        ],\n  \"choices\": [\n    {\n      \"text\": \"Use a bucket to bail out the
+        water\",\n      \"effects\": [\n        {\n          \"effectType\": \"ReduceThirst\",\n         
+        \"intensity\": 10,\n          \"target\": \"Daughter\"\n        },\n       
+        {\n          \"effectType\": \"ReduceThirst\",\n          \"intensity\":
+        10,\n          \"target\": \"Father\"\n        },\n        {\n          \"effectType\":
+        \"ReduceThirst\",\n          \"intensity\": 10,\n          \"target\": \"Mother\"\n       
+        },\n        {\n          \"effectType\": \"ReduceThirst\",\n          \"intensity\":
+        10,\n          \"target\": \"Son\"\n        }\n      ]\n    },\n    {\n     
+        \"text\": \"Wade through the water to retrieve supplies\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"AddSupplies\",\n          \"intensity\":
+        15,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"ReduceSanity\",\n          \"intensity\": 5,\n          \"target\": \"Daughter\"\n       
+        },\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        5,\n          \"target\": \"Father\"\n        },\n        {\n          \"effectType\":
+        \"ReduceSanity\",\n          \"intensity\": 5,\n          \"target\": \"Mother\"\n       
+        },\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        5,\n          \"target\": \"Son\"\n        }\n      ]\n    },\n    {\n     
+        \"text\": \"Ignore the flooded room for now and explore another area\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 10,\n          \"target\": \"Daughter\"\n        },\n       
+        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 10,\n         
+        \"target\": \"Father\"\n        },\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 10,\n          \"target\": \"Mother\"\n       
+        },\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
+        10,\n          \"target\": \"Son\"\n        }\n      ]\n    }\n  ]\n}"
   - DayNumber: 2
     Events:
     - PlayerAction: Search the storage room for supplies
@@ -451,6 +631,7 @@ MonoBehaviour:
         the air.
       EffectCount: 3
       ChoiceCount: 3
+      Category: 
       Timestamp: 16:09:27
       FullEventJson: "{\n  \"title\": \"A Mysterious Rattle\",\n  \"description\":
         \"While searching the storage room, the family hears a strange rattling noise
@@ -486,6 +667,7 @@ MonoBehaviour:
         sharing their scarce resources.
       EffectCount: 2
       ChoiceCount: 3
+      Category: 
       Timestamp: 16:12:14
       FullEventJson: "{\n  \"title\": \"The Stranger at the Door\",\n  \"description\":
         \"While searching the city, the family encounters a lone survivor begging
@@ -518,5 +700,5 @@ MonoBehaviour:
         \"intensity\": 3,\n          \"target\": \"Father\"\n        },\n       
         {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 3,\n         
         \"target\": \"Mother\"\n        }\n      ]\n    }\n  ]\n}"
-  totalEvents: 13
-  lastUpdated: 2026-02-07 18:00:37
+  totalEvents: 17
+  lastUpdated: 2026-02-07 19:57:52

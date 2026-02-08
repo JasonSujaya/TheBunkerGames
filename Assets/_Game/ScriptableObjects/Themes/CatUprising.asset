@@ -25,6 +25,6 @@ MonoBehaviour:
   - Stealth Ambushes
   - Territorial Control
   - Hairball Hazards
-  previewVideo: {fileID: 0}
+  previewVideo: {fileID: 32900000, guid: 1da8c3715c32344a98bcc86381f43493, type: 3}
   eventSchedule: {fileID: 0}
   storyPrompt: {fileID: 0}

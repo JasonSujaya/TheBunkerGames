@@ -1,28 +1,28 @@
 # Storyteller System - Feature Specification
 
 ## Overview
-The **Storyteller** is the narrative engine of *Entropy's Watch*. It orchestrates the 30-day survival loop, injecting specific events, dilemmas, and flavor text based on the selected "Scenario".
+The **Storyteller** is the narrative engine of *Bunker Game*. It orchestrates the survival loop, triggering specific events, dilemmas, and flavor text. While it supports fixed scenarios, its core strength is the ability to handle **real-time generated stories**.
 
 ## Core Architecture
 
 ### 1. Story Scenario (ScriptableObject)
-A `StoryScenarioSO` defines a full campaign or run configuration.
+A `StoryScenarioSO` defines a run configuration.
 *   **Campaign Name**: e.g., "The First Collapse", "Endless Winter".
-*   **Total Days**: Default 30.
-*   **Starting Conditions**: Links to `FamilyListSO` (optional override) or specific starting resources.
+*   **Total Days**: Default 30 (or infinite).
+*   **Starting Conditions**: Links to `FamilyListSO` or specific starting resources.
 *   **Event Timeline**: A list mapping `Day Number` -> `Story Event`.
+    *   *Note*: In fully dynamic modes, this timeline might be empty, relying entirely on the generator.
 
 ### 2. Story Event (ScriptableObject)
-A `StoryEventSO` represents a specific narrative beat that happens on a specific day (or range of days).
+A `StoryEventSO` represents a specific narrative beat.
 *   **Event Type**:
-    *   *Fixed*: Always happens on Day X (e.g., "The Door Knock" on Day 3).
-    *   *Random*: Pulled from a pool (e.g., "Rat Infestation").
+    *   *Fixed*: Pre-written events.
+    *   *Generated*: Created at runtime by the LLM.
 *   **Narrative Content**:
     *   **Title**: "A Knock at the Door".
-    *   **Description**: The flavor text A.N.G.E.L. reads or displays.
+    *   **Description**: The event text displayed to the player.
 *   **Choices (Dilemmas)**:
-    *   Links to `DilemmaSO` (if using the existing dilemma system).
-    *   Or defines simple choices: "Open Door" vs "Ignore".
+    *   Simple choices: "Open Door" vs "Ignore".
 *   **Consequences**:
     *   Resource changes (-10 Food).
     *   Health/Sanity changes.
@@ -33,8 +33,8 @@ The active director in the scene.
 *   **Cycle Handling**: Listen to `OnDayStart` from `GameManager`.
 *   **Logic**:
     1.  Day Starts -> Check Scenario for Day X.
-    2.  If Event exists -> Trigger Event UI / A.N.G.E.L. voice.
-    3.  If no fixed Event -> Trigger "Quiet Day" or "Random Pool Event".
+    2.  If Event exists -> Trigger Event UI.
+    3.  If no fixed Event -> Request **Generated Event** from LLM based on current game state.
 
 ## Data Structure Proposal
 
@@ -127,5 +127,5 @@ The `StorytellerManager` will deserialize this JSON into a runtime `StoryEvent` 
 
 ## Future Extensions
 *   **Branching**: Events could have "Requirements" (e.g., "Only if Father is Dead").
-*   **Dynamic Injection**: A.N.G.E.L. inserts AI-generated events if the timeline is empty.
+*   **Dynamic Injection**: The system inserts AI-generated events if the timeline is empty.
 *   **Theme overrides**: Scenarios could change the UI skin or music.

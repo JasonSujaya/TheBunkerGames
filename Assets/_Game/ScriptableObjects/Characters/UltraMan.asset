@@ -19,7 +19,8 @@ MonoBehaviour:
     Wears a cape made from a bedsheet and insists on being called 'The Man of Steel
     Nerves.' Oddly strong and weirdly good at finding things. His weakness? Anything
     green and glowy.
-  portrait: {fileID: 0}
+  portrait: {fileID: 3411984908866964098, guid: 05be818cbf2994d929ac3e405247040c, type: 3}
+  bodyImage: {fileID: 0}
   maxHealth: 100
   maxHunger: 90
   maxThirst: 90

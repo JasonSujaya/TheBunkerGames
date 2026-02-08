@@ -19,7 +19,8 @@ MonoBehaviour:
     and that he alone can fix everything. Constantly promises to build a bigger,
     better bunker. His negotiation skills are questionable, but his confidence is
     unmatched.
-  portrait: {fileID: 0}
+  portrait: {fileID: 7712413129018869235, guid: e05b48df5cbb34825939a4c0f9ed1ed6, type: 3}
+  bodyImage: {fileID: 0}
   maxHealth: 75
   maxHunger: 75
   maxThirst: 75

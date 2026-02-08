@@ -18,7 +18,8 @@ MonoBehaviour:
   description: He's been preparing for this his entire life. Bunker blueprints, canned
     beans by the pallet, and a tin foil hat collection to rival a museum. Paranoid?
     Maybe. Ready? Absolutely.
-  portrait: {fileID: 0}
+  portrait: {fileID: -5831287418125998029, guid: c71d9a27454cd494d97aea8385730fd4, type: 3}
+  bodyImage: {fileID: 0}
   maxHealth: 95
   maxHunger: 95
   maxThirst: 90

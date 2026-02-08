@@ -19,7 +19,8 @@ MonoBehaviour:
     by his grandpa. Surprisingly resilient despite constant complaining. Has a weird
     knack for stumbling into the right solution at the worst possible time. Just
     wants things to be normal again.
-  portrait: {fileID: 0}
+  portrait: {fileID: 7350673588825939993, guid: ccbe0250a13064a2c82ecb6d49964fb5, type: 3}
+  bodyImage: {fileID: 0}
   maxHealth: 75
   maxHunger: 80
   maxThirst: 80

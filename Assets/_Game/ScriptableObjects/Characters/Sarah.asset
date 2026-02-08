@@ -18,7 +18,8 @@ MonoBehaviour:
   description: A sharp-witted nurse who knows her way around a first-aid kit. Natural
     leader who keeps everyone calm and organized. Surprisingly tough when pushed
     to her limits.
-  portrait: {fileID: 0}
+  portrait: {fileID: 5057424907196188666, guid: 6725221c79431450da28d939a1c64efb, type: 3}
+  bodyImage: {fileID: 0}
   maxHealth: 85
   maxHunger: 80
   maxThirst: 80

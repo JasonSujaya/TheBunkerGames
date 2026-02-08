@@ -1,0 +1,205 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 928998e74bc334e50b88018a286ccc65, type: 3}
+  m_Name: PlayerActionChallengePool
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.PlayerActionChallengePoolSO
+  explorationChallenges:
+  - category: 0
+    title: Locked Door
+    description: You've found a heavy locked door in the lower bunker level. It might
+      lead to a supply cache. How do you get it open?
+    targetCharacter: 
+  - category: 0
+    title: Collapsed Tunnel
+    description: A section of the maintenance tunnel has caved in, blocking access
+      to the water pump. How do you clear the debris?
+    targetCharacter: 
+  - category: 0
+    title: Flooded Room
+    description: The storage room is ankle-deep in murky water from a burst pipe.
+      Important supplies are on the shelves. How do you retrieve them safely?
+    targetCharacter: 
+  - category: 0
+    title: Jammed Air Vent
+    description: The main ventilation shaft is clogged with dust and debris. Air
+      quality is dropping. How do you fix the airflow?
+    targetCharacter: 
+  - category: 0
+    title: Broken Generator
+    description: The backup generator sputtered and died. Without it, you lose lighting
+      and the water pump. How do you get it running again?
+    targetCharacter: 
+  - category: 0
+    title: Contaminated Water Tank
+    description: The main water tank has a strange discoloration. It might be contaminated.
+      How do you handle the water situation?
+    targetCharacter: 
+  - category: 0
+    title: Strange Noises Above
+    description: You hear scratching and thumping sounds from the ceiling. Something
+      is above the bunker. How do you investigate?
+    targetCharacter: 
+  - category: 0
+    title: Rusted Hatch
+    description: The emergency exit hatch is rusted shut. You might need it as an
+      escape route. How do you try to free it?
+    targetCharacter: 
+  - category: 0
+    title: Flickering Lights
+    description: The electrical wiring is sparking in the main corridor. It's a fire
+      hazard and could short out the whole system. How do you deal with it?
+    targetCharacter: 
+  - category: 0
+    title: Rat Infestation
+    description: Rats have gotten into the food storage area. They're chewing through
+      packaging and contaminating supplies. How do you handle the pest problem?
+    targetCharacter: 
+  - category: 0
+    title: Mysterious Radio Signal
+    description: The old radio picked up a faint transmission. It could be survivors,
+      military, or a trap. How do you respond?
+    targetCharacter: 
+  - category: 0
+    title: Cracked Wall
+    description: A large crack has appeared in the bunker wall. You can feel cold
+      air seeping through. Is the structural integrity at risk? What do you do?
+    targetCharacter: 
+  - category: 0
+    title: Medicine Cabinet
+    description: You found a sealed medicine cabinet in an unused room, but it has
+      a combination lock. How do you access it?
+    targetCharacter: 
+  - category: 0
+    title: Blocked Drain
+    description: The bunker's waste drain is completely blocked. Sewage is starting
+      to back up. How do you unclog it before it becomes a health crisis?
+    targetCharacter: 
+  - category: 0
+    title: Solar Panel Access
+    description: There's a solar panel array on the surface that could supplement
+      power, but going outside is dangerous. How do you attempt to connect it?
+    targetCharacter: 
+  dilemmaChallenges:
+  - category: 1
+    title: Water Rationing
+    description: Water supplies are running critically low. You can ration equally
+      (everyone suffers a little) or prioritize the children (adults go thirsty).
+      What do you decide?
+    targetCharacter: 
+  - category: 1
+    title: Stranger at the Door
+    description: Someone is banging on the bunker door begging for help. They claim
+      to be injured. Letting them in risks your family's safety. Ignoring them means
+      they might die. What do you do?
+    targetCharacter: 
+  - category: 1
+    title: Stolen Supplies
+    description: You discover that food has been disappearing. Circumstantial evidence
+      points to a family member sneaking extra rations at night. How do you handle
+      this?
+    targetCharacter: 
+  - category: 1
+    title: Power Rationing
+    description: The generator fuel is almost gone. You can keep the lights on (morale),
+      run the water pump (hydration), or power the radio (information). You can only
+      pick one. Which do you choose?
+    targetCharacter: 
+  - category: 1
+    title: Sick Outsider
+    description: A wounded stranger managed to get inside. They're clearly infected
+      with something. Using your limited medicine on them means less for your family.
+      What do you do?
+    targetCharacter: 
+  - category: 1
+    title: The Last Antibiotics
+    description: Two family members are getting sick. You only have enough antibiotics
+      for one. Who gets the medicine?
+    targetCharacter: 
+  - category: 1
+    title: Risky Trade
+    description: A passing trader offers a large amount of food in exchange for your
+      only weapon. Without the weapon you're defenseless, but without food you'll
+      starve. What's your call?
+    targetCharacter: 
+  - category: 1
+    title: Evacuation Rumor
+    description: A radio broadcast claims evacuation helicopters are coming to a
+      location 2 days' walk away. It could be real, or it could be a raider trap.
+      Do you stay in the bunker or risk the journey?
+    targetCharacter: 
+  - category: 1
+    title: The Confession
+    description: A family member confesses they've been secretly communicating with
+      outsiders via radio, potentially revealing your location. They say they were
+      trying to find help. How do you respond?
+    targetCharacter: 
+  - category: 1
+    title: Contaminated Food
+    description: Half of your remaining food supply may have been exposed to contamination.
+      Eating it risks sickness. Throwing it away means going hungry. What's the plan?
+    targetCharacter: 
+  familyRequestChallenges:
+  - category: 2
+    title: High Fever
+    description: '{target} has developed a high fever and is shivering uncontrollably.
+      They need care and possibly medicine. How do you help them?'
+    targetCharacter: 
+  - category: 2
+    title: Nightmares
+    description: '{target} hasn''t been sleeping. They keep waking up screaming from
+      nightmares about the outside world. Their sanity is slipping. How do you comfort
+      them?'
+    targetCharacter: 
+  - category: 2
+    title: Refusing to Eat
+    description: '{target} has stopped eating. They say they''d rather the others
+      have their share. They''re getting weaker by the day. How do you convince them
+      to eat?'
+    targetCharacter: 
+  - category: 2
+    title: Panic Attack
+    description: '{target} is having a severe panic attack. They''re hyperventilating
+      and saying the walls are closing in. How do you calm them down?'
+    targetCharacter: 
+  - category: 2
+    title: Infected Wound
+    description: '{target} has a wound that''s turning red and swollen. It looks
+      infected. Without treatment it could get much worse. What do you do?'
+    targetCharacter: 
+  - category: 2
+    title: Homesick and Hopeless
+    description: '{target} has completely lost hope. They keep talking about how
+      pointless it is to keep trying. Their despair is affecting everyone. How do
+      you lift their spirits?'
+    targetCharacter: 
+  - category: 2
+    title: Family Conflict
+    description: '{target} got into a heated argument with another family member.
+      Tensions are high and they''re refusing to speak to each other. How do you
+      mediate?'
+    targetCharacter: 
+  - category: 2
+    title: Dehydration
+    description: '{target} is showing signs of severe dehydration: dry lips, dizziness,
+      confusion. They need water urgently, but supplies are limited. How do you handle
+      this?'
+    targetCharacter: 
+  - category: 2
+    title: Broken Bone
+    description: '{target} fell and may have broken their arm. They''re in significant
+      pain. You have limited medical supplies. How do you treat the injury?'
+    targetCharacter: 
+  - category: 2
+    title: Wants to Leave
+    description: '{target} wants to leave the bunker alone to search for help. It''s
+      dangerous outside, but they''re determined. How do you respond to their plan?'
+    targetCharacter: 

@@ -24,6 +24,6 @@ MonoBehaviour:
   - Barricade Defense
   - Infection Risk
   - Scavenging Runs
-  previewVideo: {fileID: 0}
+  previewVideo: {fileID: 32900000, guid: 0ece5fd9c0ed7464c824fd1612b218b9, type: 3}
   eventSchedule: {fileID: 0}
   storyPrompt: {fileID: 0}

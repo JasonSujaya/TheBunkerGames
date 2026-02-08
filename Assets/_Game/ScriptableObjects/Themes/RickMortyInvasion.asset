@@ -25,6 +25,6 @@ MonoBehaviour:
   - Alien Creatures
   - Portal Anomalies
   - Reality Warping
-  previewVideo: {fileID: 0}
+  previewVideo: {fileID: 32900000, guid: 6cfebec37936540eb85babb1ec55989c, type: 3}
   eventSchedule: {fileID: 0}
   storyPrompt: {fileID: 0}

@@ -19,7 +19,8 @@ MonoBehaviour:
     for authority. Claims he's the smartest being in the multiverse and honestly,
     he might be right. Built a portal gun out of bunker scraps on day one. Constantly
     muttering about how everyone else is an idiot.
-  portrait: {fileID: 0}
+  portrait: {fileID: -8198393618177738103, guid: b55de6e8dec7041808ece24f02d66a54, type: 3}
+  bodyImage: {fileID: 0}
   maxHealth: 65
   maxHunger: 60
   maxThirst: 55

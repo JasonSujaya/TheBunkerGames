@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2ee0084deb024f438cd173e2f07dbf8, type: 3}
+  m_Name: ChefRamsay
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.CharacterDefinitionSO
+  characterName: Chef Ramsay
+  role: 4
+  subtype: 0
+  description: A fiery celebrity chef who can turn canned beans into a gourmet meal.
+    His sharp tongue keeps morale interesting.
+  portrait: {fileID: 5779106381930009108, guid: 516cd6201bdff4880ae3d35c60a189de, type: 3}
+  bodyImage: {fileID: 0}
+  maxHealth: 85
+  maxHunger: 100
+  maxThirst: 90
+  maxSanity: 70
+  startingTraits:
+  - Master Cook
+  - Short Temper

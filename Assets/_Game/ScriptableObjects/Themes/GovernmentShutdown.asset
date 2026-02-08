@@ -24,6 +24,6 @@ MonoBehaviour:
   - Resource Scarcity
   - Civil Unrest
   - No Emergency Services
-  previewVideo: {fileID: 0}
+  previewVideo: {fileID: 32900000, guid: c7e5e8281462044f1b5f14e451abd4fa, type: 3}
   eventSchedule: {fileID: 0}
   storyPrompt: {fileID: 0}

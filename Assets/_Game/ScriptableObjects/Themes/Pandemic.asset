@@ -24,6 +24,6 @@ MonoBehaviour:
   - Quarantine Lockdown
   - Air Contamination
   - Medical Scarcity
-  previewVideo: {fileID: 0}
+  previewVideo: {fileID: 32900000, guid: b040b3a34f5274caabc1ca2d9796f47c, type: 3}
   eventSchedule: {fileID: 0}
   storyPrompt: {fileID: 0}

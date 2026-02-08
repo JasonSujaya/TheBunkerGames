@@ -17,6 +17,7 @@ namespace TheBunkerGames
         [TextArea(3, 5)]
         [SerializeField] private string description;
         [SerializeField] private Sprite portrait;
+        [SerializeField] private Sprite bodyImage;
 
         #if ODIN_INSPECTOR
         [Title("Base Stats")]
@@ -37,11 +38,13 @@ namespace TheBunkerGames
         public CharacterSubtype Subtype => subtype;
         public string Description => description;
         public Sprite Portrait => portrait;
+        public Sprite BodyImage => bodyImage;
         public float MaxHealth => maxHealth;
         public float MaxHunger => maxHunger;
         public float MaxThirst => maxThirst;
         public float MaxSanity => maxSanity;
-        
+        public string[] StartingTraits => startingTraits;
+
         // Factory method to create runtime data instance
         public CharacterData CreateCharacter()
         {
