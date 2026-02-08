@@ -5,6 +5,24 @@ namespace TheBunkerGames
 {
     public class GameSessionData : MonoBehaviour
     {
+        // -------------------------------------------------------------------------
+        // Singleton
+        // -------------------------------------------------------------------------
+        public static GameSessionData Instance { get; private set; }
+
+        private void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+        }
+
+        // -------------------------------------------------------------------------
+        // Data Fields
+        // -------------------------------------------------------------------------
         public GameState CurrentState;
         public int CurrentDay;
         public int FamilyCount;

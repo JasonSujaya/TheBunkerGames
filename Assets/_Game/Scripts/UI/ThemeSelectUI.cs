@@ -801,11 +801,16 @@ namespace TheBunkerGames
                 if (enableDebugLogs) Debug.Log($"[ThemeSelectUI] Applied event schedule: {selectedTheme.EventSchedule.name}");
             }
 
-            // Store selected theme in game session data
-            if (gameSessionData != null)
+            // Store selected theme in game session data (use serialized ref or singleton)
+            var sessionData = gameSessionData != null ? gameSessionData : GameSessionData.Instance;
+            if (sessionData != null)
             {
-                gameSessionData.SelectedTheme = selectedTheme;
+                sessionData.SelectedTheme = selectedTheme;
                 if (enableDebugLogs) Debug.Log($"[ThemeSelectUI] Set GameSessionData.SelectedTheme: {selectedTheme.ThemeName}");
+            }
+            else
+            {
+                Debug.LogWarning("[ThemeSelectUI] GameSessionData not found - theme selection won't persist!");
             }
 
             Hide();
