@@ -286,10 +286,11 @@ namespace TheBunkerGames
             videoImage.color = Color.white;
             videoImage.enabled = false;
 
-            // AspectRatioFitter for 9:16 ratio (video only)
+            // AspectRatioFitter — envelope parent so video fills the area
+            // Videos are 832x464 (landscape ~16:9), EnvelopeParent crops to fill
             AspectRatioFitter aspect = videoObj.AddComponent<AspectRatioFitter>();
-            aspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
-            aspect.aspectRatio = 9f / 16f;
+            aspect.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            aspect.aspectRatio = 16f / 9f;
 
             // Theme title — bottom strip of the card with dark background
             GameObject titleArea = new GameObject("CardTitle");
@@ -623,7 +624,7 @@ namespace TheBunkerGames
             // Create RenderTexture for video output
             if (videoRenderTexture == null)
             {
-                videoRenderTexture = new RenderTexture(540, 960, 0); // 9:16 ratio
+                videoRenderTexture = new RenderTexture(832, 464, 0); // 16:9 landscape
                 videoRenderTexture.Create();
             }
 
