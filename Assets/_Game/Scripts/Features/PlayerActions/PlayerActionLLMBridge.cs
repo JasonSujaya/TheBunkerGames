@@ -95,6 +95,21 @@ namespace TheBunkerGames
             sb.AppendLine($"The game lasts {totalDays} days. A family must survive in their underground bunker after a government-triggered catastrophe.");
             sb.AppendLine();
 
+            // Theme context from selected scenario
+            var selectedTheme = GameSessionData.Instance?.SelectedTheme;
+            if (selectedTheme != null)
+            {
+                sb.AppendLine("SCENARIO/THEME:");
+                sb.AppendLine($"  Name: {selectedTheme.ThemeName}");
+                if (!string.IsNullOrEmpty(selectedTheme.Description))
+                    sb.AppendLine($"  Setting: {selectedTheme.Description}");
+                if (selectedTheme.Traits != null && selectedTheme.Traits.Length > 0)
+                    sb.AppendLine($"  Traits: {string.Join(", ", selectedTheme.Traits)}");
+                sb.AppendLine("All story content should be consistent with this theme and setting.");
+                sb.AppendLine();
+            }
+
+
             // Category-specific role
             switch (category)
             {
