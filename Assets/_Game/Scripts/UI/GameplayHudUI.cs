@@ -283,9 +283,9 @@ namespace TheBunkerGames
             MakeActionBtn(parent, "EndDayBtn", "END DAY", null,
                 new Vector2(0.005f, 0.84f), new Vector2(0.12f, 0.895f));
 
-            // DIARY — below END DAY, opens Player Action UI
+            // DIARY — right next to END DAY
             MakeActionBtn(parent, "DiaryBtn", "DIARY", iconDiary,
-                new Vector2(0.005f, 0.78f), new Vector2(0.12f, 0.835f));
+                new Vector2(0.125f, 0.84f), new Vector2(0.24f, 0.895f));
         }
 
         private void MakeActionBtn(Transform parent, string name, string label,
@@ -351,9 +351,9 @@ namespace TheBunkerGames
         // =====================================================================
         private void Build_CharacterColumn(Transform parent)
         {
-            // small portrait thumbnails stacked on left edge
+            // small portrait thumbnails stacked on left edge, below the action buttons
             var col = MakeRect(parent, "CharacterList",
-                new Vector2(0.005f, 0.10f), new Vector2(0.06f, 0.82f));
+                new Vector2(0.005f, 0.10f), new Vector2(0.06f, 0.83f));
 
             var vlg = col.gameObject.AddComponent<VerticalLayoutGroup>();
             vlg.childAlignment    = TextAnchor.UpperCenter;
