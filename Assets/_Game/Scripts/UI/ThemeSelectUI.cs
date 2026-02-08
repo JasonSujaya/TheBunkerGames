@@ -105,6 +105,13 @@ namespace TheBunkerGames
             Instance = this;
         }
 
+        private void Start()
+        {
+            // Auto-show on play if canvas exists and we have themes
+            if (canvasRoot != null && availableThemes.Count > 0)
+                Show();
+        }
+
         private void OnDestroy()
         {
             if (videoRenderTexture != null)
