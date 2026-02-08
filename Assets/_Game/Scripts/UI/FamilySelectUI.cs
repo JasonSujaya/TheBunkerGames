@@ -9,9 +9,10 @@ using Sirenix.OdinInspector;
 namespace TheBunkerGames
 {
     /// <summary>
-    /// UI manager for family profile selection.
-    /// Has its own auto-setup that creates a Canvas root with a selection panel.
-    /// Each FamilyListSO is displayed as a selectable button showing name + member count.
+    /// UI manager for family/character selection.
+    /// Displays a portrait grid of all characters from available FamilyListSO profiles.
+    /// Clicking a portrait shows character details (name, traits, bio) in a side panel.
+    /// Selected characters are highlighted; confirm button applies the family profile.
     /// </summary>
     public class FamilySelectUI : MonoBehaviour
     {
@@ -33,7 +34,22 @@ namespace TheBunkerGames
         #endif
         [SerializeField] private List<FamilyListSO> availableFamilies = new List<FamilyListSO>();
         [SerializeField] private int canvasSortOrder = 101;
+        [SerializeField] private int portraitGridColumns = 5;
+        [SerializeField] private float portraitSize = 140f;
+        [SerializeField] private float portraitSpacing = 10f;
         [SerializeField] private bool enableDebugLogs = false;
+
+        // -------------------------------------------------------------------------
+        // Style
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Style")]
+        #endif
+        [SerializeField] private Color panelBgColor = new Color(0.12f, 0.11f, 0.1f, 0.95f);
+        [SerializeField] private Color portraitDefaultBorder = new Color(0.35f, 0.32f, 0.28f, 1f);
+        [SerializeField] private Color portraitSelectedBorder = new Color(0.8f, 0.25f, 0.2f, 1f);
+        [SerializeField] private Color detailPanelBg = new Color(0.9f, 0.87f, 0.8f, 0.95f);
+        [SerializeField] private Color detailTextColor = new Color(0.15f, 0.12f, 0.1f, 1f);
 
         // -------------------------------------------------------------------------
         // Generated References (populated by AutoSetup)
@@ -49,6 +65,17 @@ namespace TheBunkerGames
         // Runtime State
         // -------------------------------------------------------------------------
         private FamilyListSO selectedFamily;
+        private CharacterDefinitionSO inspectedCharacter;
+        private List<GameObject> portraitCards = new List<GameObject>();
+
+        // Runtime UI references (found after auto-setup)
+        private Transform portraitGridContainer;
+        private Text detailNameText;
+        private Text detailTraitsText;
+        private Text detailBioText;
+        private Image detailPortraitImage;
+        private GameObject detailPanel;
+
         public FamilyListSO SelectedFamily => selectedFamily;
 
         // -------------------------------------------------------------------------
@@ -86,24 +113,264 @@ namespace TheBunkerGames
             canvasRoot = UIBuilderUtils.CreateCanvasRoot(transform, "FamilySelectCanvas", canvasSortOrder);
             UIBuilderUtils.EnsureEventSystem();
 
-            // Panel
-            panel = UIBuilderUtils.CreatePanel(canvasRoot.transform, "FamilySelectPanel", new Color(0.12f, 0.15f, 0.12f, 0.95f));
+            // Main panel (full screen)
+            panel = UIBuilderUtils.CreatePanel(canvasRoot.transform, "FamilySelectPanel", panelBgColor);
 
-            // Title
-            UIBuilderUtils.CreateTitle(panel.transform, "Choose Your Family");
+            // ---- Title Banner ----
+            BuildTitleBanner(panel.transform);
 
-            // Scroll content
-            GameObject scrollContent = UIBuilderUtils.CreateScrollArea(panel.transform);
-            scrollContent.name = "Content";
+            // ---- Portrait Grid (left side, ~65% width) ----
+            BuildPortraitGrid(panel.transform);
 
-            // Confirm button
-            UIBuilderUtils.CreateButton(panel.transform, "Confirm", "ConfirmButton");
+            // ---- Detail Panel (right side, ~30% width) ----
+            BuildDetailPanel(panel.transform);
+
+            // ---- Confirm Button (bottom right) ----
+            BuildConfirmButton(panel.transform);
 
             if (enableDebugLogs) Debug.Log("[FamilySelectUI] Auto Setup complete.");
 
             #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(this);
             #endif
+        }
+
+        // -------------------------------------------------------------------------
+        // UI Builders
+        // -------------------------------------------------------------------------
+        private void BuildTitleBanner(Transform parent)
+        {
+            GameObject bannerObj = new GameObject("TitleBanner");
+            bannerObj.transform.SetParent(parent, false);
+
+            RectTransform rect = bannerObj.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.05f, 0.88f);
+            rect.anchorMax = new Vector2(0.62f, 0.96f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            Image bg = bannerObj.AddComponent<Image>();
+            bg.color = new Color(0.25f, 0.22f, 0.18f, 0.9f);
+
+            // Title text
+            GameObject textObj = new GameObject("TitleText");
+            textObj.transform.SetParent(bannerObj.transform, false);
+
+            RectTransform textRect = textObj.AddComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = new Vector2(20, 0);
+            textRect.offsetMax = new Vector2(-20, 0);
+
+            Text text = textObj.AddComponent<Text>();
+            text.text = "CHARACTER SELECTION";
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.fontSize = 28;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.color = Color.white;
+            text.fontStyle = FontStyle.Bold;
+        }
+
+        private void BuildPortraitGrid(Transform parent)
+        {
+            // Scroll area for portraits
+            GameObject scrollObj = new GameObject("PortraitScrollArea");
+            scrollObj.transform.SetParent(parent, false);
+
+            RectTransform scrollRect = scrollObj.AddComponent<RectTransform>();
+            scrollRect.anchorMin = new Vector2(0.05f, 0.08f);
+            scrollRect.anchorMax = new Vector2(0.62f, 0.86f);
+            scrollRect.offsetMin = Vector2.zero;
+            scrollRect.offsetMax = Vector2.zero;
+
+            ScrollRect scroll = scrollObj.AddComponent<ScrollRect>();
+            scroll.horizontal = false;
+
+            Image scrollBg = scrollObj.AddComponent<Image>();
+            scrollBg.color = new Color(0, 0, 0, 0.15f);
+
+            // Viewport
+            GameObject viewport = new GameObject("Viewport");
+            viewport.transform.SetParent(scrollObj.transform, false);
+
+            RectTransform viewRect = viewport.AddComponent<RectTransform>();
+            viewRect.anchorMin = Vector2.zero;
+            viewRect.anchorMax = Vector2.one;
+            viewRect.offsetMin = Vector2.zero;
+            viewRect.offsetMax = Vector2.zero;
+
+            viewport.AddComponent<Image>().color = Color.clear;
+            viewport.AddComponent<Mask>().showMaskGraphic = false;
+
+            // Content with GridLayout
+            GameObject content = new GameObject("PortraitGrid");
+            content.transform.SetParent(viewport.transform, false);
+
+            RectTransform contentRect = content.AddComponent<RectTransform>();
+            contentRect.anchorMin = new Vector2(0, 1);
+            contentRect.anchorMax = new Vector2(1, 1);
+            contentRect.pivot = new Vector2(0.5f, 1);
+            contentRect.offsetMin = Vector2.zero;
+            contentRect.offsetMax = Vector2.zero;
+
+            GridLayoutGroup grid = content.AddComponent<GridLayoutGroup>();
+            grid.cellSize = new Vector2(portraitSize, portraitSize * 1.2f);
+            grid.spacing = new Vector2(portraitSpacing, portraitSpacing);
+            grid.padding = new RectOffset(15, 15, 15, 15);
+            grid.childAlignment = TextAnchor.UpperCenter;
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = portraitGridColumns;
+
+            ContentSizeFitter fitter = content.AddComponent<ContentSizeFitter>();
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            scroll.viewport = viewRect;
+            scroll.content = contentRect;
+        }
+
+        private void BuildDetailPanel(Transform parent)
+        {
+            // Detail panel container (right side)
+            detailPanel = new GameObject("DetailPanel");
+            detailPanel.transform.SetParent(parent, false);
+
+            RectTransform detailRect = detailPanel.AddComponent<RectTransform>();
+            detailRect.anchorMin = new Vector2(0.65f, 0.14f);
+            detailRect.anchorMax = new Vector2(0.95f, 0.96f);
+            detailRect.offsetMin = Vector2.zero;
+            detailRect.offsetMax = Vector2.zero;
+
+            Image detailBg = detailPanel.AddComponent<Image>();
+            detailBg.color = detailPanelBg;
+
+            // Portrait preview (top of detail panel)
+            GameObject portraitPreview = new GameObject("PortraitPreview");
+            portraitPreview.transform.SetParent(detailPanel.transform, false);
+
+            RectTransform previewRect = portraitPreview.AddComponent<RectTransform>();
+            previewRect.anchorMin = new Vector2(0.15f, 0.6f);
+            previewRect.anchorMax = new Vector2(0.85f, 0.95f);
+            previewRect.offsetMin = Vector2.zero;
+            previewRect.offsetMax = Vector2.zero;
+
+            detailPortraitImage = portraitPreview.AddComponent<Image>();
+            detailPortraitImage.color = new Color(0.5f, 0.5f, 0.5f, 0.3f);
+            detailPortraitImage.preserveAspect = true;
+
+            // Name label
+            GameObject nameLabel = new GameObject("NameLabel");
+            nameLabel.transform.SetParent(detailPanel.transform, false);
+
+            RectTransform nameRect = nameLabel.AddComponent<RectTransform>();
+            nameRect.anchorMin = new Vector2(0.05f, 0.48f);
+            nameRect.anchorMax = new Vector2(0.95f, 0.58f);
+            nameRect.offsetMin = Vector2.zero;
+            nameRect.offsetMax = Vector2.zero;
+
+            detailNameText = nameLabel.AddComponent<Text>();
+            detailNameText.text = "NAME:";
+            detailNameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            detailNameText.fontSize = 22;
+            detailNameText.alignment = TextAnchor.MiddleLeft;
+            detailNameText.color = detailTextColor;
+            detailNameText.fontStyle = FontStyle.Bold;
+
+            // Traits label
+            GameObject traitsLabel = new GameObject("TraitsLabel");
+            traitsLabel.transform.SetParent(detailPanel.transform, false);
+
+            RectTransform traitsRect = traitsLabel.AddComponent<RectTransform>();
+            traitsRect.anchorMin = new Vector2(0.05f, 0.32f);
+            traitsRect.anchorMax = new Vector2(0.95f, 0.47f);
+            traitsRect.offsetMin = Vector2.zero;
+            traitsRect.offsetMax = Vector2.zero;
+
+            detailTraitsText = traitsLabel.AddComponent<Text>();
+            detailTraitsText.text = "TRAITS:";
+            detailTraitsText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            detailTraitsText.fontSize = 18;
+            detailTraitsText.alignment = TextAnchor.UpperLeft;
+            detailTraitsText.color = detailTextColor;
+            detailTraitsText.fontStyle = FontStyle.Bold;
+
+            // Bio label
+            GameObject bioHeader = new GameObject("BioHeader");
+            bioHeader.transform.SetParent(detailPanel.transform, false);
+
+            RectTransform bioHeaderRect = bioHeader.AddComponent<RectTransform>();
+            bioHeaderRect.anchorMin = new Vector2(0.05f, 0.24f);
+            bioHeaderRect.anchorMax = new Vector2(0.95f, 0.32f);
+            bioHeaderRect.offsetMin = Vector2.zero;
+            bioHeaderRect.offsetMax = Vector2.zero;
+
+            Text bioHeaderText = bioHeader.AddComponent<Text>();
+            bioHeaderText.text = "BIO:";
+            bioHeaderText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            bioHeaderText.fontSize = 18;
+            bioHeaderText.alignment = TextAnchor.MiddleLeft;
+            bioHeaderText.color = detailTextColor;
+            bioHeaderText.fontStyle = FontStyle.Bold;
+
+            // Bio text
+            GameObject bioContent = new GameObject("BioContent");
+            bioContent.transform.SetParent(detailPanel.transform, false);
+
+            RectTransform bioContentRect = bioContent.AddComponent<RectTransform>();
+            bioContentRect.anchorMin = new Vector2(0.05f, 0.08f);
+            bioContentRect.anchorMax = new Vector2(0.95f, 0.24f);
+            bioContentRect.offsetMin = Vector2.zero;
+            bioContentRect.offsetMax = Vector2.zero;
+
+            detailBioText = bioContent.AddComponent<Text>();
+            detailBioText.text = "";
+            detailBioText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            detailBioText.fontSize = 16;
+            detailBioText.alignment = TextAnchor.UpperLeft;
+            detailBioText.color = detailTextColor;
+
+            // Start with placeholder text
+            ClearDetailPanel();
+        }
+
+        private void BuildConfirmButton(Transform parent)
+        {
+            GameObject btnObj = new GameObject("ConfirmButton");
+            btnObj.transform.SetParent(parent, false);
+
+            RectTransform rect = btnObj.AddComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.65f, 0.04f);
+            rect.anchorMax = new Vector2(0.95f, 0.12f);
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+
+            Image bg = btnObj.AddComponent<Image>();
+            bg.color = new Color(0.3f, 0.28f, 0.25f, 1f);
+
+            Button btn = btnObj.AddComponent<Button>();
+            var colors = btn.colors;
+            colors.highlightedColor = new Color(0.4f, 0.35f, 0.3f, 1f);
+            colors.pressedColor = new Color(0.2f, 0.18f, 0.15f, 1f);
+            colors.disabledColor = new Color(0.25f, 0.25f, 0.25f, 0.5f);
+            btn.colors = colors;
+            btn.interactable = false;
+
+            // Button text
+            GameObject textObj = new GameObject("Text");
+            textObj.transform.SetParent(btnObj.transform, false);
+
+            RectTransform textRect = textObj.AddComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+
+            Text text = textObj.AddComponent<Text>();
+            text.text = "CONFIRM";
+            text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            text.fontSize = 24;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.color = Color.white;
+            text.fontStyle = FontStyle.Bold;
         }
 
         // -------------------------------------------------------------------------
@@ -114,7 +381,12 @@ namespace TheBunkerGames
             if (canvasRoot == null) return;
             canvasRoot.SetActive(true);
             selectedFamily = null;
-            PopulateFamilyButtons();
+            inspectedCharacter = null;
+
+            CacheUIReferences();
+            PopulatePortraitGrid();
+            ClearDetailPanel();
+
             UIBuilderUtils.SetButtonInteractable(panel, "ConfirmButton", false);
 
             // Wire confirm button
@@ -134,48 +406,224 @@ namespace TheBunkerGames
         }
 
         // -------------------------------------------------------------------------
-        // Population
+        // Cache UI References
         // -------------------------------------------------------------------------
-        private void PopulateFamilyButtons()
+        private void CacheUIReferences()
         {
-            Transform content = UIBuilderUtils.FindScrollContent(panel);
-            if (content == null) return;
+            if (panel == null) return;
 
-            UIBuilderUtils.ClearChildren(content);
+            // Find portrait grid
+            Transform gridTransform = panel.transform.Find("PortraitScrollArea/Viewport/PortraitGrid");
+            portraitGridContainer = gridTransform;
 
-            foreach (var family in availableFamilies)
+            // Find detail panel elements
+            detailPanel = panel.transform.Find("DetailPanel")?.gameObject;
+            if (detailPanel != null)
             {
-                if (family == null) continue;
-                var capturedFamily = family;
-                int memberCount = family.DefaultFamilyMembers != null ? family.DefaultFamilyMembers.Count : 0;
-                string sublabel = $"{memberCount} member(s)";
-                UIBuilderUtils.CreateSelectionButton(content, family.name, sublabel, () => SelectFamily(capturedFamily));
+                detailPortraitImage = detailPanel.transform.Find("PortraitPreview")?.GetComponent<Image>();
+                detailNameText = detailPanel.transform.Find("NameLabel")?.GetComponent<Text>();
+                detailTraitsText = detailPanel.transform.Find("TraitsLabel")?.GetComponent<Text>();
+                detailBioText = detailPanel.transform.Find("BioContent")?.GetComponent<Text>();
             }
         }
 
+        // -------------------------------------------------------------------------
+        // Portrait Grid
+        // -------------------------------------------------------------------------
+        private void PopulatePortraitGrid()
+        {
+            if (portraitGridContainer == null) return;
+
+            UIBuilderUtils.ClearChildren(portraitGridContainer);
+            portraitCards.Clear();
+
+            // For now, use the first available family to show characters
+            // (or combine all characters from all families)
+            foreach (var family in availableFamilies)
+            {
+                if (family == null || family.DefaultFamilyMembers == null) continue;
+
+                foreach (var charDef in family.DefaultFamilyMembers)
+                {
+                    if (charDef == null) continue;
+                    var capturedChar = charDef;
+                    var capturedFamily = family;
+                    GameObject card = CreatePortraitCard(portraitGridContainer, charDef, () =>
+                    {
+                        InspectCharacter(capturedChar);
+                        SelectFamily(capturedFamily);
+                    });
+                    portraitCards.Add(card);
+                }
+            }
+        }
+
+        private GameObject CreatePortraitCard(Transform parent, CharacterDefinitionSO charDef, UnityEngine.Events.UnityAction onClick)
+        {
+            GameObject card = new GameObject("Portrait_" + charDef.CharacterName);
+            card.transform.SetParent(parent, false);
+
+            // Border / background
+            Image borderImg = card.AddComponent<Image>();
+            borderImg.color = portraitDefaultBorder;
+
+            Button btn = card.AddComponent<Button>();
+            var colors = btn.colors;
+            colors.highlightedColor = new Color(0.5f, 0.45f, 0.38f, 1f);
+            colors.pressedColor = new Color(0.3f, 0.27f, 0.22f, 1f);
+            btn.colors = colors;
+            btn.onClick.AddListener(onClick);
+
+            // Portrait image (inset from border)
+            GameObject portraitObj = new GameObject("PortraitImage");
+            portraitObj.transform.SetParent(card.transform, false);
+
+            RectTransform portraitRect = portraitObj.AddComponent<RectTransform>();
+            portraitRect.anchorMin = new Vector2(0.06f, 0.12f);
+            portraitRect.anchorMax = new Vector2(0.94f, 0.94f);
+            portraitRect.offsetMin = Vector2.zero;
+            portraitRect.offsetMax = Vector2.zero;
+
+            Image portraitImg = portraitObj.AddComponent<Image>();
+            if (charDef.Portrait != null)
+            {
+                portraitImg.sprite = charDef.Portrait;
+                portraitImg.preserveAspect = true;
+            }
+            else
+            {
+                portraitImg.color = new Color(0.3f, 0.3f, 0.3f, 1f);
+            }
+
+            // Name text (bottom of card)
+            GameObject nameObj = new GameObject("NameText");
+            nameObj.transform.SetParent(card.transform, false);
+
+            RectTransform nameRect = nameObj.AddComponent<RectTransform>();
+            nameRect.anchorMin = new Vector2(0, 0);
+            nameRect.anchorMax = new Vector2(1, 0.14f);
+            nameRect.offsetMin = Vector2.zero;
+            nameRect.offsetMax = Vector2.zero;
+
+            // Name background
+            Image nameBg = nameObj.AddComponent<Image>();
+            nameBg.color = new Color(0, 0, 0, 0.6f);
+
+            GameObject nameTextObj = new GameObject("Text");
+            nameTextObj.transform.SetParent(nameObj.transform, false);
+
+            RectTransform nameTextRect = nameTextObj.AddComponent<RectTransform>();
+            nameTextRect.anchorMin = Vector2.zero;
+            nameTextRect.anchorMax = Vector2.one;
+            nameTextRect.offsetMin = new Vector2(4, 0);
+            nameTextRect.offsetMax = new Vector2(-4, 0);
+
+            Text nameText = nameTextObj.AddComponent<Text>();
+            nameText.text = charDef.CharacterName.ToUpper();
+            nameText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            nameText.fontSize = 12;
+            nameText.alignment = TextAnchor.MiddleCenter;
+            nameText.color = Color.white;
+            nameText.resizeTextForBestFit = true;
+            nameText.resizeTextMinSize = 8;
+            nameText.resizeTextMaxSize = 14;
+
+            return card;
+        }
+
+        // -------------------------------------------------------------------------
+        // Character Inspection (Detail Panel)
+        // -------------------------------------------------------------------------
+        private void InspectCharacter(CharacterDefinitionSO charDef)
+        {
+            inspectedCharacter = charDef;
+
+            if (detailNameText != null)
+                detailNameText.text = $"NAME:\n{charDef.CharacterName.ToUpper()}";
+
+            if (detailTraitsText != null)
+            {
+                string traits = "TRAITS:\n";
+                if (charDef.Role != CharacterRole.Other)
+                    traits += charDef.Role.ToString().ToUpper() + "\n";
+
+                // Access startingTraits via reflection since it's private
+                var traitsField = typeof(CharacterDefinitionSO).GetField("startingTraits",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (traitsField != null)
+                {
+                    string[] traitsList = traitsField.GetValue(charDef) as string[];
+                    if (traitsList != null)
+                    {
+                        foreach (var trait in traitsList)
+                        {
+                            if (!string.IsNullOrEmpty(trait))
+                                traits += trait.ToUpper() + "\n";
+                        }
+                    }
+                }
+                detailTraitsText.text = traits.TrimEnd('\n');
+            }
+
+            if (detailBioText != null)
+                detailBioText.text = !string.IsNullOrEmpty(charDef.Description) ? charDef.Description : "No bio available.";
+
+            if (detailPortraitImage != null)
+            {
+                if (charDef.Portrait != null)
+                {
+                    detailPortraitImage.sprite = charDef.Portrait;
+                    detailPortraitImage.color = Color.white;
+                    detailPortraitImage.preserveAspect = true;
+                }
+                else
+                {
+                    detailPortraitImage.sprite = null;
+                    detailPortraitImage.color = new Color(0.5f, 0.5f, 0.5f, 0.3f);
+                }
+            }
+
+            // Highlight the selected portrait card
+            HighlightPortrait(charDef.CharacterName);
+
+            if (enableDebugLogs) Debug.Log($"[FamilySelectUI] Inspecting: {charDef.CharacterName}");
+        }
+
+        private void HighlightPortrait(string characterName)
+        {
+            foreach (var card in portraitCards)
+            {
+                if (card == null) continue;
+                Image borderImg = card.GetComponent<Image>();
+                if (borderImg != null)
+                {
+                    bool isSelected = card.name == "Portrait_" + characterName;
+                    borderImg.color = isSelected ? portraitSelectedBorder : portraitDefaultBorder;
+                }
+            }
+        }
+
+        private void ClearDetailPanel()
+        {
+            if (detailNameText != null) detailNameText.text = "NAME:";
+            if (detailTraitsText != null) detailTraitsText.text = "TRAITS:";
+            if (detailBioText != null) detailBioText.text = "Select a character to view details.";
+            if (detailPortraitImage != null)
+            {
+                detailPortraitImage.sprite = null;
+                detailPortraitImage.color = new Color(0.5f, 0.5f, 0.5f, 0.3f);
+            }
+        }
+
+        // -------------------------------------------------------------------------
+        // Family Selection
+        // -------------------------------------------------------------------------
         private void SelectFamily(FamilyListSO family)
         {
             selectedFamily = family;
             UIBuilderUtils.SetButtonInteractable(panel, "ConfirmButton", true);
 
-            // Highlight selected
-            Transform content = UIBuilderUtils.FindScrollContent(panel);
-            if (content != null)
-            {
-                foreach (Transform child in content)
-                {
-                    Image bg = child.GetComponent<Image>();
-                    if (bg != null)
-                    {
-                        bool isSelected = child.name == "SelectBtn_" + family.name;
-                        bg.color = isSelected
-                            ? new Color(0.2f, 0.45f, 0.2f, 1f)
-                            : new Color(0.2f, 0.2f, 0.3f, 0.9f);
-                    }
-                }
-            }
-
-            if (enableDebugLogs) Debug.Log($"[FamilySelectUI] Selected: {family.name}");
+            if (enableDebugLogs) Debug.Log($"[FamilySelectUI] Family selected: {family.name}");
         }
 
         // -------------------------------------------------------------------------
@@ -185,7 +633,6 @@ namespace TheBunkerGames
         {
             if (selectedFamily == null) return;
 
-            // Wire selected family profile to FamilyManager
             ApplyFamilyProfile(selectedFamily);
 
             Hide();
