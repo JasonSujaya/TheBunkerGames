@@ -71,6 +71,7 @@ namespace TheBunkerGames
         public FamilySelectUI FamilySelect;
         public InventoryDisplayUI InventoryDisplay;
         public GameplayHudUI GameplayHud;
+        public PlayerActionUI PlayerActions;
 
         public StatusReviewManager StatusReview;
         public CityExplorationManager CityExploration;
@@ -136,6 +137,7 @@ namespace TheBunkerGames
             if (FamilySelect == null) FamilySelect = FindFirstObjectByType<FamilySelectUI>();
             if (InventoryDisplay == null) InventoryDisplay = FindFirstObjectByType<InventoryDisplayUI>();
             if (GameplayHud == null) GameplayHud = FindFirstObjectByType<GameplayHudUI>();
+            if (PlayerActions == null) PlayerActions = FindFirstObjectByType<PlayerActionUI>();
 
             if (StatusReview == null) StatusReview = FindFirstObjectByType<StatusReviewManager>();
             if (CityExploration == null) CityExploration = FindFirstObjectByType<CityExplorationManager>();

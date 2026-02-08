@@ -32,6 +32,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         public static event Action OnEndDayClicked;
         public static event Action OnOurThingsClicked;
+        public static event Action OnDiaryClicked;
         public static event Action OnPrevCharacterClicked;
         public static event Action OnNextCharacterClicked;
         /// <summary>Fired when a character thumbnail is clicked. Passes the selected CharacterData.</summary>
@@ -271,6 +272,10 @@ namespace TheBunkerGames
             // END DAY — right below the day strip
             MakeActionBtn(parent, "EndDayBtn", "END DAY", null,
                 new Vector2(0.005f, 0.84f), new Vector2(0.12f, 0.895f));
+
+            // DIARY — below END DAY, opens Player Action UI
+            MakeActionBtn(parent, "DiaryBtn", "DIARY", iconDiary,
+                new Vector2(0.005f, 0.78f), new Vector2(0.12f, 0.835f));
         }
 
         private void MakeActionBtn(Transform parent, string name, string label,
@@ -820,6 +825,7 @@ namespace TheBunkerGames
 
             Wire("OurThingsBtn", () => { OnOurThingsClicked?.Invoke(); });
             Wire("EndDayBtn",    () => { OnEndDayClicked?.Invoke(); });
+            Wire("DiaryBtn",     () => { OnDiaryClicked?.Invoke(); });
         }
 
         private void WireChild(Transform parent, string childName, UnityEngine.Events.UnityAction action)
