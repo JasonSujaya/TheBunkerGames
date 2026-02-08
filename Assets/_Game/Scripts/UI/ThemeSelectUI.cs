@@ -181,9 +181,10 @@ namespace TheBunkerGames
             GameObject bannerObj = new GameObject("TitleBanner");
             bannerObj.transform.SetParent(parent, false);
 
+            // Positioned at top-center above the card area
             RectTransform rect = bannerObj.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.05f, 0.88f);
-            rect.anchorMax = new Vector2(0.62f, 0.96f);
+            rect.anchorMin = new Vector2(0.08f, 0.85f);
+            rect.anchorMax = new Vector2(0.58f, 0.95f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
@@ -210,23 +211,26 @@ namespace TheBunkerGames
 
             var text = textObj.AddComponent<TextMeshProUGUI>();
             text.text = "SCENARIO SELECTION";
-            text.fontSize = 28;
+            text.fontSize = 36;
             text.alignment = TextAlignmentOptions.Center;
             text.color = Color.white;
             text.fontStyle = FontStyles.Bold;
+            text.enableAutoSizing = true;
+            text.fontSizeMin = 20;
+            text.fontSizeMax = 42;
             if (titleFont != null) text.font = titleFont;
         }
 
         private void BuildThemeCard(Transform parent)
         {
-            // Card border / frame (white card — polaroid style)
-            // The card occupies the lower portion; the media overflows upward
+            // Card border / frame (polaroid style — white weathered card)
+            // Image fills most of the card, title bar at the bottom
             GameObject cardObj = new GameObject("ThemeCard");
             cardObj.transform.SetParent(parent, false);
 
             RectTransform cardRect = cardObj.AddComponent<RectTransform>();
-            cardRect.anchorMin = new Vector2(0.05f, 0.08f);
-            cardRect.anchorMax = new Vector2(0.62f, 0.86f);
+            cardRect.anchorMin = new Vector2(0.04f, 0.06f);
+            cardRect.anchorMax = new Vector2(0.62f, 0.84f);
             cardRect.offsetMin = Vector2.zero;
             cardRect.offsetMax = Vector2.zero;
 
@@ -242,22 +246,21 @@ namespace TheBunkerGames
                 cardBorder.color = cardBorderColor;
             }
 
-            // Video / Image area — sits ON TOP of the card frame, overflowing upward
-            // Anchored from 18% to 102% of the card height (extends above the card boundary)
-            // No Mask on the card, so the overflow is visible
+            // Video / Image area — fills the card interior above the title bar
+            // Inset slightly from the card border on all sides except bottom
             GameObject mediaArea = new GameObject("MediaArea");
             mediaArea.transform.SetParent(cardObj.transform, false);
 
             RectTransform mediaRect = mediaArea.AddComponent<RectTransform>();
-            mediaRect.anchorMin = new Vector2(0.04f, 0.18f);
-            mediaRect.anchorMax = new Vector2(0.96f, 1.02f);
+            mediaRect.anchorMin = new Vector2(0.04f, 0.16f);
+            mediaRect.anchorMax = new Vector2(0.96f, 0.96f);
             mediaRect.offsetMin = Vector2.zero;
             mediaRect.offsetMax = Vector2.zero;
 
-            // Fallback static image
+            // Fallback static image — fill the area, no preserveAspect so it covers fully
             cardImage = mediaArea.AddComponent<Image>();
             cardImage.color = new Color(0.3f, 0.3f, 0.3f, 1f);
-            cardImage.preserveAspect = true;
+            cardImage.preserveAspect = false;
 
             // Video overlay (RawImage on top of the static image)
             GameObject videoObj = new GameObject("VideoDisplay");
@@ -273,19 +276,18 @@ namespace TheBunkerGames
             videoImage.color = Color.white;
             videoImage.enabled = false;
 
-            // AspectRatioFitter for 9:16 ratio
+            // AspectRatioFitter for 9:16 ratio (video only)
             AspectRatioFitter aspect = videoObj.AddComponent<AspectRatioFitter>();
             aspect.aspectMode = AspectRatioFitter.AspectMode.FitInParent;
             aspect.aspectRatio = 9f / 16f;
 
-            // Theme title — sits ON the white card frame area at the bottom, with black bg
-            // Anchored at bottom 18% of card (the white frame area below the media)
+            // Theme title — bottom strip of the card with dark background
             GameObject titleArea = new GameObject("CardTitle");
             titleArea.transform.SetParent(cardObj.transform, false);
 
             RectTransform titleRect = titleArea.AddComponent<RectTransform>();
             titleRect.anchorMin = new Vector2(0.04f, 0.02f);
-            titleRect.anchorMax = new Vector2(0.96f, 0.18f);
+            titleRect.anchorMax = new Vector2(0.96f, 0.16f);
             titleRect.offsetMin = Vector2.zero;
             titleRect.offsetMax = Vector2.zero;
 
@@ -298,18 +300,18 @@ namespace TheBunkerGames
             RectTransform ttRect = titleTextObj.AddComponent<RectTransform>();
             ttRect.anchorMin = Vector2.zero;
             ttRect.anchorMax = Vector2.one;
-            ttRect.offsetMin = new Vector2(15, 0);
-            ttRect.offsetMax = new Vector2(-15, 0);
+            ttRect.offsetMin = new Vector2(10, 0);
+            ttRect.offsetMax = new Vector2(-10, 0);
 
             var cardTitle = titleTextObj.AddComponent<TextMeshProUGUI>();
             cardTitle.text = "SCENARIO NAME";
-            cardTitle.fontSize = 30;
+            cardTitle.fontSize = 40;
             cardTitle.alignment = TextAlignmentOptions.Center;
             cardTitle.color = Color.white;
             cardTitle.fontStyle = FontStyles.Bold;
             cardTitle.enableAutoSizing = true;
-            cardTitle.fontSizeMin = 18;
-            cardTitle.fontSizeMax = 36;
+            cardTitle.fontSizeMin = 22;
+            cardTitle.fontSizeMax = 48;
             if (titleFont != null) cardTitle.font = titleFont;
             cardTitleText = cardTitle;
         }
@@ -319,9 +321,10 @@ namespace TheBunkerGames
             detailPanel = new GameObject("DetailPanel");
             detailPanel.transform.SetParent(parent, false);
 
+            // Notes panel on the right side
             RectTransform detailRect = detailPanel.AddComponent<RectTransform>();
-            detailRect.anchorMin = new Vector2(0.65f, 0.14f);
-            detailRect.anchorMax = new Vector2(0.95f, 0.96f);
+            detailRect.anchorMin = new Vector2(0.64f, 0.08f);
+            detailRect.anchorMax = new Vector2(0.97f, 0.92f);
             detailRect.offsetMin = Vector2.zero;
             detailRect.offsetMax = Vector2.zero;
 
@@ -337,41 +340,47 @@ namespace TheBunkerGames
                 bg.color = detailPanelBg;
             }
 
-            // Name
+            // Name — top section with larger font
             GameObject nameObj = new GameObject("NameLabel");
             nameObj.transform.SetParent(detailPanel.transform, false);
 
             RectTransform nameRect = nameObj.AddComponent<RectTransform>();
-            nameRect.anchorMin = new Vector2(0.05f, 0.78f);
-            nameRect.anchorMax = new Vector2(0.95f, 0.95f);
+            nameRect.anchorMin = new Vector2(0.08f, 0.78f);
+            nameRect.anchorMax = new Vector2(0.92f, 0.95f);
             nameRect.offsetMin = Vector2.zero;
             nameRect.offsetMax = Vector2.zero;
 
             var nameText = nameObj.AddComponent<TextMeshProUGUI>();
             nameText.text = "NAME:";
-            nameText.fontSize = 22;
+            nameText.fontSize = 28;
             nameText.alignment = TextAlignmentOptions.TopLeft;
             nameText.color = detailTextColor;
             nameText.fontStyle = FontStyles.Bold;
+            nameText.enableAutoSizing = true;
+            nameText.fontSizeMin = 16;
+            nameText.fontSizeMax = 32;
             if (titleFont != null) nameText.font = titleFont;
             detailNameText = nameText;
 
-            // Traits
+            // Traits — middle section
             GameObject traitsObj = new GameObject("TraitsLabel");
             traitsObj.transform.SetParent(detailPanel.transform, false);
 
             RectTransform traitsRect = traitsObj.AddComponent<RectTransform>();
-            traitsRect.anchorMin = new Vector2(0.05f, 0.5f);
-            traitsRect.anchorMax = new Vector2(0.95f, 0.76f);
+            traitsRect.anchorMin = new Vector2(0.08f, 0.52f);
+            traitsRect.anchorMax = new Vector2(0.92f, 0.76f);
             traitsRect.offsetMin = Vector2.zero;
             traitsRect.offsetMax = Vector2.zero;
 
             var traitsText = traitsObj.AddComponent<TextMeshProUGUI>();
             traitsText.text = "TRAITS:";
-            traitsText.fontSize = 18;
+            traitsText.fontSize = 24;
             traitsText.alignment = TextAlignmentOptions.TopLeft;
             traitsText.color = detailTextColor;
             traitsText.fontStyle = FontStyles.Bold;
+            traitsText.enableAutoSizing = true;
+            traitsText.fontSizeMin = 14;
+            traitsText.fontSizeMax = 28;
             if (subtitleFont != null) traitsText.font = subtitleFont;
             detailTraitsText = traitsText;
 
@@ -380,49 +389,58 @@ namespace TheBunkerGames
             bioHeaderObj.transform.SetParent(detailPanel.transform, false);
 
             RectTransform bioHeaderRect = bioHeaderObj.AddComponent<RectTransform>();
-            bioHeaderRect.anchorMin = new Vector2(0.05f, 0.42f);
-            bioHeaderRect.anchorMax = new Vector2(0.95f, 0.5f);
+            bioHeaderRect.anchorMin = new Vector2(0.08f, 0.44f);
+            bioHeaderRect.anchorMax = new Vector2(0.92f, 0.52f);
             bioHeaderRect.offsetMin = Vector2.zero;
             bioHeaderRect.offsetMax = Vector2.zero;
 
             var bioHeader = bioHeaderObj.AddComponent<TextMeshProUGUI>();
             bioHeader.text = "BIO:";
-            bioHeader.fontSize = 18;
+            bioHeader.fontSize = 24;
             bioHeader.alignment = TextAlignmentOptions.MidlineLeft;
             bioHeader.color = detailTextColor;
             bioHeader.fontStyle = FontStyles.Bold;
+            bioHeader.enableAutoSizing = true;
+            bioHeader.fontSizeMin = 14;
+            bioHeader.fontSizeMax = 28;
             if (subtitleFont != null) bioHeader.font = subtitleFont;
 
-            // Bio content
+            // Bio content — lower section with wrapping text
             GameObject bioObj = new GameObject("BioContent");
             bioObj.transform.SetParent(detailPanel.transform, false);
 
             RectTransform bioRect = bioObj.AddComponent<RectTransform>();
-            bioRect.anchorMin = new Vector2(0.05f, 0.08f);
-            bioRect.anchorMax = new Vector2(0.95f, 0.42f);
+            bioRect.anchorMin = new Vector2(0.08f, 0.08f);
+            bioRect.anchorMax = new Vector2(0.92f, 0.44f);
             bioRect.offsetMin = Vector2.zero;
             bioRect.offsetMax = Vector2.zero;
 
             var bioText = bioObj.AddComponent<TextMeshProUGUI>();
             bioText.text = "";
-            bioText.fontSize = 16;
+            bioText.fontSize = 22;
             bioText.alignment = TextAlignmentOptions.TopLeft;
             bioText.color = detailTextColor;
+            bioText.enableAutoSizing = true;
+            bioText.fontSizeMin = 12;
+            bioText.fontSizeMax = 26;
             if (subtitleFont != null) bioText.font = subtitleFont;
             detailBioText = bioText;
         }
 
         private void BuildNavigationArrows(Transform parent)
         {
-            // Left arrow — wider and taller for better touch/click target
+            // Left arrow — positioned at left edge of card, uses fixed pixel size
             GameObject leftBtn = new GameObject("LeftArrow");
             leftBtn.transform.SetParent(parent, false);
 
             RectTransform leftRect = leftBtn.AddComponent<RectTransform>();
-            leftRect.anchorMin = new Vector2(0.005f, 0.38f);
-            leftRect.anchorMax = new Vector2(0.05f, 0.62f);
-            leftRect.offsetMin = Vector2.zero;
-            leftRect.offsetMax = Vector2.zero;
+            // Anchor at left edge, vertically centered on card
+            leftRect.anchorMin = new Vector2(0f, 0.4f);
+            leftRect.anchorMax = new Vector2(0f, 0.6f);
+            leftRect.pivot = new Vector2(0.5f, 0.5f);
+            // Fixed pixel size: 60x80
+            leftRect.offsetMin = new Vector2(5, 0);
+            leftRect.offsetMax = new Vector2(65, 0);
 
             Image leftBg = leftBtn.AddComponent<Image>();
             leftBg.color = new Color(0.3f, 0.28f, 0.25f, 0.8f);
@@ -450,15 +468,18 @@ namespace TheBunkerGames
             lt.fontStyle = FontStyles.Bold;
             if (titleFont != null) lt.font = titleFont;
 
-            // Right arrow — wider and taller to match left arrow
+            // Right arrow — positioned at right edge of card area
             GameObject rightBtn = new GameObject("RightArrow");
             rightBtn.transform.SetParent(parent, false);
 
             RectTransform rightRect = rightBtn.AddComponent<RectTransform>();
-            rightRect.anchorMin = new Vector2(0.615f, 0.38f);
-            rightRect.anchorMax = new Vector2(0.66f, 0.62f);
-            rightRect.offsetMin = Vector2.zero;
-            rightRect.offsetMax = Vector2.zero;
+            // Anchor at right edge of card area (0.62), vertically centered
+            rightRect.anchorMin = new Vector2(0.62f, 0.4f);
+            rightRect.anchorMax = new Vector2(0.62f, 0.6f);
+            rightRect.pivot = new Vector2(0.5f, 0.5f);
+            // Fixed pixel size: 60x80 centered on anchor
+            rightRect.offsetMin = new Vector2(-30, 0);
+            rightRect.offsetMax = new Vector2(30, 0);
 
             Image rightBg = rightBtn.AddComponent<Image>();
             rightBg.color = new Color(0.3f, 0.28f, 0.25f, 0.8f);
@@ -493,8 +514,8 @@ namespace TheBunkerGames
             btnObj.transform.SetParent(parent, false);
 
             RectTransform rect = btnObj.AddComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.65f, 0.04f);
-            rect.anchorMax = new Vector2(0.95f, 0.12f);
+            rect.anchorMin = new Vector2(0.64f, 0.02f);
+            rect.anchorMax = new Vector2(0.97f, 0.08f);
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
 
@@ -521,10 +542,13 @@ namespace TheBunkerGames
 
             var text = textObj.AddComponent<TextMeshProUGUI>();
             text.text = "CONFIRM";
-            text.fontSize = 24;
+            text.fontSize = 28;
             text.alignment = TextAlignmentOptions.Center;
             text.color = Color.white;
             text.fontStyle = FontStyles.Bold;
+            text.enableAutoSizing = true;
+            text.fontSizeMin = 16;
+            text.fontSizeMax = 32;
             if (titleFont != null) text.font = titleFont;
         }
 
