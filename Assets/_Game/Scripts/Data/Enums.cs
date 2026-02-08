@@ -107,6 +107,16 @@ namespace TheBunkerGames
     }
 
     // -------------------------------------------------------------------------
+    // Character Actions (actions a player can perform on a character)
+    // -------------------------------------------------------------------------
+    public enum CharacterAction
+    {
+        Eat,
+        Drink,
+        Heal
+    }
+
+    // -------------------------------------------------------------------------
     // Pre-Scripted Event Categories (government fallout narrative beats)
     // -------------------------------------------------------------------------
     public enum ScriptedEventCategory

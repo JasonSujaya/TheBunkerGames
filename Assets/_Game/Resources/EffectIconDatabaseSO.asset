@@ -12,5 +12,49 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f1e0741000e1409faa98a3d80c21777, type: 3}
   m_Name: EffectIconDatabaseSO
   m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.EffectIconDatabaseSO
-  entries: []
+  entries:
+  - category: HP
+    icon: {fileID: -8499366904903173949, guid: 9119e724ed2184df0b932c6a13805789, type: 3}
+    positiveColor: {r: 0.2, g: 0.8, b: 0.2, a: 1}
+    negativeColor: {r: 0.9, g: 0.2, b: 0.2, a: 1}
+  - category: Sanity
+    icon: {fileID: 3927755122435446231, guid: 990ad05bf2bd54c9ba8e5804f000530b, type: 3}
+    positiveColor: {r: 0.3, g: 0.7, b: 0.9, a: 1}
+    negativeColor: {r: 0.6, g: 0.2, b: 0.8, a: 1}
+  - category: Hunger
+    icon: {fileID: -8726573824125903919, guid: 69e3f597de2664773b5a535adff214af, type: 3}
+    positiveColor: {r: 0.2, g: 0.8, b: 0.2, a: 1}
+    negativeColor: {r: 0.9, g: 0.6, b: 0.1, a: 1}
+  - category: Thirst
+    icon: {fileID: 3705436369387674645, guid: eab9ae605b7d446d4815995a343f6fff, type: 3}
+    positiveColor: {r: 0.3, g: 0.7, b: 0.9, a: 1}
+    negativeColor: {r: 0.9, g: 0.6, b: 0.1, a: 1}
+  - category: Food
+    icon: {fileID: -8726573824125903919, guid: 69e3f597de2664773b5a535adff214af, type: 3}
+    positiveColor: {r: 0.2, g: 0.8, b: 0.2, a: 1}
+    negativeColor: {r: 0.9, g: 0.2, b: 0.2, a: 1}
+  - category: Water
+    icon: {fileID: 3705436369387674645, guid: eab9ae605b7d446d4815995a343f6fff, type: 3}
+    positiveColor: {r: 0.3, g: 0.7, b: 0.9, a: 1}
+    negativeColor: {r: 0.9, g: 0.2, b: 0.2, a: 1}
+  - category: Supplies
+    icon: {fileID: 2474771093228965356, guid: 49752da6bddbc44ae96521fbd0bf8000, type: 3}
+    positiveColor: {r: 0.2, g: 0.8, b: 0.2, a: 1}
+    negativeColor: {r: 0.9, g: 0.2, b: 0.2, a: 1}
+  - category: Injury
+    icon: {fileID: 6306893742978414437, guid: 796bf1328667140bba6bcb799b0b9b36, type: 3}
+    positiveColor: {r: 0.2, g: 0.8, b: 0.2, a: 1}
+    negativeColor: {r: 0.9, g: 0.2, b: 0.2, a: 1}
+  - category: Sickness
+    icon: {fileID: 9127666469554883236, guid: 5e7a0ed10b01e498eba0d47d9153b66a, type: 3}
+    positiveColor: {r: 0.2, g: 0.8, b: 0.2, a: 1}
+    negativeColor: {r: 0.8, g: 0.8, b: 0.1, a: 1}
+  - category: Death
+    icon: {fileID: -6169201478288293479, guid: 5562416259de341a0b6f4888fc6b1b66, type: 3}
+    positiveColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    negativeColor: {r: 0.9, g: 0.1, b: 0.1, a: 1}
+  - category: Cure
+    icon: {fileID: 5400296433747976227, guid: a418ba9f7893745b0967b0fd7e829281, type: 3}
+    positiveColor: {r: 0.2, g: 0.9, b: 0.4, a: 1}
+    negativeColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   fallbackIcon: {fileID: 0}
