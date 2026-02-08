@@ -132,9 +132,6 @@ namespace TheBunkerGames
                 Destroy(videoPlayer);
                 videoPlayer = null;
             }
-            cardRenderTextures.Clear();
-            cardVideoPlayers.Clear();
-            cardVideoImages.Clear();
         }
 
         // -------------------------------------------------------------------------
@@ -244,7 +241,7 @@ namespace TheBunkerGames
             if (titleFont != null) text.font = titleFont;
         }
 
-        private void BuildCardGrid(Transform parent)
+        private void BuildThemeCard(Transform parent)
         {
             // The card sits on the left ~60% of the screen
             // Reference layout: card takes roughly left 62% of width, ~10%-85% height
@@ -320,7 +317,6 @@ namespace TheBunkerGames
             ttRect.offsetMin = new Vector2(5, 0);
             ttRect.offsetMax = new Vector2(-5, 0);
 
-            string themeName = theme != null ? theme.ThemeName.ToUpper() : "UNKNOWN";
             var cardTitle = titleTextObj.AddComponent<TextMeshProUGUI>();
             cardTitle.text = "SCENARIO NAME";
             cardTitle.fontSize = 44;
@@ -429,7 +425,7 @@ namespace TheBunkerGames
             text.fontStyle = FontStyles.Normal;
             text.color = detailTextColor;
             text.alignment = TextAlignmentOptions.TopLeft;
-            text.enableWordWrapping = true;
+            text.textWrappingMode = TextWrappingModes.Normal;
             text.overflowMode = TextOverflowModes.Ellipsis;
             text.enableAutoSizing = false;
             if (subtitleFont != null) text.font = subtitleFont;
@@ -557,7 +553,7 @@ namespace TheBunkerGames
             currentIndex = 0;
 
             SetupVideoPlayer();
-            WireButtons();
+            WireCardButtons();
             DisplayCurrentTheme();
 
             UIBuilderUtils.SetButtonInteractable(panel, "ConfirmButton", false);
@@ -567,7 +563,7 @@ namespace TheBunkerGames
 
         public void Hide()
         {
-            StopAllVideos();
+            StopVideo();
             if (canvasRoot != null) canvasRoot.SetActive(false);
         }
 
@@ -620,15 +616,107 @@ namespace TheBunkerGames
                 videoImage.texture = renderTexture;
         }
 
-        private void StopAllVideos()
+        private void PlayVideo(VideoClip clip)
         {
             if (videoPlayer == null || clip == null) return;
 
-            foreach (var img in cardVideoImages)
+            videoPlayer.clip = clip;
+            videoPlayer.isLooping = true;
+            videoPlayer.Play();
+
+            if (videoImage != null)
+                videoImage.enabled = true;
+        }
+
+        private void StopVideo()
+        {
+            if (videoPlayer != null && videoPlayer.isPlaying)
+                videoPlayer.Stop();
+
+            if (videoImage != null)
+                videoImage.enabled = false;
+        }
+
+        // -------------------------------------------------------------------------
+        // Display Current Theme
+        // -------------------------------------------------------------------------
+        private void DisplayCurrentTheme()
+        {
+            if (availableThemes.Count == 0) return;
+            if (currentIndex < 0 || currentIndex >= availableThemes.Count)
+                currentIndex = 0;
+
+            GameThemeSO theme = availableThemes[currentIndex];
+            if (theme == null) return;
+
+            // Update card title
+            if (scenarioNameText != null)
+                scenarioNameText.text = theme.ThemeName.ToUpper();
+
+            // Update card media (static image fallback)
+            if (cardMediaImage != null)
             {
-                if (img != null)
-                    img.enabled = false;
+                if (theme.ThemeIcon != null)
+                {
+                    cardMediaImage.sprite = theme.ThemeIcon;
+                    cardMediaImage.color = Color.white;
+                    cardMediaImage.preserveAspect = false;
+                }
+                else
+                {
+                    cardMediaImage.sprite = null;
+                    cardMediaImage.color = new Color(0.2f, 0.2f, 0.2f, 1f);
+                }
             }
+
+            // Update detail panel
+            if (detailNameText != null)
+                detailNameText.text = theme.ThemeName.ToUpper();
+
+            if (detailTraitsText != null)
+            {
+                if (theme.Traits != null && theme.Traits.Length > 0)
+                    detailTraitsText.text = string.Join("\n", theme.Traits).ToUpper();
+                else
+                    detailTraitsText.text = "NONE";
+            }
+
+            if (detailBioText != null)
+                detailBioText.text = !string.IsNullOrEmpty(theme.Description)
+                    ? theme.Description
+                    : "No description available.";
+
+            // Play video
+            StopVideo();
+            if (theme.PreviewVideo != null)
+                PlayVideo(theme.PreviewVideo);
+
+            // Auto-select the displayed theme
+            selectedTheme = theme;
+            UIBuilderUtils.SetButtonInteractable(panel, "ConfirmButton", true);
+
+            if (enableDebugLogs) Debug.Log($"[ThemeSelectUI] Displaying: {theme.ThemeName} ({currentIndex + 1}/{availableThemes.Count})");
+        }
+
+        // -------------------------------------------------------------------------
+        // Navigation
+        // -------------------------------------------------------------------------
+        private void NavigateLeft()
+        {
+            if (availableThemes.Count == 0) return;
+            currentIndex--;
+            if (currentIndex < 0)
+                currentIndex = availableThemes.Count - 1;
+            DisplayCurrentTheme();
+        }
+
+        private void NavigateRight()
+        {
+            if (availableThemes.Count == 0) return;
+            currentIndex++;
+            if (currentIndex >= availableThemes.Count)
+                currentIndex = 0;
+            DisplayCurrentTheme();
         }
 
         // -------------------------------------------------------------------------
