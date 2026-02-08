@@ -132,9 +132,6 @@ namespace TheBunkerGames
                 Destroy(videoPlayer);
                 videoPlayer = null;
             }
-            cardRenderTextures.Clear();
-            cardVideoPlayers.Clear();
-            cardVideoImages.Clear();
         }
 
         // -------------------------------------------------------------------------
@@ -244,7 +241,7 @@ namespace TheBunkerGames
             if (titleFont != null) text.font = titleFont;
         }
 
-        private void BuildCardGrid(Transform parent)
+        private void BuildThemeCard(Transform parent)
         {
             // The card sits on the left ~60% of the screen
             // Reference layout: card takes roughly left 62% of width, ~10%-85% height
@@ -320,7 +317,6 @@ namespace TheBunkerGames
             ttRect.offsetMin = new Vector2(5, 0);
             ttRect.offsetMax = new Vector2(-5, 0);
 
-            string themeName = theme != null ? theme.ThemeName.ToUpper() : "UNKNOWN";
             var cardTitle = titleTextObj.AddComponent<TextMeshProUGUI>();
             cardTitle.text = "SCENARIO NAME";
             cardTitle.fontSize = 44;
@@ -429,7 +425,7 @@ namespace TheBunkerGames
             text.fontStyle = FontStyles.Normal;
             text.color = detailTextColor;
             text.alignment = TextAlignmentOptions.TopLeft;
-            text.enableWordWrapping = true;
+            text.textWrappingMode = TextWrappingModes.Normal;
             text.overflowMode = TextOverflowModes.Ellipsis;
             text.enableAutoSizing = false;
             if (subtitleFont != null) text.font = subtitleFont;
@@ -557,7 +553,7 @@ namespace TheBunkerGames
             currentIndex = 0;
 
             SetupVideoPlayer();
-            WireButtons();
+            WireCardButtons();
             DisplayCurrentTheme();
 
             UIBuilderUtils.SetButtonInteractable(panel, "ConfirmButton", false);
@@ -567,7 +563,7 @@ namespace TheBunkerGames
 
         public void Hide()
         {
-            StopAllVideos();
+            StopVideo();
             if (canvasRoot != null) canvasRoot.SetActive(false);
         }
 
@@ -620,15 +616,25 @@ namespace TheBunkerGames
                 videoImage.texture = renderTexture;
         }
 
-        private void StopAllVideos()
+        private void PlayVideo(VideoClip clip)
         {
             if (videoPlayer == null || clip == null) return;
 
-            foreach (var img in cardVideoImages)
-            {
-                if (img != null)
-                    img.enabled = false;
-            }
+            videoPlayer.clip = clip;
+            videoPlayer.isLooping = true;
+            videoPlayer.Play();
+
+            if (videoImage != null)
+                videoImage.enabled = true;
+        }
+
+        private void StopVideo()
+        {
+            if (videoPlayer != null && videoPlayer.isPlaying)
+                videoPlayer.Stop();
+
+            if (videoImage != null)
+                videoImage.enabled = false;
         }
 
         // -------------------------------------------------------------------------
