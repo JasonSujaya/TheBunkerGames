@@ -50,14 +50,14 @@ namespace TheBunkerGames
             {
                 // Sync counts
                 FamilyCount = familyManager.AliveCount;
-                
+
                 // Sync Snapshot for Inspector
                 DebugFamilySnapshot.Clear();
                 if (familyManager.FamilyMembers != null)
                 {
                     DebugFamilySnapshot.AddRange(familyManager.FamilyMembers);
                 }
-                
+
                 // Calc Average Health
                 if (DebugFamilySnapshot.Count > 0)
                 {
@@ -81,6 +81,12 @@ namespace TheBunkerGames
                     }
                     InventorySnapshot.Add($"{displayName}: {item.Quantity}");
                 }
+            }
+
+            // Refresh the HUD so it picks up any stat/inventory changes
+            if (GameplayHudUI.Instance != null && GameplayHudUI.Instance.IsVisible)
+            {
+                GameplayHudUI.Instance.UpdateDayDisplay();
             }
         }
     }

@@ -111,25 +111,40 @@ namespace TheBunkerGames
         [SerializeField] private GameObject canvasRoot;
         [SerializeField] private GameObject panel;
 
-        // ---- runtime references (found after auto-setup or cached on Show) ----
-        private TextMeshProUGUI dayText;
-        private TextMeshProUGUI timeText;
-        private TextMeshProUGUI temperatureText;
-        private Transform characterListContainer;
+        // ---- Serialized UI references (assigned by AutoSetup or Inspector) ----
+        #if ODIN_INSPECTOR
+        [Title("Day Strip")]
+        #endif
+        public TextMeshProUGUI dayText;
+        public TextMeshProUGUI timeText;
+        public TextMeshProUGUI temperatureText;
+
+        #if ODIN_INSPECTOR
+        [Title("Character List")]
+        #endif
+        public Transform characterListContainer;
         private readonly List<ThumbRefs> thumbs = new List<ThumbRefs>();
 
-        // detail card
-        private Image   detailPortrait;
-        private Image   detailHealthFill;
-        private Image   detailHungerFill;
-        private Image   detailThirstFill;
+        #if ODIN_INSPECTOR
+        [Title("Detail Card")]
+        #endif
+        public TextMeshProUGUI detailNameText;
+        public Image   detailPortrait;
+        public Image   detailHealthFill;
+        public Image   detailHungerFill;
+        public Image   detailThirstFill;
+        public Image   detailSanityFill;
+        public Button  prevCharButton;
+        public Button  nextCharButton;
 
-        // resource texts
-        private TextMeshProUGUI foodCountText;
-        private TextMeshProUGUI waterCountText;
-        private TextMeshProUGUI medsCountText;
-        private TextMeshProUGUI toolsCountText;
-        private TextMeshProUGUI junkCountText;
+        #if ODIN_INSPECTOR
+        [Title("Resource Counts")]
+        #endif
+        public TextMeshProUGUI foodCountText;
+        public TextMeshProUGUI waterCountText;
+        public TextMeshProUGUI medsCountText;
+        public TextMeshProUGUI toolsCountText;
+        public TextMeshProUGUI junkCountText;
 
         // selection state
         private CharacterData selectedCharacter;
@@ -158,9 +173,7 @@ namespace TheBunkerGames
 
         private void Start()
         {
-            // Use same initialization as Show() to ensure we are ready
             if (enableDebugLogs) Debug.Log("[GameplayHudUI] Start() - Self-initializing...");
-            CacheReferences();
             WireButtons();
             PopulateCharacterList();
             RefreshFamilyBodies();
@@ -502,9 +515,37 @@ namespace TheBunkerGames
             // slight rotation for taped-photo feel
             card.localRotation = Quaternion.Euler(0, 0, 1.5f);
 
-            // ---- portrait area (top ~60%) ----
+            // ---- navigation row (prev arrow | name | next arrow) at very top ----
+            var navRow = MakeRect(card, "NavRow",
+                new Vector2(0.04f, 0.92f), new Vector2(0.96f, 0.99f));
+
+            var navHlg = navRow.gameObject.AddComponent<HorizontalLayoutGroup>();
+            navHlg.childAlignment    = TextAnchor.MiddleCenter;
+            navHlg.spacing           = 2;
+            navHlg.padding           = new RectOffset(2, 2, 0, 0);
+            navHlg.childControlWidth = false; navHlg.childControlHeight = true;
+            navHlg.childForceExpandWidth = false; navHlg.childForceExpandHeight = true;
+
+            prevCharButton = MakeArrowBtn(navRow, "PrevCharBtn", arrowPrevSprite, "<", 24);
+            // character name label
+            var nameGo = new GameObject("CharName", typeof(RectTransform));
+            nameGo.transform.SetParent(navRow, false);
+            nameGo.AddComponent<LayoutElement>().flexibleWidth = 1;
+            detailNameText = nameGo.AddComponent<TextMeshProUGUI>();
+            detailNameText.text = "";
+            detailNameText.fontSize = 18;
+            detailNameText.fontStyle = FontStyles.Bold;
+            detailNameText.alignment = TextAlignmentOptions.Center;
+            detailNameText.color = textColor;
+            detailNameText.enableAutoSizing = true;
+            detailNameText.fontSizeMin = 10;
+            detailNameText.fontSizeMax = 18;
+            if (titleFont != null) detailNameText.font = titleFont;
+            nextCharButton = MakeArrowBtn(navRow, "NextCharBtn", arrowNextSprite, ">", 24);
+
+            // ---- portrait area (below nav, top ~55%) ----
             var pArea = MakeRect(card, "PortraitArea",
-                new Vector2(0.08f, 0.38f), new Vector2(0.92f, 0.96f));
+                new Vector2(0.08f, 0.36f), new Vector2(0.92f, 0.91f));
 
             // portrait frame
             var pFrame = pArea.gameObject.AddComponent<Image>();
@@ -517,9 +558,9 @@ namespace TheBunkerGames
             detailPortrait.color = new Color(0.35f, 0.35f, 0.35f, 0.5f);
             detailPortrait.preserveAspect = true;
 
-            // ---- stat bars (below portrait — thin lines) ----
+            // ---- stat bars (below portrait — 4 bars: health, hunger, thirst, sanity) ----
             var statsArea = MakeRect(card, "StatsArea",
-                new Vector2(0.12f, 0.18f), new Vector2(0.92f, 0.36f));
+                new Vector2(0.12f, 0.14f), new Vector2(0.92f, 0.34f));
 
             var sVlg = statsArea.gameObject.AddComponent<VerticalLayoutGroup>();
             sVlg.childAlignment    = TextAnchor.UpperLeft;
@@ -531,10 +572,11 @@ namespace TheBunkerGames
             detailHealthFill = MakeDetailBar(statsArea, "HealthBar", iconHeart, healthColor);
             detailHungerFill = MakeDetailBar(statsArea, "HungerBar", iconFood,  hungerColor);
             detailThirstFill = MakeDetailBar(statsArea, "ThirstBar", iconWater, thirstColor);
+            detailSanityFill = MakeDetailBar(statsArea, "SanityBar", iconBrain, sanityColor);
 
             // ---- status condition icons row (very bottom) ----
             var statusRow = MakeRect(card, "StatusRow",
-                new Vector2(0.12f, 0.05f), new Vector2(0.92f, 0.16f));
+                new Vector2(0.12f, 0.03f), new Vector2(0.92f, 0.12f));
 
             var srHlg = statusRow.gameObject.AddComponent<HorizontalLayoutGroup>();
             srHlg.childAlignment    = TextAnchor.MiddleCenter;
@@ -684,8 +726,8 @@ namespace TheBunkerGames
             { img.color = fallback; }
         }
 
-        /// <summary>Small arrow button inside the day strip for prev/next day.</summary>
-        private void MakeArrowBtn(RectTransform parent, string name, Sprite arrowSprite,
+        /// <summary>Small arrow button. Returns the Button component.</summary>
+        private Button MakeArrowBtn(RectTransform parent, string name, Sprite arrowSprite,
             string fallbackChar, float size)
         {
             var go = new GameObject(name, typeof(RectTransform));
@@ -725,6 +767,8 @@ namespace TheBunkerGames
                 tmp.raycastTarget = false;
                 if (titleFont != null) tmp.font = titleFont;
             }
+
+            return btn;
         }
 
         private void MakeSep(RectTransform parent)
@@ -792,7 +836,6 @@ namespace TheBunkerGames
         {
             if (canvasRoot == null) return;
             canvasRoot.SetActive(true);
-            CacheReferences();
             WireButtons();
             PopulateCharacterList();
             RefreshFamilyBodies();
@@ -806,50 +849,6 @@ namespace TheBunkerGames
             if (canvasRoot != null) canvasRoot.SetActive(false);
         }
 
-        // =====================================================================
-        //  Cache references after AutoSetup (or on Show)
-        // =====================================================================
-        private void CacheReferences()
-        {
-            if (panel == null) return;
-
-            var strip = panel.transform.Find("DayStrip");
-            if (strip != null)
-            {
-                dayText         = strip.Find("Day/Text")?.GetComponent<TextMeshProUGUI>();
-                timeText        = strip.Find("Clock/Text")?.GetComponent<TextMeshProUGUI>();
-                temperatureText = strip.Find("Temp/Text")?.GetComponent<TextMeshProUGUI>();
-            }
-
-            characterListContainer = panel.transform.Find("CharacterList");
-
-            var dc = panel.transform.Find("DetailCard");
-            if (dc != null)
-            {
-                detailPortrait   = dc.Find("PortraitArea/PortraitImage")?.GetComponent<Image>();
-                var sa = dc.Find("StatsArea");
-                if (sa != null)
-                {
-                    detailHealthFill = sa.Find("HealthBar/BG/Fill")?.GetComponent<Image>();
-                    detailHungerFill = sa.Find("HungerBar/BG/Fill")?.GetComponent<Image>();
-                    detailThirstFill = sa.Find("ThirstBar/BG/Fill")?.GetComponent<Image>();
-                }
-            }
-
-            var res = panel.transform.Find("Resources");
-            if (res != null)
-            {
-                foodCountText  = res.Find("Food/Count")?.GetComponent<TextMeshProUGUI>();
-                waterCountText = res.Find("Water/Count")?.GetComponent<TextMeshProUGUI>();
-                medsCountText  = res.Find("Meds/Count")?.GetComponent<TextMeshProUGUI>();
-                toolsCountText = res.Find("Tools/Count")?.GetComponent<TextMeshProUGUI>();
-                junkCountText  = res.Find("Junk/Count")?.GetComponent<TextMeshProUGUI>();
-            }
-        }
-
-        // =====================================================================
-        //  Wire Buttons
-        // =====================================================================
         // -------------------------------------------------------------------------
         // UI References (Buttons)
         // -------------------------------------------------------------------------
@@ -860,8 +859,6 @@ namespace TheBunkerGames
         [SerializeField] private Button endDayButton;
         [SerializeField] private Button ourThingsButton;
 
-        // ... existing code ...
-
         // =====================================================================
         //  Wire Buttons
         // =====================================================================
@@ -870,6 +867,18 @@ namespace TheBunkerGames
             // Auto-find PlayerActionUI if not assigned
             if (playerActionUI == null)
                 playerActionUI = FindFirstObjectByType<PlayerActionUI>(FindObjectsInactive.Include);
+
+            // Wire character navigation arrows on detail card
+            if (prevCharButton != null)
+            {
+                prevCharButton.onClick.RemoveAllListeners();
+                prevCharButton.onClick.AddListener(CyclePrevCharacter);
+            }
+            if (nextCharButton != null)
+            {
+                nextCharButton.onClick.RemoveAllListeners();
+                nextCharButton.onClick.AddListener(CycleNextCharacter);
+            }
 
             if (ourThingsButton != null)
             {
@@ -909,14 +918,6 @@ namespace TheBunkerGames
             }
         }
         
-        // Removed string-based Wire() method as it's no longer needed for main buttons
-        private void WireChild(Transform parent, string childName, UnityEngine.Events.UnityAction action)
-        {
-            var child = parent.Find(childName);
-            if (child == null) return;
-            var btn = child.GetComponent<Button>();
-            if (btn != null) { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(action); }
-        }
 
         // =====================================================================
         //  Populate Character List  (runtime — needs FamilyManager)
@@ -1146,11 +1147,12 @@ namespace TheBunkerGames
         }
 
         /// <summary>Set detail card stat bars directly (0-1 range).</summary>
-        public void SetDetailStats(float healthNorm, float hungerNorm, float thirstNorm)
+        public void SetDetailStats(float healthNorm, float hungerNorm, float thirstNorm, float sanityNorm = -1f)
         {
             if (detailHealthFill != null) detailHealthFill.fillAmount = Mathf.Clamp01(healthNorm);
             if (detailHungerFill != null) detailHungerFill.fillAmount = Mathf.Clamp01(hungerNorm);
             if (detailThirstFill != null) detailThirstFill.fillAmount = Mathf.Clamp01(thirstNorm);
+            if (sanityNorm >= 0f && detailSanityFill != null) detailSanityFill.fillAmount = Mathf.Clamp01(sanityNorm);
         }
 
         // ---- Button enable/disable -----------------------------------------
@@ -1174,13 +1176,8 @@ namespace TheBunkerGames
         /// <summary>Enable or disable the prev/next character arrows.</summary>
         public void SetCharacterArrowsInteractable(bool interactable)
         {
-            if (panel == null) return;
-            var strip = panel.transform.Find("DayStrip");
-            if (strip == null) return;
-            var prev = strip.Find("PrevDayBtn")?.GetComponent<Button>();
-            var next = strip.Find("NextDayBtn")?.GetComponent<Button>();
-            if (prev != null) prev.interactable = interactable;
-            if (next != null) next.interactable = interactable;
+            if (prevCharButton != null) prevCharButton.interactable = interactable;
+            if (nextCharButton != null) nextCharButton.interactable = interactable;
         }
 
         // =====================================================================
@@ -1190,6 +1187,7 @@ namespace TheBunkerGames
         {
             if (selectedCharacter == null) return;
 
+            if (detailNameText != null) detailNameText.text = selectedCharacter.Name;
             if (detailPortrait != null)
             {
                 var sp = FindPortrait(selectedCharacter.Name);
@@ -1198,6 +1196,7 @@ namespace TheBunkerGames
             if (detailHealthFill != null) detailHealthFill.fillAmount = selectedCharacter.Health / 100f;
             if (detailHungerFill != null) detailHungerFill.fillAmount = selectedCharacter.Hunger / 100f;
             if (detailThirstFill != null) detailThirstFill.fillAmount = selectedCharacter.Thirst / 100f;
+            if (detailSanityFill != null) detailSanityFill.fillAmount = selectedCharacter.Sanity / 100f;
         }
 
         private void UpdateResourceDisplay()
