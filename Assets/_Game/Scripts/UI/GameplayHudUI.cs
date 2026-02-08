@@ -186,12 +186,22 @@ namespace TheBunkerGames
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            if (enableDebugLogs) Debug.Log("[GameplayHudUI] Awake() called");
+        }
+
+        private void OnEnable()
+        {
+            if (enableDebugLogs) Debug.Log("[GameplayHudUI] OnEnable() called");
+            WireButtons();
         }
 
         private void Start()
         {
             if (enableDebugLogs) Debug.Log("[GameplayHudUI] Start() - Self-initializing...");
             
+            // Ensure EventSystem exists for clicks
+            UIBuilderUtils.EnsureEventSystem();
+
             // Generate fallback sprite if needed
             if (barFillSprite == null) barFillSprite = UIBuilderUtils.CreateWhiteSprite();
 
@@ -207,6 +217,10 @@ namespace TheBunkerGames
             UpdateDayDisplay();
             UpdateResourceDisplay();
         }
+
+// ... existing code ...
+
+
 
         private void LateUpdate()
         {
@@ -796,10 +810,24 @@ namespace TheBunkerGames
 
         private void OnUseItem(ResourceRow row)
         {
-            if (selectedCharacter == null) return;
+            if (enableDebugLogs) Debug.Log($"[GameplayHudUI] OnUseItem called for {row.type}");
+            if (selectedCharacter == null)
+            {
+                Debug.LogWarning("[GameplayHudUI] OnUseItem: selectedCharacter is NULL");
+                return;
+            }
             ItemType type = row.type;
 
-            if (InventoryManager.Instance == null || ItemManager.Instance == null) return;
+            if (InventoryManager.Instance == null)
+            {
+                Debug.LogError("[GameplayHudUI] OnUseItem: InventoryManager is NULL");
+                return;
+            }
+            if (ItemManager.Instance == null)
+            {
+                Debug.LogError("[GameplayHudUI] OnUseItem: ItemManager is NULL");
+                return;
+            }
 
             // Find an item of this type in inventory
             string foundItemId = null;
@@ -809,14 +837,22 @@ namespace TheBunkerGames
                 if (data != null && data.Type == type)
                 {
                     foundItemId = slot.ItemId;
+                    if (enableDebugLogs) Debug.Log($"[GameplayHudUI] Found item {foundItemId} for type {type}");
                     break;
                 }
             }
 
-            if (string.IsNullOrEmpty(foundItemId)) return;
+            if (string.IsNullOrEmpty(foundItemId))
+            {
+                if (enableDebugLogs) Debug.LogWarning($"[GameplayHudUI] No item of type {type} found in inventory.");
+                return;
+            }
             
             // Consume 1
-            if (InventoryManager.Instance.RemoveItem(foundItemId, 1))
+            bool removed = InventoryManager.Instance.RemoveItem(foundItemId, 1);
+            if (enableDebugLogs) Debug.Log($"[GameplayHudUI] RemoveItem({foundItemId}) returned {removed}");
+
+            if (removed)
             {
                 // Animation punch on icon
                 StartCoroutine(PunchAnimate(row.icon.rectTransform));
@@ -826,14 +862,17 @@ namespace TheBunkerGames
                 {
                     case ItemType.Food:
                         selectedCharacter.ModifyHunger(2f); // +2 Food
+                        if (enableDebugLogs) Debug.Log($"[GameplayHudUI] Restored Hunger for {selectedCharacter.Name}");
                         if (detailHungerFill != null) StartCoroutine(PunchAnimate(detailHungerFill.rectTransform.parent as RectTransform));
                         break;
                     case ItemType.Water:
                         selectedCharacter.ModifyThirst(2f); // +2 Water
+                        if (enableDebugLogs) Debug.Log($"[GameplayHudUI] Restored Thirst for {selectedCharacter.Name}");
                         if (detailThirstFill != null) StartCoroutine(PunchAnimate(detailThirstFill.rectTransform.parent as RectTransform));
                         break;
                     case ItemType.Meds:
                         selectedCharacter.ModifyHealth(2f); // +2 Health
+                        if (enableDebugLogs) Debug.Log($"[GameplayHudUI] Restored Health for {selectedCharacter.Name}");
                         if (detailHealthFill != null) StartCoroutine(PunchAnimate(detailHealthFill.rectTransform.parent as RectTransform));
                         break;
                 }
@@ -1079,6 +1118,35 @@ namespace TheBunkerGames
                         Debug.LogWarning("[GameplayHudUI] PlayerActionUI not found!");
                     }
                 });
+            }
+
+            // Wire up resource icons (runtime only)
+            if (foodRow != null && foodRow.button != null)
+            {
+                foodRow.button.onClick.RemoveAllListeners();
+                foodRow.button.onClick.AddListener(() => OnUseItem(foodRow));
+            }
+            if (waterRow != null && waterRow.button != null)
+            {
+                waterRow.button.onClick.RemoveAllListeners();
+                waterRow.button.onClick.AddListener(() => OnUseItem(waterRow));
+            }
+            if (medsRow != null && medsRow.button != null)
+            {
+                medsRow.button.onClick.RemoveAllListeners();
+                medsRow.button.onClick.AddListener(() => OnUseItem(medsRow));
+            }
+            if (toolsRow != null && toolsRow.button != null)
+            {
+                // Tools generally not consumable like food/water, but wire it anyway
+                toolsRow.button.onClick.RemoveAllListeners();
+                toolsRow.button.onClick.AddListener(() => OnUseItem(toolsRow));
+            }
+            if (junkRow != null && junkRow.button != null)
+            {
+                // Junk generally not consumable
+                junkRow.button.onClick.RemoveAllListeners();
+                junkRow.button.onClick.AddListener(() => OnUseItem(junkRow));
             }
         }
         
