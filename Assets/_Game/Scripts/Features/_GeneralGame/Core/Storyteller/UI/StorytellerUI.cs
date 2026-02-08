@@ -1,6 +1,9 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
 
 namespace TheBunkerGames
 {
@@ -10,21 +13,77 @@ namespace TheBunkerGames
     /// </summary>
     public class StorytellerUI : MonoBehaviour
     {
+        // -------------------------------------------------------------------------
+        // Visual Assets (drag & drop in Inspector)
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Visual Assets – Fonts")]
+        #endif
+        [Header("Fonts")]
+        [SerializeField] private TMP_FontAsset titleFont;
+        [SerializeField] private TMP_FontAsset bodyFont;
+
+        #if ODIN_INSPECTOR
+        [Title("Visual Assets – Sprites")]
+        #endif
+        [Header("Sprites – Backgrounds & Frames")]
+        [SerializeField] private Sprite panelBackgroundSprite;    // main overlay bg
+        [SerializeField] private Sprite titleBackgroundSprite;    // title area bg
+        [SerializeField] private Sprite descriptionFrameSprite;   // description area frame
+        [SerializeField] private Sprite inputFieldSprite;         // text input bg
+        [SerializeField] private Sprite effectsContainerSprite;   // effects area bg
+
+        [Header("Sprites – Buttons")]
+        [SerializeField] private Sprite buttonSprite;             // general button bg
+        [SerializeField] private Sprite continueButtonSprite;     // continue button bg
+        [SerializeField] private Sprite closeButtonSprite;        // close (X) button bg
+
+        [Header("Sprites – Icons")]
+        [SerializeField] private Sprite iconClose;                // X icon
+        [SerializeField] private Sprite iconContinue;             // continue/arrow icon
+
+        #if ODIN_INSPECTOR
+        [Title("Visual Assets – Colors")]
+        #endif
+        [Header("Colors")]
+        [SerializeField] private Color panelBgColor          = new Color(0f, 0f, 0f, 0.9f);
+        [SerializeField] private Color titleColor            = Color.white;
+        [SerializeField] private Color descriptionColor      = Color.white;
+        [SerializeField] private Color inputBgColor          = new Color(0.2f, 0.2f, 0.2f, 1f);
+        [SerializeField] private Color textColor             = Color.white;
+        [SerializeField] private Color placeholderColor      = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+        [SerializeField] private Color continueButtonColor   = Color.green;
+        [SerializeField] private Color closeButtonColor      = Color.red;
+        [SerializeField] private Color buttonTextColor       = Color.black;
+
+        // -------------------------------------------------------------------------
+        // UI References
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("UI References")]
+        #endif
         [Header("UI References")]
         [SerializeField] private TextMeshProUGUI titleText;
         [SerializeField] private TextMeshProUGUI descriptionText;
         [SerializeField] private GameObject contentParent;
 
+        #if ODIN_INSPECTOR
+        [Title("Interaction")]
+        #endif
         [Header("Interaction")]
         [SerializeField] private Button closeButton;
         [SerializeField] private Button continueButton;
         [SerializeField] private TMP_InputField inputField;
 
+        #if ODIN_INSPECTOR
+        [Title("Effect Display")]
+        #endif
         [Header("Effect Display")]
         [SerializeField] private Transform effectsContainer;
         [SerializeField] private EffectDisplayEntry effectEntryPrefab;
         [SerializeField] private EffectIconDatabaseSO effectIconDatabase;
 
+        [Header("Settings")]
         [SerializeField] private bool autoToggleVisibility = true;
 
         private void Awake()
@@ -169,7 +228,7 @@ namespace TheBunkerGames
                     rect.offsetMax = Vector2.zero;
                     
                     var img = panelGO.AddComponent<UnityEngine.UI.Image>();
-                    img.color = new Color(0, 0, 0, 0.9f);
+                    ApplySprite(img, panelBackgroundSprite, panelBgColor);
                 }
                 contentParent = panelTransform.gameObject;
             }
@@ -187,7 +246,8 @@ namespace TheBunkerGames
                     txt.fontSize = 24;
                     txt.alignment = TextAlignmentOptions.Center;
                     txt.fontStyle = FontStyles.Bold;
-                    txt.color = Color.white;
+                    txt.color = titleColor;
+                    if (titleFont != null) txt.font = titleFont;
                     
                     var r = txt.rectTransform;
                     r.anchorMin = new Vector2(0, 0.85f);
@@ -215,7 +275,8 @@ namespace TheBunkerGames
                     txt.text = "Event Description...";
                     txt.fontSize = 18;
                     txt.alignment = TextAlignmentOptions.TopLeft;
-                    txt.color = Color.white;
+                    txt.color = descriptionColor;
+                    if (bodyFont != null) txt.font = bodyFont;
                     
                     var r = txt.rectTransform;
                     r.anchorMin = new Vector2(0.05f, 0.2f); // Adjusted for buttons
@@ -243,8 +304,8 @@ namespace TheBunkerGames
                     var go = new GameObject("Input_Field");
                     go.transform.SetParent(contentParent.transform, false);
                     var img = go.AddComponent<Image>();
-                    img.color = new Color(0.2f, 0.2f, 0.2f, 1f);
-                    
+                    ApplySprite(img, inputFieldSprite, inputBgColor);
+
                     var input = go.AddComponent<TMP_InputField>();
                     var r = go.GetComponent<RectTransform>();
                     r.anchorMin = new Vector2(0.1f, 0.1f);
@@ -267,16 +328,18 @@ namespace TheBunkerGames
                     var text = textGO.AddComponent<TextMeshProUGUI>();
                     text.text = "";
                     text.fontSize = 14;
-                    text.color = Color.white;
-                    
+                    text.color = textColor;
+                    if (bodyFont != null) text.font = bodyFont;
+
                     // Placeholder
                     var placeholderGO = new GameObject("Placeholder");
                     placeholderGO.transform.SetParent(textArea.transform, false);
                     var placeholder = placeholderGO.AddComponent<TextMeshProUGUI>();
                     placeholder.text = "Enter response...";
                     placeholder.fontSize = 14;
-                    placeholder.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+                    placeholder.color = placeholderColor;
                     placeholder.fontStyle = FontStyles.Italic;
+                    if (bodyFont != null) placeholder.font = bodyFont;
 
                     input.textViewport = textAreaRect;
                     input.textComponent = text;
@@ -299,23 +362,24 @@ namespace TheBunkerGames
                     var go = new GameObject("Continue_Button");
                     go.transform.SetParent(contentParent.transform, false);
                     var img = go.AddComponent<Image>();
-                    img.color = Color.green;
-                    
+                    ApplySprite(img, continueButtonSprite, continueButtonColor);
+
                     var btn = go.AddComponent<Button>();
-                    
+
                     var r = go.GetComponent<RectTransform>();
                     r.anchorMin = new Vector2(0.75f, 0.1f);
                     r.anchorMax = new Vector2(0.9f, 0.18f);
                     r.offsetMin = Vector2.zero;
                     r.offsetMax = Vector2.zero;
-                    
+
                     // Text
                     var textGO = new GameObject("Text");
                     textGO.transform.SetParent(go.transform, false);
                     var text = textGO.AddComponent<TextMeshProUGUI>();
                     text.text = "Continue";
                     text.fontSize = 14;
-                    text.color = Color.black;
+                    text.color = buttonTextColor;
+                    if (titleFont != null) text.font = titleFont;
                     text.alignment = TextAlignmentOptions.Center;
                     text.rectTransform.anchorMin = Vector2.zero;
                     text.rectTransform.anchorMax = Vector2.one;
@@ -339,7 +403,7 @@ namespace TheBunkerGames
                     var go = new GameObject("Close_Button");
                     go.transform.SetParent(contentParent.transform, false);
                     var img = go.AddComponent<Image>();
-                    img.color = Color.red;
+                    ApplySprite(img, closeButtonSprite, closeButtonColor);
                     
                     var btn = go.AddComponent<Button>();
                     
@@ -355,7 +419,8 @@ namespace TheBunkerGames
                     var text = textGO.AddComponent<TextMeshProUGUI>();
                     text.text = "X";
                     text.fontSize = 14;
-                    text.color = Color.white;
+                    text.color = textColor;
+                    if (titleFont != null) text.font = titleFont;
                     text.alignment = TextAlignmentOptions.Center;
                     text.rectTransform.anchorMin = Vector2.zero;
                     text.rectTransform.anchorMax = Vector2.one;
@@ -414,6 +479,17 @@ namespace TheBunkerGames
             Debug.Log("[StorytellerUI] Auto-Setup Complete.");
         }
 #endif
+
+        // -------------------------------------------------------------------------
+        // Helpers
+        // -------------------------------------------------------------------------
+        private void ApplySprite(Image img, Sprite sprite, Color fallback)
+        {
+            if (sprite != null)
+            { img.sprite = sprite; img.type = Image.Type.Sliced; img.color = Color.white; }
+            else
+            { img.color = fallback; }
+        }
     }
 }
 
