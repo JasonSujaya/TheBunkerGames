@@ -1138,6 +1138,7 @@ namespace TheBunkerGames
                     duration = 0.4f;
                     while (elapsed < duration)
                     {
+                        if (cardTransform == null) yield break;
                         float t = elapsed / duration;
                         float intensity = (1f - t) * 3f; // Fade out
                         float angle = Mathf.Sin(elapsed * 40f) * intensity;
@@ -1151,6 +1152,7 @@ namespace TheBunkerGames
                     duration = 0.8f;
                     while (elapsed < duration)
                     {
+                        if (cardTransform == null) yield break;
                         float t = elapsed / duration;
                         float intensity = Mathf.Sin(t * Mathf.PI) * 2.5f; // Ramp up then down
                         float angle = Mathf.Sin(elapsed * 12f) * intensity;
@@ -1162,7 +1164,9 @@ namespace TheBunkerGames
             }
 
             // Reset to original rotation only - GridLayoutGroup handles position
-            cardTransform.localRotation = originalRot;
+            // Reset to original rotation only - GridLayoutGroup handles position
+            if (cardTransform != null)
+                cardTransform.localRotation = originalRot;
         }
 
         // -------------------------------------------------------------------------
