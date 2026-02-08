@@ -160,6 +160,12 @@ namespace TheBunkerGames
             {
                 ExecuteEffect(effect);
             }
+            
+            // Refresh HUD to reflect stat/inventory changes
+            if (GameplayHudUI.Instance != null && GameplayHudUI.Instance.IsVisible)
+            {
+                GameplayHudUI.Instance.RefreshAll();
+            }
         }
 
         /// <summary>
