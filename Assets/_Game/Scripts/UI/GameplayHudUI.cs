@@ -134,9 +134,13 @@ namespace TheBunkerGames
         public TextMeshProUGUI detailNameText;
         public Image   detailPortrait;
         public Image   detailHealthFill;
+        public TextMeshProUGUI detailHealthText;
         public Image   detailHungerFill;
+        public TextMeshProUGUI detailHungerText;
         public Image   detailThirstFill;
+        public TextMeshProUGUI detailThirstText;
         public Image   detailSanityFill;
+        public TextMeshProUGUI detailSanityText;
         public Button  prevCharButton;
         public Button  nextCharButton;
 
@@ -213,6 +217,11 @@ namespace TheBunkerGames
         {
             if (canvasRoot != null) { DestroyImmediate(canvasRoot); canvasRoot = null; }
 
+            // Attempt to load missing icons before building
+            #if UNITY_EDITOR
+            TryLoadMissingIcons();
+            #endif
+
             canvasRoot = UIBuilderUtils.CreateCanvasRoot(transform, "GameplayHudCanvas", canvasSortOrder);
             UIBuilderUtils.EnsureEventSystem();
             panel = UIBuilderUtils.CreatePanel(canvasRoot.transform, "HudPanel", Color.clear);
@@ -239,6 +248,38 @@ namespace TheBunkerGames
             UnityEditor.EditorUtility.SetDirty(this);
             #endif
         }
+
+        #if UNITY_EDITOR
+        private void TryLoadMissingIcons()
+        {
+            // Helper to find sprite by name in Assets
+            Sprite FindSprite(string spriteName)
+            {
+                string[] guids = UnityEditor.AssetDatabase.FindAssets($"{spriteName} t:Sprite");
+                if (guids.Length > 0)
+                {
+                    string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[0]);
+                    return UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                }
+                return null;
+            }
+
+            if (iconFood == null)        iconFood        = FindSprite("Icon_Food");
+            if (iconWater == null)       iconWater       = FindSprite("Icon_Water");
+            if (iconMeds == null)        iconMeds        = FindSprite("Icon_Medecine"); // Note spelling
+            if (iconTools == null)       iconTools       = FindSprite("Icon_Tools");
+            if (iconJunk == null)        iconJunk        = FindSprite("Icon_Thrash");   // Note spelling
+            
+            if (iconHeart == null)       iconHeart       = FindSprite("Icon_Heart");
+            if (iconBrain == null)       iconBrain       = FindSprite("Icon_Brain");
+            if (iconClock == null)       iconClock       = FindSprite("Icon_Clock");
+            if (iconThermometer == null) iconThermometer = FindSprite("Icon_Thermo");
+            if (iconCalendar == null)    iconCalendar    = FindSprite("Icon_Calendar");
+            if (iconDiary == null)       iconDiary       = FindSprite("Icon_Diary");
+
+            if (enableDebugLogs) Debug.Log("[GameplayHudUI] Attempted to load missing icons.");
+        }
+        #endif
 
         /// <summary>
         /// Populates character thumbnails and detail card with preview portraits
@@ -583,10 +624,10 @@ namespace TheBunkerGames
             sVlg.childControlWidth = true;  sVlg.childControlHeight = true;
             sVlg.childForceExpandWidth = true; sVlg.childForceExpandHeight = true;
 
-            detailHealthFill = MakeDetailBar(statsArea, "HealthBar", iconHeart, healthColor);
-            detailHungerFill = MakeDetailBar(statsArea, "HungerBar", iconFood,  hungerColor);
-            detailThirstFill = MakeDetailBar(statsArea, "ThirstBar", iconWater, thirstColor);
-            detailSanityFill = MakeDetailBar(statsArea, "SanityBar", iconBrain, sanityColor);
+            (detailHealthFill, detailHealthText) = MakeDetailBar(statsArea, "HealthBar", iconHeart, healthColor);
+            (detailHungerFill, detailHungerText) = MakeDetailBar(statsArea, "HungerBar", iconFood,  hungerColor);
+            (detailThirstFill, detailThirstText) = MakeDetailBar(statsArea, "ThirstBar", iconWater, thirstColor);
+            (detailSanityFill, detailSanityText) = MakeDetailBar(statsArea, "SanityBar", iconBrain, sanityColor);
 
             // ---- status condition icons row (very bottom) ----
             var statusRow = MakeRect(card, "StatusRow",
@@ -605,7 +646,7 @@ namespace TheBunkerGames
             MakeStatusIcon(statusRow, "iTools",  iconTools);
         }
 
-        private Image MakeDetailBar(RectTransform parent, string name,
+        private (Image fill, TextMeshProUGUI text) MakeDetailBar(RectTransform parent, string name,
             Sprite icon, Color fillColor)
         {
             var bar = new GameObject(name, typeof(RectTransform));
@@ -626,6 +667,7 @@ namespace TheBunkerGames
             var bgRT = MakeRect(bar.GetComponent<RectTransform>(), "BG",
                 new Vector2(0f, 0.20f), new Vector2(1f, 0.80f));
             bgRT.offsetMin = new Vector2(20, bgRT.offsetMin.y); // 20px left margin for icon
+            bgRT.offsetMax = new Vector2(-40, bgRT.offsetMax.y); // 40px right margin for text
             bgRT.gameObject.AddComponent<Image>().color = barBgColor;
 
             var fRT = MakeRect(bgRT, "Fill", Vector2.zero, Vector2.one);
@@ -637,7 +679,23 @@ namespace TheBunkerGames
             fImg.fillMethod = Image.FillMethod.Horizontal;
             fImg.fillAmount = 0.75f;
 
-            return fImg;
+            // Value Text (right side)
+            var valRT = MakeRect(bar.GetComponent<RectTransform>(), "Val",
+                new Vector2(1f, 0f), new Vector2(1f, 1f));
+            valRT.pivot = new Vector2(1, 0.5f);
+            valRT.sizeDelta = new Vector2(35, 0); // fixed width
+            valRT.anchorMin = new Vector2(1, 0); valRT.anchorMax = new Vector2(1, 1);
+            valRT.offsetMin = new Vector2(-35, 0); valRT.offsetMax = new Vector2(0, 0);
+
+            var tmp = valRT.gameObject.AddComponent<TextMeshProUGUI>();
+            tmp.text = "100";
+            tmp.fontSize = 14;
+            tmp.alignment = TextAlignmentOptions.Right;
+            tmp.color = textColor;
+            if (subtitleFont != null) tmp.font = subtitleFont;
+            else if (titleFont != null) tmp.font = titleFont;
+
+            return (fImg, tmp);
         }
 
         private void MakeStatusIcon(RectTransform parent, string name, Sprite icon)
@@ -1197,9 +1255,19 @@ namespace TheBunkerGames
         public void SetDetailStats(float healthNorm, float hungerNorm, float thirstNorm, float sanityNorm = -1f)
         {
             if (detailHealthFill != null) detailHealthFill.fillAmount = Mathf.Clamp01(healthNorm);
+            if (detailHealthText != null) detailHealthText.text = Mathf.RoundToInt(healthNorm * 100).ToString();
+
             if (detailHungerFill != null) detailHungerFill.fillAmount = Mathf.Clamp01(hungerNorm);
+            if (detailHungerText != null) detailHungerText.text = Mathf.RoundToInt(hungerNorm * 100).ToString();
+
             if (detailThirstFill != null) detailThirstFill.fillAmount = Mathf.Clamp01(thirstNorm);
-            if (sanityNorm >= 0f && detailSanityFill != null) detailSanityFill.fillAmount = Mathf.Clamp01(sanityNorm);
+            if (detailThirstText != null) detailThirstText.text = Mathf.RoundToInt(thirstNorm * 100).ToString();
+
+            if (sanityNorm >= 0f)
+            {
+                if (detailSanityFill != null) detailSanityFill.fillAmount = Mathf.Clamp01(sanityNorm);
+                if (detailSanityText != null) detailSanityText.text = Mathf.RoundToInt(sanityNorm * 100).ToString();
+            }
         }
 
         // ---- Button enable/disable -----------------------------------------
@@ -1241,9 +1309,16 @@ namespace TheBunkerGames
                 if (sp != null) { detailPortrait.sprite = sp; detailPortrait.color = Color.white; }
             }
             if (detailHealthFill != null) detailHealthFill.fillAmount = selectedCharacter.Health / 100f;
+            if (detailHealthText != null) detailHealthText.text = Mathf.RoundToInt(selectedCharacter.Health).ToString();
+
             if (detailHungerFill != null) detailHungerFill.fillAmount = selectedCharacter.Hunger / 100f;
+            if (detailHungerText != null) detailHungerText.text = Mathf.RoundToInt(selectedCharacter.Hunger).ToString();
+
             if (detailThirstFill != null) detailThirstFill.fillAmount = selectedCharacter.Thirst / 100f;
+            if (detailThirstText != null) detailThirstText.text = Mathf.RoundToInt(selectedCharacter.Thirst).ToString();
+
             if (detailSanityFill != null) detailSanityFill.fillAmount = selectedCharacter.Sanity / 100f;
+            if (detailSanityText != null) detailSanityText.text = Mathf.RoundToInt(selectedCharacter.Sanity).ToString();
         }
 
         private void UpdateResourceDisplay()
