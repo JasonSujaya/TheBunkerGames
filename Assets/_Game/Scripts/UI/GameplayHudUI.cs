@@ -32,6 +32,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         public static event Action OnEndDayClicked;
         public static event Action OnOurThingsClicked;
+        public static event Action OnDiaryClicked;
         public static event Action OnPrevCharacterClicked;
         public static event Action OnNextCharacterClicked;
         /// <summary>Fired when a character thumbnail is clicked. Passes the selected CharacterData.</summary>
@@ -45,6 +46,16 @@ namespace TheBunkerGames
         #endif
         [SerializeField] private int canvasSortOrder = 50;
         [SerializeField] private bool enableDebugLogs = false;
+
+        #if ODIN_INSPECTOR
+        [Title("UI References")]
+        #endif
+        [SerializeField] private PlayerActionUI playerActionUI;
+
+        #if ODIN_INSPECTOR
+        [Title("Family Body Slots (drag scene GameObjects with Image)")]
+        #endif
+        [SerializeField] private Image[] familyBodySlots = new Image[3];
 
         // -------------------------------------------------------------------------
         // Visual Assets (drag & drop in Inspector)
@@ -100,25 +111,40 @@ namespace TheBunkerGames
         [SerializeField] private GameObject canvasRoot;
         [SerializeField] private GameObject panel;
 
-        // ---- runtime references (found after auto-setup or cached on Show) ----
-        private TextMeshProUGUI dayText;
-        private TextMeshProUGUI timeText;
-        private TextMeshProUGUI temperatureText;
-        private Transform characterListContainer;
+        // ---- Serialized UI references (assigned by AutoSetup or Inspector) ----
+        #if ODIN_INSPECTOR
+        [Title("Day Strip")]
+        #endif
+        public TextMeshProUGUI dayText;
+        public TextMeshProUGUI timeText;
+        public TextMeshProUGUI temperatureText;
+
+        #if ODIN_INSPECTOR
+        [Title("Character List")]
+        #endif
+        public Transform characterListContainer;
         private readonly List<ThumbRefs> thumbs = new List<ThumbRefs>();
 
-        // detail card
-        private Image   detailPortrait;
-        private Image   detailHealthFill;
-        private Image   detailHungerFill;
-        private Image   detailThirstFill;
+        #if ODIN_INSPECTOR
+        [Title("Detail Card")]
+        #endif
+        public TextMeshProUGUI detailNameText;
+        public Image   detailPortrait;
+        public Image   detailHealthFill;
+        public Image   detailHungerFill;
+        public Image   detailThirstFill;
+        public Image   detailSanityFill;
+        public Button  prevCharButton;
+        public Button  nextCharButton;
 
-        // resource texts
-        private TextMeshProUGUI foodCountText;
-        private TextMeshProUGUI waterCountText;
-        private TextMeshProUGUI medsCountText;
-        private TextMeshProUGUI toolsCountText;
-        private TextMeshProUGUI junkCountText;
+        #if ODIN_INSPECTOR
+        [Title("Resource Counts")]
+        #endif
+        public TextMeshProUGUI foodCountText;
+        public TextMeshProUGUI waterCountText;
+        public TextMeshProUGUI medsCountText;
+        public TextMeshProUGUI toolsCountText;
+        public TextMeshProUGUI junkCountText;
 
         // selection state
         private CharacterData selectedCharacter;
@@ -143,6 +169,16 @@ namespace TheBunkerGames
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+        }
+
+        private void Start()
+        {
+            if (enableDebugLogs) Debug.Log("[GameplayHudUI] Start() - Self-initializing...");
+            WireButtons();
+            PopulateCharacterList();
+            RefreshFamilyBodies();
+            UpdateDayDisplay();
+            UpdateResourceDisplay();
         }
 
         private void LateUpdate()
@@ -176,6 +212,14 @@ namespace TheBunkerGames
 
             // populate preview portraits from FamilyManager in scene (editor mode)
             PopulateEditorPreview();
+
+            // Auto-assign button refs
+            if (panel != null)
+            {
+                diaryButton     = UIBuilderUtils.FindButton(panel, "DiaryBtn");
+                endDayButton    = UIBuilderUtils.FindButton(panel, "EndDayBtn");
+                ourThingsButton = UIBuilderUtils.FindButton(panel, "OurThingsBtn");
+            }
 
             if (enableDebugLogs) Debug.Log("[GameplayHudUI] Auto Setup complete.");
             #if UNITY_EDITOR
@@ -271,6 +315,10 @@ namespace TheBunkerGames
             // END DAY — right below the day strip
             MakeActionBtn(parent, "EndDayBtn", "END DAY", null,
                 new Vector2(0.005f, 0.84f), new Vector2(0.12f, 0.895f));
+
+            // DIARY — right next to END DAY
+            MakeActionBtn(parent, "DiaryBtn", "DIARY", iconDiary,
+                new Vector2(0.125f, 0.84f), new Vector2(0.24f, 0.895f));
         }
 
         private void MakeActionBtn(Transform parent, string name, string label,
@@ -336,9 +384,9 @@ namespace TheBunkerGames
         // =====================================================================
         private void Build_CharacterColumn(Transform parent)
         {
-            // small portrait thumbnails stacked on left edge
+            // small portrait thumbnails stacked on left edge, below the action buttons
             var col = MakeRect(parent, "CharacterList",
-                new Vector2(0.005f, 0.10f), new Vector2(0.06f, 0.82f));
+                new Vector2(0.005f, 0.10f), new Vector2(0.06f, 0.83f));
 
             var vlg = col.gameObject.AddComponent<VerticalLayoutGroup>();
             vlg.childAlignment    = TextAnchor.UpperCenter;
@@ -467,9 +515,37 @@ namespace TheBunkerGames
             // slight rotation for taped-photo feel
             card.localRotation = Quaternion.Euler(0, 0, 1.5f);
 
-            // ---- portrait area (top ~60%) ----
+            // ---- navigation row (prev arrow | name | next arrow) at very top ----
+            var navRow = MakeRect(card, "NavRow",
+                new Vector2(0.04f, 0.92f), new Vector2(0.96f, 0.99f));
+
+            var navHlg = navRow.gameObject.AddComponent<HorizontalLayoutGroup>();
+            navHlg.childAlignment    = TextAnchor.MiddleCenter;
+            navHlg.spacing           = 2;
+            navHlg.padding           = new RectOffset(2, 2, 0, 0);
+            navHlg.childControlWidth = false; navHlg.childControlHeight = true;
+            navHlg.childForceExpandWidth = false; navHlg.childForceExpandHeight = true;
+
+            prevCharButton = MakeArrowBtn(navRow, "PrevCharBtn", arrowPrevSprite, "<", 24);
+            // character name label
+            var nameGo = new GameObject("CharName", typeof(RectTransform));
+            nameGo.transform.SetParent(navRow, false);
+            nameGo.AddComponent<LayoutElement>().flexibleWidth = 1;
+            detailNameText = nameGo.AddComponent<TextMeshProUGUI>();
+            detailNameText.text = "";
+            detailNameText.fontSize = 18;
+            detailNameText.fontStyle = FontStyles.Bold;
+            detailNameText.alignment = TextAlignmentOptions.Center;
+            detailNameText.color = textColor;
+            detailNameText.enableAutoSizing = true;
+            detailNameText.fontSizeMin = 10;
+            detailNameText.fontSizeMax = 18;
+            if (titleFont != null) detailNameText.font = titleFont;
+            nextCharButton = MakeArrowBtn(navRow, "NextCharBtn", arrowNextSprite, ">", 24);
+
+            // ---- portrait area (below nav, top ~55%) ----
             var pArea = MakeRect(card, "PortraitArea",
-                new Vector2(0.08f, 0.38f), new Vector2(0.92f, 0.96f));
+                new Vector2(0.08f, 0.36f), new Vector2(0.92f, 0.91f));
 
             // portrait frame
             var pFrame = pArea.gameObject.AddComponent<Image>();
@@ -482,9 +558,9 @@ namespace TheBunkerGames
             detailPortrait.color = new Color(0.35f, 0.35f, 0.35f, 0.5f);
             detailPortrait.preserveAspect = true;
 
-            // ---- stat bars (below portrait — thin lines) ----
+            // ---- stat bars (below portrait — 4 bars: health, hunger, thirst, sanity) ----
             var statsArea = MakeRect(card, "StatsArea",
-                new Vector2(0.12f, 0.18f), new Vector2(0.92f, 0.36f));
+                new Vector2(0.12f, 0.14f), new Vector2(0.92f, 0.34f));
 
             var sVlg = statsArea.gameObject.AddComponent<VerticalLayoutGroup>();
             sVlg.childAlignment    = TextAnchor.UpperLeft;
@@ -496,10 +572,11 @@ namespace TheBunkerGames
             detailHealthFill = MakeDetailBar(statsArea, "HealthBar", iconHeart, healthColor);
             detailHungerFill = MakeDetailBar(statsArea, "HungerBar", iconFood,  hungerColor);
             detailThirstFill = MakeDetailBar(statsArea, "ThirstBar", iconWater, thirstColor);
+            detailSanityFill = MakeDetailBar(statsArea, "SanityBar", iconBrain, sanityColor);
 
             // ---- status condition icons row (very bottom) ----
             var statusRow = MakeRect(card, "StatusRow",
-                new Vector2(0.12f, 0.05f), new Vector2(0.92f, 0.16f));
+                new Vector2(0.12f, 0.03f), new Vector2(0.92f, 0.12f));
 
             var srHlg = statusRow.gameObject.AddComponent<HorizontalLayoutGroup>();
             srHlg.childAlignment    = TextAnchor.MiddleCenter;
@@ -649,8 +726,8 @@ namespace TheBunkerGames
             { img.color = fallback; }
         }
 
-        /// <summary>Small arrow button inside the day strip for prev/next day.</summary>
-        private void MakeArrowBtn(RectTransform parent, string name, Sprite arrowSprite,
+        /// <summary>Small arrow button. Returns the Button component.</summary>
+        private Button MakeArrowBtn(RectTransform parent, string name, Sprite arrowSprite,
             string fallbackChar, float size)
         {
             var go = new GameObject(name, typeof(RectTransform));
@@ -690,6 +767,8 @@ namespace TheBunkerGames
                 tmp.raycastTarget = false;
                 if (titleFont != null) tmp.font = titleFont;
             }
+
+            return btn;
         }
 
         private void MakeSep(RectTransform parent)
@@ -757,9 +836,9 @@ namespace TheBunkerGames
         {
             if (canvasRoot == null) return;
             canvasRoot.SetActive(true);
-            CacheReferences();
             WireButtons();
             PopulateCharacterList();
+            RefreshFamilyBodies();
             UpdateDayDisplay();
             UpdateResourceDisplay();
             if (enableDebugLogs) Debug.Log("[GameplayHudUI] Shown.");
@@ -770,71 +849,75 @@ namespace TheBunkerGames
             if (canvasRoot != null) canvasRoot.SetActive(false);
         }
 
-        // =====================================================================
-        //  Cache references after AutoSetup (or on Show)
-        // =====================================================================
-        private void CacheReferences()
-        {
-            if (panel == null) return;
-
-            var strip = panel.transform.Find("DayStrip");
-            if (strip != null)
-            {
-                dayText         = strip.Find("Day/Text")?.GetComponent<TextMeshProUGUI>();
-                timeText        = strip.Find("Clock/Text")?.GetComponent<TextMeshProUGUI>();
-                temperatureText = strip.Find("Temp/Text")?.GetComponent<TextMeshProUGUI>();
-            }
-
-            characterListContainer = panel.transform.Find("CharacterList");
-
-            var dc = panel.transform.Find("DetailCard");
-            if (dc != null)
-            {
-                detailPortrait   = dc.Find("PortraitArea/PortraitImage")?.GetComponent<Image>();
-                var sa = dc.Find("StatsArea");
-                if (sa != null)
-                {
-                    detailHealthFill = sa.Find("HealthBar/BG/Fill")?.GetComponent<Image>();
-                    detailHungerFill = sa.Find("HungerBar/BG/Fill")?.GetComponent<Image>();
-                    detailThirstFill = sa.Find("ThirstBar/BG/Fill")?.GetComponent<Image>();
-                }
-            }
-
-            var res = panel.transform.Find("Resources");
-            if (res != null)
-            {
-                foodCountText  = res.Find("Food/Count")?.GetComponent<TextMeshProUGUI>();
-                waterCountText = res.Find("Water/Count")?.GetComponent<TextMeshProUGUI>();
-                medsCountText  = res.Find("Meds/Count")?.GetComponent<TextMeshProUGUI>();
-                toolsCountText = res.Find("Tools/Count")?.GetComponent<TextMeshProUGUI>();
-                junkCountText  = res.Find("Junk/Count")?.GetComponent<TextMeshProUGUI>();
-            }
-        }
+        // -------------------------------------------------------------------------
+        // UI References (Buttons)
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Buttons")]
+        #endif
+        [SerializeField] private Button diaryButton;
+        [SerializeField] private Button endDayButton;
+        [SerializeField] private Button ourThingsButton;
 
         // =====================================================================
         //  Wire Buttons
         // =====================================================================
         private void WireButtons()
         {
-            if (panel == null) return;
+            // Auto-find PlayerActionUI if not assigned
+            if (playerActionUI == null)
+                playerActionUI = FindFirstObjectByType<PlayerActionUI>(FindObjectsInactive.Include);
 
-            Wire("OurThingsBtn", () => { OnOurThingsClicked?.Invoke(); });
-            Wire("EndDayBtn",    () => { OnEndDayClicked?.Invoke(); });
-        }
+            // Wire character navigation arrows on detail card
+            if (prevCharButton != null)
+            {
+                prevCharButton.onClick.RemoveAllListeners();
+                prevCharButton.onClick.AddListener(CyclePrevCharacter);
+            }
+            if (nextCharButton != null)
+            {
+                nextCharButton.onClick.RemoveAllListeners();
+                nextCharButton.onClick.AddListener(CycleNextCharacter);
+            }
 
-        private void WireChild(Transform parent, string childName, UnityEngine.Events.UnityAction action)
-        {
-            var child = parent.Find(childName);
-            if (child == null) return;
-            var btn = child.GetComponent<Button>();
-            if (btn != null) { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(action); }
-        }
+            if (ourThingsButton != null)
+            {
+                ourThingsButton.onClick.RemoveAllListeners();
+                ourThingsButton.onClick.AddListener(() => OnOurThingsClicked?.Invoke());
+            }
 
-        private void Wire(string name, UnityEngine.Events.UnityAction action)
-        {
-            var btn = UIBuilderUtils.FindButton(panel, name);
-            if (btn != null) { btn.onClick.RemoveAllListeners(); btn.onClick.AddListener(action); }
+            if (endDayButton != null)
+            {
+                endDayButton.onClick.RemoveAllListeners();
+                endDayButton.onClick.AddListener(() => OnEndDayClicked?.Invoke());
+            }
+
+            if (diaryButton != null)
+            {
+                diaryButton.onClick.RemoveAllListeners();
+                diaryButton.onClick.AddListener(() =>
+                {
+                    OnDiaryClicked?.Invoke();
+                    
+                    if (enableDebugLogs) Debug.Log("[GameplayHudUI] Diary clicked!");
+
+                    // Lazy find if needed
+                    if (playerActionUI == null)
+                        playerActionUI = FindFirstObjectByType<PlayerActionUI>(FindObjectsInactive.Include);
+
+                    if (playerActionUI != null)
+                    {
+                        playerActionUI.Show();
+                        if (enableDebugLogs) Debug.Log("[GameplayHudUI] Showing PlayerActionUI.");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[GameplayHudUI] PlayerActionUI not found!");
+                    }
+                });
+            }
         }
+        
 
         // =====================================================================
         //  Populate Character List  (runtime — needs FamilyManager)
@@ -877,6 +960,70 @@ namespace TheBunkerGames
             foreach (var d in FamilyManager.Instance.DefaultFamilyProfile.DefaultFamilyMembers)
                 if (d != null && d.CharacterName == characterName && d.Portrait != null) return d.Portrait;
             return null;
+        }
+
+        private Sprite FindBodyImage(string characterName)
+        {
+            if (FamilyManager.Instance == null || FamilyManager.Instance.DefaultFamilyProfile == null) return null;
+            foreach (var d in FamilyManager.Instance.DefaultFamilyProfile.DefaultFamilyMembers)
+                if (d != null && d.CharacterName == characterName && d.BodyImage != null) return d.BodyImage;
+            return null;
+        }
+
+        /// <summary>
+        /// Updates the family body slot Images with the body sprites from the current family members.
+        /// Slots are matched by index: slot 0 = first family member, slot 1 = second, etc.
+        /// </summary>
+        public void RefreshFamilyBodies()
+        {
+            if (familyBodySlots == null) return;
+
+            // Get family from runtime or editor profile
+            List<CharacterDefinitionSO> defs = null;
+            List<CharacterData> runtimeFamily = null;
+
+            if (FamilyManager.Instance != null)
+            {
+                runtimeFamily = FamilyManager.Instance.FamilyMembers;
+                if (FamilyManager.Instance.DefaultFamilyProfile != null)
+                    defs = FamilyManager.Instance.DefaultFamilyProfile.DefaultFamilyMembers;
+            }
+            else
+            {
+                // Editor fallback
+                var fm = FindFirstObjectByType<FamilyManager>();
+                if (fm != null && fm.DefaultFamilyProfile != null)
+                    defs = fm.DefaultFamilyProfile.DefaultFamilyMembers;
+            }
+
+            for (int i = 0; i < familyBodySlots.Length; i++)
+            {
+                if (familyBodySlots[i] == null) continue;
+
+                Sprite body = null;
+
+                // Try runtime family first
+                if (runtimeFamily != null && i < runtimeFamily.Count)
+                    body = FindBodyImage(runtimeFamily[i].Name);
+
+                // Fallback to definition
+                if (body == null && defs != null && i < defs.Count && defs[i] != null)
+                    body = defs[i].BodyImage;
+
+                if (body != null)
+                {
+                    familyBodySlots[i].sprite = body;
+                    familyBodySlots[i].color = Color.white;
+                    familyBodySlots[i].preserveAspect = true;
+                    familyBodySlots[i].gameObject.SetActive(true);
+                }
+                else
+                {
+                    familyBodySlots[i].gameObject.SetActive(false);
+                }
+            }
+
+            if (enableDebugLogs) Debug.Log("[GameplayHudUI] Family bodies refreshed.");
         }
 
         // =====================================================================
@@ -1000,11 +1147,12 @@ namespace TheBunkerGames
         }
 
         /// <summary>Set detail card stat bars directly (0-1 range).</summary>
-        public void SetDetailStats(float healthNorm, float hungerNorm, float thirstNorm)
+        public void SetDetailStats(float healthNorm, float hungerNorm, float thirstNorm, float sanityNorm = -1f)
         {
             if (detailHealthFill != null) detailHealthFill.fillAmount = Mathf.Clamp01(healthNorm);
             if (detailHungerFill != null) detailHungerFill.fillAmount = Mathf.Clamp01(hungerNorm);
             if (detailThirstFill != null) detailThirstFill.fillAmount = Mathf.Clamp01(thirstNorm);
+            if (sanityNorm >= 0f && detailSanityFill != null) detailSanityFill.fillAmount = Mathf.Clamp01(sanityNorm);
         }
 
         // ---- Button enable/disable -----------------------------------------
@@ -1028,13 +1176,8 @@ namespace TheBunkerGames
         /// <summary>Enable or disable the prev/next character arrows.</summary>
         public void SetCharacterArrowsInteractable(bool interactable)
         {
-            if (panel == null) return;
-            var strip = panel.transform.Find("DayStrip");
-            if (strip == null) return;
-            var prev = strip.Find("PrevDayBtn")?.GetComponent<Button>();
-            var next = strip.Find("NextDayBtn")?.GetComponent<Button>();
-            if (prev != null) prev.interactable = interactable;
-            if (next != null) next.interactable = interactable;
+            if (prevCharButton != null) prevCharButton.interactable = interactable;
+            if (nextCharButton != null) nextCharButton.interactable = interactable;
         }
 
         // =====================================================================
@@ -1044,6 +1187,7 @@ namespace TheBunkerGames
         {
             if (selectedCharacter == null) return;
 
+            if (detailNameText != null) detailNameText.text = selectedCharacter.Name;
             if (detailPortrait != null)
             {
                 var sp = FindPortrait(selectedCharacter.Name);
@@ -1052,6 +1196,7 @@ namespace TheBunkerGames
             if (detailHealthFill != null) detailHealthFill.fillAmount = selectedCharacter.Health / 100f;
             if (detailHungerFill != null) detailHungerFill.fillAmount = selectedCharacter.Hunger / 100f;
             if (detailThirstFill != null) detailThirstFill.fillAmount = selectedCharacter.Thirst / 100f;
+            if (detailSanityFill != null) detailSanityFill.fillAmount = selectedCharacter.Sanity / 100f;
         }
 
         private void UpdateResourceDisplay()
@@ -1082,6 +1227,9 @@ namespace TheBunkerGames
         [Button("Show",  ButtonSizes.Medium)] private void Debug_Show()    => Show();
         [Button("Hide",  ButtonSizes.Medium)] private void Debug_Hide()    => Hide();
         [Button("Refresh Characters", ButtonSizes.Medium)] private void Debug_Refresh() => PopulateCharacterList();
+        [Button("Refresh Family Bodies", ButtonSizes.Medium)]
+        [GUIColor(0.4f, 0.8f, 1f)]
+        private void Debug_RefreshBodies() => RefreshFamilyBodies();
         #endif
     }
 }

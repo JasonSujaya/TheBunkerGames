@@ -20,7 +20,7 @@ MonoBehaviour:
     Nerves.' Oddly strong and weirdly good at finding things. His weakness? Anything
     green and glowy.
   portrait: {fileID: 3411984908866964098, guid: 05be818cbf2994d929ac3e405247040c, type: 3}
-  bodyImage: {fileID: 8151639560283296786, guid: a6933c70587b34c529deded366fb2f36, type: 3}
+  bodyImage: {fileID: 21300000, guid: a6933c70587b34c529deded366fb2f36, type: 3}
   maxHealth: 100
   maxHunger: 90
   maxThirst: 90

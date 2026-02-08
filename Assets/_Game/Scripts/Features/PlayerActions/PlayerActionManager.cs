@@ -147,6 +147,11 @@ namespace TheBunkerGames
             dayResults.Clear();
             pendingResults = 0;
             isProcessing = false;
+            
+            // Clear storyteller event queue from previous day
+            var storytellerUI = FindFirstObjectByType<StorytellerUI>();
+            if (storytellerUI != null)
+                storytellerUI.ClearEventQueue();
 
             currentDayState = new DailyActionState
             {
@@ -255,12 +260,31 @@ namespace TheBunkerGames
 
         /// <summary>
         /// Submit all active categories at once. Convenience method.
+        /// Syncs inspector input fields to currentDayState before submitting.
         /// </summary>
         public void SubmitAllActions()
         {
+            Debug.Log($"[PlayerActionManager] SubmitAllActions called. currentDayState null? {currentDayState == null}");
+            
             if (currentDayState == null) return;
 
+            // Sync inspector fields to currentDayState (so inspector-entered values are submitted)
+            if (currentDayState.ExplorationActive && !string.IsNullOrEmpty(explorationInput?.Trim()) && string.IsNullOrEmpty(currentDayState.ExplorationInput))
+            {
+                currentDayState.ExplorationInput = explorationInput.Trim();
+            }
+            if (currentDayState.DilemmaActive && !string.IsNullOrEmpty(dilemmaInput?.Trim()) && string.IsNullOrEmpty(currentDayState.DilemmaInput))
+            {
+                currentDayState.DilemmaInput = dilemmaInput.Trim();
+            }
+            if (currentDayState.FamilyRequestActive && !string.IsNullOrEmpty(familyRequestInput?.Trim()) && string.IsNullOrEmpty(currentDayState.FamilyRequestInput))
+            {
+                currentDayState.FamilyRequestInput = familyRequestInput.Trim();
+            }
+
             var active = currentDayState.GetActiveCategories();
+            Debug.Log($"[PlayerActionManager] Active categories: {active.Count} - {string.Join(", ", active)}");
+            
             foreach (var cat in active)
             {
                 string input = "";
@@ -271,19 +295,25 @@ namespace TheBunkerGames
                     case PlayerActionCategory.Exploration:
                         input = currentDayState.ExplorationInput;
                         items = currentDayState.ExplorationItems;
+                        explorationInput = ""; // Clear inspector field
                         break;
                     case PlayerActionCategory.Dilemma:
                         input = currentDayState.DilemmaInput;
                         items = currentDayState.DilemmaItems;
+                        dilemmaInput = ""; // Clear inspector field
                         break;
                     case PlayerActionCategory.FamilyRequest:
                         input = currentDayState.FamilyRequestInput;
                         items = currentDayState.FamilyRequestItems;
+                        familyRequestInput = ""; // Clear inspector field
                         break;
                 }
 
+                Debug.Log($"[PlayerActionManager] Category {cat}: input='{input}', alreadySubmitted={dayResults.ContainsKey(cat)}");
+                
                 if (!string.IsNullOrEmpty(input) && !dayResults.ContainsKey(cat))
                 {
+                    Debug.Log($"[PlayerActionManager] Submitting {cat} action...");
                     SubmitAction(cat, input, items);
                 }
             }
@@ -321,7 +351,7 @@ namespace TheBunkerGames
             SetInput(category, playerInput);
 
             if (enableDebugLogs)
-                Debug.Log($"[PlayerActionManager] Saved [{category}]: \"{playerInput}\" with {selectedItems?.Count ?? 0} item(s)");
+                Debug.Log($"[PlayerActionManager] Saved [{category}]: \"{playerInput}\" with {selectedItems?.Count ?? 0} item(s). State updated.");
 
             OnCategorySaved?.Invoke(category);
         }
@@ -350,13 +380,32 @@ namespace TheBunkerGames
                 );
             }
 
-            // Execute effects via StorytellerManager pipeline
+            // Execute effects via StorytellerManager pipeline (logs event, updates UI, executes effects)
             if (!result.HasError && result.StoryEvent != null)
             {
-                // Execute immediate effects
-                if (LLMEffectExecutor.Instance != null && result.StoryEvent.Effects != null)
+                // Try to get StorytellerManager (fallback to FindFirstObjectByType if singleton not initialized)
+                var storyteller = StorytellerManager.Instance;
+                if (storyteller == null)
                 {
-                    LLMEffectExecutor.Instance.ExecuteEffects(result.StoryEvent.Effects);
+                    storyteller = FindFirstObjectByType<StorytellerManager>();
+                    if (enableDebugLogs && storyteller != null)
+                        Debug.Log("[PlayerActionManager] Found StorytellerManager via FindFirstObjectByType (singleton not yet initialized).");
+                }
+
+                if (storyteller != null)
+                {
+                    if (enableDebugLogs)
+                        Debug.Log($"[PlayerActionManager] Forwarding event to StorytellerManager: {result.StoryEvent.Title}");
+                    storyteller.ProcessEvent(result.StoryEvent);
+                }
+                else
+                {
+                    Debug.LogWarning("[PlayerActionManager] StorytellerManager not found in scene! Falling back to direct effect execution.");
+                    // Fallback: execute effects directly if storyteller is missing
+                    if (LLMEffectExecutor.Instance != null && result.StoryEvent.Effects != null)
+                    {
+                        LLMEffectExecutor.Instance.ExecuteEffects(result.StoryEvent.Effects);
+                    }
                 }
 
                 // Consume used items
@@ -518,14 +567,33 @@ namespace TheBunkerGames
 
         /// <summary>
         /// Set the inspector input for a category (called by UI panels to sync back).
+        /// Also syncs to currentDayState so SubmitAllActions() can find the input.
         /// </summary>
         public void SetInput(PlayerActionCategory category, string value)
         {
+            // Update inspector fields
             switch (category)
             {
                 case PlayerActionCategory.Exploration: explorationInput = value; break;
                 case PlayerActionCategory.Dilemma: dilemmaInput = value; break;
                 case PlayerActionCategory.FamilyRequest: familyRequestInput = value; break;
+            }
+            
+            // Also sync to currentDayState so SubmitAllActions() can find the input
+            if (currentDayState != null)
+            {
+                switch (category)
+                {
+                    case PlayerActionCategory.Exploration:
+                        currentDayState.ExplorationInput = value;
+                        break;
+                    case PlayerActionCategory.Dilemma:
+                        currentDayState.DilemmaInput = value;
+                        break;
+                    case PlayerActionCategory.FamilyRequest:
+                        currentDayState.FamilyRequestInput = value;
+                        break;
+                }
             }
         }
 

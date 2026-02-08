@@ -153,28 +153,30 @@ namespace TheBunkerGames
 
         private void StartGame()
         {
-            // If we are just enabling the HUD (single scene architecture)
-            if (gameplayHUD != null)
-            {
-                gameplayHUD.Show();
-                if (enableDebugLogs) Debug.Log("[MainMenuController] Gameplay HUD Shown.");
-            }
-
             if (Application.CanStreamedLevelBeLoaded(gameSceneName))
             {
                 SceneManager.LoadScene(gameSceneName);
             }
             else
             {
-                Debug.LogWarning($"[MainMenuController] Scene '{gameSceneName}' cannot be loaded. Check Build Settings.");
-                
-                // Fallback: If we are testing and the scene IS the game scene
+                Debug.LogWarning($"[MainMenuController] Scene '{gameSceneName}' cannot be loaded. Using single-scene fallback.");
+
+                // Single-scene architecture: spawn family, then show HUD
                 var flow = FindFirstObjectByType<GameFlowController>();
                 if (flow != null)
                 {
                     flow.StartNewGame();
+                    if (enableDebugLogs) Debug.Log("[MainMenuController] GameFlowController.StartNewGame() called — family spawned.");
+                }
+
+                // Show HUD and populate with the freshly spawned family
+                if (gameplayHUD != null)
+                {
+                    gameplayHUD.Show();
+                    if (enableDebugLogs) Debug.Log("[MainMenuController] Gameplay HUD shown and populated with family.");
                 }
             }
+
         }
         
         // -------------------------------------------------------------------------

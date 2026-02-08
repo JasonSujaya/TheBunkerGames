@@ -19,7 +19,7 @@ MonoBehaviour:
     beans by the pallet, and a tin foil hat collection to rival a museum. Paranoid?
     Maybe. Ready? Absolutely.
   portrait: {fileID: -5831287418125998029, guid: c71d9a27454cd494d97aea8385730fd4, type: 3}
-  bodyImage: {fileID: -2026874304575852102, guid: 94cdfcda0100f4656ac89737000241f7, type: 3}
+  bodyImage: {fileID: 21300000, guid: 94cdfcda0100f4656ac89737000241f7, type: 3}
   maxHealth: 95
   maxHunger: 95
   maxThirst: 90

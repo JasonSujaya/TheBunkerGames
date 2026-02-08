@@ -24,6 +24,64 @@ namespace TheBunkerGames
         public static PlayerActionUI Instance { get; private set; }
 
         // -------------------------------------------------------------------------
+        // Visual Assets (drag & drop in Inspector)
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Visual Assets – Fonts")]
+        #endif
+        [Header("Fonts")]
+        [SerializeField] private TMP_FontAsset titleFont;
+        [SerializeField] private TMP_FontAsset bodyFont;
+
+        #if ODIN_INSPECTOR
+        [Title("Visual Assets – Sprites")]
+        #endif
+        [Header("Sprites – Backgrounds & Frames")]
+        [SerializeField] private Sprite panelBackgroundSprite;    // main panel bg
+        [SerializeField] private Sprite headerBackgroundSprite;   // header strip bg
+        [SerializeField] private Sprite listItemSprite;           // inbox row bg
+        [SerializeField] private Sprite detailPanelSprite;        // detail view bg
+        [SerializeField] private Sprite inputFieldSprite;         // text input bg
+        [SerializeField] private Sprite separatorSprite;          // horizontal divider
+
+        [Header("Sprites – Buttons")]
+        [SerializeField] private Sprite buttonSprite;             // general button bg
+        [SerializeField] private Sprite saveButtonSprite;         // save/confirm button bg
+        [SerializeField] private Sprite submitButtonSprite;       // submit all button bg
+        [SerializeField] private Sprite backButtonSprite;         // back / navigation button bg
+        [SerializeField] private Sprite closeButtonSprite;        // close (X) button bg
+
+        [Header("Sprites – Icons")]
+        [SerializeField] private Sprite iconClose;                // X icon
+        [SerializeField] private Sprite iconBack;                 // back arrow icon
+        [SerializeField] private Sprite iconSave;                 // save/checkmark icon
+        [SerializeField] private Sprite iconSubmit;               // submit icon
+        [SerializeField] private Sprite iconExploration;          // exploration category icon
+        [SerializeField] private Sprite iconDilemma;              // dilemma category icon
+        [SerializeField] private Sprite iconFamilyRequest;        // family request category icon
+        [SerializeField] private Sprite iconLock;                 // locked/saved indicator
+
+        #if ODIN_INSPECTOR
+        [Title("Visual Assets – Colors")]
+        #endif
+        [Header("Colors")]
+        [SerializeField] private Color panelBgColor          = new Color(0.05f, 0.05f, 0.1f, 0.92f);
+        [SerializeField] private Color headerBgColor         = new Color(0.08f, 0.08f, 0.14f, 1f);
+        [SerializeField] private Color listItemBgColor       = new Color(0.12f, 0.12f, 0.18f, 1f);
+        [SerializeField] private Color listItemHoverColor    = new Color(0.18f, 0.18f, 0.28f, 1f);
+        [SerializeField] private Color detailBgColor         = new Color(0.08f, 0.08f, 0.14f, 1f);
+        [SerializeField] private Color inputBgColor          = new Color(0.15f, 0.15f, 0.2f, 1f);
+        [SerializeField] private Color inputLockedBgColor    = new Color(0.08f, 0.08f, 0.1f, 1f);
+        [SerializeField] private Color textColor             = Color.white;
+        [SerializeField] private Color textMutedColor        = new Color(0.6f, 0.6f, 0.6f, 1f);
+        [SerializeField] private Color textLockedColor       = new Color(0.5f, 0.5f, 0.5f, 1f);
+        [SerializeField] private Color categoryLabelColor    = new Color(1f, 0.85f, 0.3f, 1f);
+        [SerializeField] private Color saveButtonColor       = new Color(0.15f, 0.6f, 0.2f, 1f);
+        [SerializeField] private Color submitButtonColor     = new Color(0.15f, 0.4f, 0.7f, 1f);
+        [SerializeField] private Color closeButtonColor      = new Color(0.4f, 0.15f, 0.15f, 1f);
+        [SerializeField] private Color completionBgColor     = new Color(0.1f, 0.15f, 0.1f, 0.95f);
+
+        // -------------------------------------------------------------------------
         // Category Data Panels (hidden, hold per-category state)
         // -------------------------------------------------------------------------
         #if ODIN_INSPECTOR
@@ -136,6 +194,16 @@ namespace TheBunkerGames
                 submitAllButton.onClick.AddListener(OnSubmitAllClicked);
 
             HideAll();
+        }
+
+        private void Start()
+        {
+            // Catch up if actions are already ready (e.g. game started before UI enabled)
+            if (PlayerActionManager.Instance != null && PlayerActionManager.Instance.CurrentDayState != null)
+            {
+                if (enableDebugLogs) Debug.Log("[PlayerActionUI] Found existing daily state on Start - catching up.");
+                HandleDailyActionsReady(PlayerActionManager.Instance.CurrentDayState);
+            }
         }
 
         private void OnEnable()
@@ -394,14 +462,10 @@ namespace TheBunkerGames
                 // Visual feedback: darken input bg when locked
                 var inputBgImg = detailInputField.GetComponent<Image>();
                 if (inputBgImg != null)
-                    inputBgImg.color = panel.IsSaved
-                        ? new Color(0.08f, 0.08f, 0.1f, 1f)   // dark locked look
-                        : new Color(0.15f, 0.15f, 0.2f, 1f);   // normal editable
+                    inputBgImg.color = panel.IsSaved ? inputLockedBgColor : inputBgColor;
                 // Dim the text when saved
                 if (detailInputField.textComponent != null)
-                    detailInputField.textComponent.color = panel.IsSaved
-                        ? new Color(0.5f, 0.5f, 0.5f, 1f)     // gray locked text
-                        : Color.white;                          // normal white text
+                    detailInputField.textComponent.color = panel.IsSaved ? textLockedColor : textColor;
             }
             AttachInputListener();
 
@@ -482,18 +546,38 @@ namespace TheBunkerGames
 
         private void OnSaveClicked()
         {
-            if (!currentlyViewingCategory.HasValue) return;
+            if (enableDebugLogs) Debug.Log("[PlayerActionUI] Save button clicked.");
+
+            if (!currentlyViewingCategory.HasValue)
+            {
+                if (enableDebugLogs) Debug.LogWarning("[PlayerActionUI] Save clicked but no category is currently viewed.");
+                return;
+            }
 
             var panel = GetPanel(currentlyViewingCategory.Value);
-            if (panel == null || panel.IsSaved) return;
+            if (panel == null)
+            {
+                if (enableDebugLogs) Debug.LogError($"[PlayerActionUI] Could not find panel for {currentlyViewingCategory.Value}");
+                return;
+            }
+
+            if (panel.IsSaved)
+            {
+                if (enableDebugLogs) Debug.Log("[PlayerActionUI] Panel is already saved. Ignoring click.");
+                return;
+            }
 
             // Sync latest input
             if (detailInputField != null)
+            {
+                if (enableDebugLogs) Debug.Log($"[PlayerActionUI] Syncing input: '{detailInputField.text}'");
                 panel.SetInputText(detailInputField.text);
+            }
 
             // Validate
             if (!panel.ValidateInput())
             {
+                if (enableDebugLogs) Debug.Log("[PlayerActionUI] Validation failed.");
                 if (detailStatusText != null)
                     detailStatusText.text = panel.Category == PlayerActionCategory.Dilemma
                         ? "You must respond to the dilemma!"
@@ -502,8 +586,9 @@ namespace TheBunkerGames
             }
 
             // Show confirmation popup
-            if (confirmationPopup != null)
+            if (confirmationPopup != null && confirmationPopup.gameObject.activeInHierarchy) // Check activeInHierarchy purely for safety if root is disabled
             {
+                if (enableDebugLogs) Debug.Log("[PlayerActionUI] Showing confirmation popup.");
                 confirmationPopup.Show(
                     "Are you sure you want to save your response?\nOnce saved, it cannot be edited until the next day.",
                     OnSaveConfirmed,
@@ -513,6 +598,7 @@ namespace TheBunkerGames
             }
             else
             {
+                if (enableDebugLogs) Debug.Log("[PlayerActionUI] No confirmation popup assigned or active. Saving directly.");
                 // No popup — just save directly
                 OnSaveConfirmed();
             }
@@ -520,7 +606,13 @@ namespace TheBunkerGames
 
         private void OnSaveConfirmed()
         {
-            if (!currentlyViewingCategory.HasValue) return;
+            if (enableDebugLogs) Debug.Log("[PlayerActionUI] Save confirmed.");
+
+            if (!currentlyViewingCategory.HasValue) 
+            {
+                 if (enableDebugLogs) Debug.LogWarning("[PlayerActionUI] Lost category context during save.");
+                 return;
+            }
 
             var category = currentlyViewingCategory.Value;
             var panel = GetPanel(category);
@@ -536,9 +628,9 @@ namespace TheBunkerGames
                 detailInputField.interactable = false;
                 var inputBgImg = detailInputField.GetComponent<Image>();
                 if (inputBgImg != null)
-                    inputBgImg.color = new Color(0.08f, 0.08f, 0.1f, 1f);
+                    inputBgImg.color = inputLockedBgColor;
                 if (detailInputField.textComponent != null)
-                    detailInputField.textComponent.color = new Color(0.5f, 0.5f, 0.5f, 1f);
+                    detailInputField.textComponent.color = textLockedColor;
             }
             if (saveButton != null)
                 saveButton.interactable = false;
@@ -675,6 +767,7 @@ namespace TheBunkerGames
 
         public void Show()
         {
+            gameObject.SetActive(true);
             if (rootPanel != null)
                 rootPanel.SetActive(true);
         }
@@ -717,6 +810,18 @@ namespace TheBunkerGames
             if (familyRequestPanel != null) familyRequestPanel.ResetPanel();
 
             savedCategories.Clear();
+
+            // Advance to next day
+            var flow = FindFirstObjectByType<GameFlowController>();
+            if (flow != null)
+            {
+                if (enableDebugLogs) Debug.Log("[PlayerActionUI] Calling AdvanceDay()...");
+                flow.AdvanceDay();
+            }
+            else
+            {
+                if (enableDebugLogs) Debug.LogWarning("[PlayerActionUI] Could not find GameFlowController to advance day!");
+            }
         }
 
         // -------------------------------------------------------------------------
@@ -775,7 +880,7 @@ namespace TheBunkerGames
             var rp = MakeUI("RootPanel", transform);
             Stretch(rp);
             var rpBg = rp.gameObject.AddComponent<Image>();
-            rpBg.color = new Color(0.05f, 0.05f, 0.1f, 0.92f);
+            ApplySprite(rpBg, panelBackgroundSprite, panelBgColor);
 
             // ----- Header -----
             var header = MakeUI("Header", rp);
@@ -798,7 +903,7 @@ namespace TheBunkerGames
             closeBtnLE.preferredWidth = 40;
             closeBtnLE.preferredHeight = 40;
             var closeBtnBg = closeBtnRT.GetComponent<Image>();
-            if (closeBtnBg != null) closeBtnBg.color = new Color(0.4f, 0.15f, 0.15f, 1f);
+            if (closeBtnBg != null) ApplySprite(closeBtnBg, closeButtonSprite, closeButtonColor);
             var closeBtnColors = closeBtnRT.GetComponent<Button>().colors;
             closeBtnColors.highlightedColor = new Color(0.6f, 0.2f, 0.2f, 1f);
             closeBtnColors.pressedColor = new Color(0.3f, 0.1f, 0.1f, 1f);
@@ -806,6 +911,8 @@ namespace TheBunkerGames
 
             // Header title — takes remaining space
             var hText = MakeTMP("HeaderText", header, "DAILY ACTIONS", 28, TextAlignmentOptions.Center);
+            if (titleFont != null) hText.font = titleFont;
+            hText.fontStyle = FontStyles.Bold;
             var hTextLE = hText.gameObject.AddComponent<LayoutElement>();
             hTextLE.flexibleWidth = 1;
 
@@ -832,7 +939,7 @@ namespace TheBunkerGames
 
             // Info label
             var infoLabel = MakeTMP("InboxInfo", inbox, "Click a task to view details and write your response.", 14, TextAlignmentOptions.Center);
-            infoLabel.color = new Color(0.6f, 0.6f, 0.6f);
+            infoLabel.color = textMutedColor;
             PrefH(infoLabel.gameObject, 25);
 
             // 3 list items
@@ -849,7 +956,7 @@ namespace TheBunkerGames
             var submitAll = MakeButton("SubmitAllButton", inbox, "Submit All Actions");
             PrefH(submitAll.gameObject, 50);
             var submitBtnImg = submitAll.GetComponent<Image>();
-            if (submitBtnImg != null) submitBtnImg.color = new Color(0.15f, 0.4f, 0.7f, 1f);
+            if (submitBtnImg != null) ApplySprite(submitBtnImg, submitButtonSprite, submitButtonColor);
             submitAll.gameObject.SetActive(false);
 
             // ===================================================================
@@ -862,7 +969,7 @@ namespace TheBunkerGames
             detail.gameObject.SetActive(false);
 
             var detailBg = detail.gameObject.AddComponent<Image>();
-            detailBg.color = new Color(0.08f, 0.08f, 0.14f, 1f);
+            ApplySprite(detailBg, detailPanelSprite, detailBgColor);
 
             // --- TOP: Back button row, pinned to top ---
             var backRow = MakeUI("BackRow", detail);
@@ -881,7 +988,7 @@ namespace TheBunkerGames
             backLE.preferredWidth = 100;
             backLE.preferredHeight = 30;
             var backBtnImg = backBtn.GetComponent<Image>();
-            if (backBtnImg != null) backBtnImg.color = new Color(0.25f, 0.25f, 0.35f, 1f);
+            if (backBtnImg != null) ApplySprite(backBtnImg, backButtonSprite, new Color(0.25f, 0.25f, 0.35f, 1f));
 
             // --- BOTTOM: Save button + status, pinned to bottom ---
             var bottomBar = MakeUI("BottomBar", detail);
@@ -905,7 +1012,7 @@ namespace TheBunkerGames
             var saveBtnRT = MakeButton("SaveButton", bottomBar, "SAVE RESPONSE");
             PrefH(saveBtnRT.gameObject, 42);
             var saveBtnImg = saveBtnRT.GetComponent<Image>();
-            if (saveBtnImg != null) saveBtnImg.color = new Color(0.15f, 0.6f, 0.2f, 1f);
+            if (saveBtnImg != null) ApplySprite(saveBtnImg, saveButtonSprite, saveButtonColor);
             var saveBtnColors = saveBtnRT.GetComponent<Button>().colors;
             saveBtnColors.highlightedColor = new Color(0.2f, 0.7f, 0.25f, 1f);
             saveBtnColors.pressedColor = new Color(0.1f, 0.45f, 0.15f, 1f);
@@ -914,7 +1021,7 @@ namespace TheBunkerGames
 
             // Status text
             var dStatus = MakeTMP("DetailStatusText", bottomBar, "", 12, TextAlignmentOptions.Center);
-            dStatus.color = new Color(0.6f, 0.6f, 0.6f);
+            dStatus.color = textMutedColor;
             PrefH(dStatus.gameObject, 16);
 
             // --- MIDDLE: Content area between top bar and bottom bar ---
@@ -934,7 +1041,7 @@ namespace TheBunkerGames
 
             // Category label
             var dCatLabel = MakeTMP("DetailCategoryLabel", contentArea, "CATEGORY", 22, TextAlignmentOptions.Left);
-            dCatLabel.color = new Color(1f, 0.85f, 0.3f);
+            dCatLabel.color = categoryLabelColor;
             dCatLabel.fontStyle = FontStyles.Bold;
             PrefH(dCatLabel.gameObject, 30);
 
@@ -963,7 +1070,7 @@ namespace TheBunkerGames
             inputGO.transform.SetParent(contentArea, false);
             var inputRT = inputGO.AddComponent<RectTransform>();
             var inputBg = inputGO.AddComponent<Image>();
-            inputBg.color = new Color(0.15f, 0.15f, 0.2f, 1f);
+            ApplySprite(inputBg, inputFieldSprite, inputBgColor);
             var dInputField = inputGO.AddComponent<TMP_InputField>();
             dInputField.lineType = TMP_InputField.LineType.MultiLineNewline;
             var inputLE = inputGO.AddComponent<LayoutElement>();
@@ -1059,7 +1166,7 @@ namespace TheBunkerGames
             comp.anchorMax = new Vector2(0.85f, 0.85f);
             comp.offsetMin = comp.offsetMax = Vector2.zero;
             var compBg = comp.gameObject.AddComponent<Image>();
-            compBg.color = new Color(0.1f, 0.15f, 0.1f, 0.95f);
+            compBg.color = completionBgColor;
             comp.gameObject.SetActive(false);
 
             var cText = MakeTMP("CompletionText", comp, "All actions complete!", 18, TextAlignmentOptions.TopLeft);
@@ -1130,11 +1237,11 @@ namespace TheBunkerGames
         {
             var row = MakeUI(name, parent);
             var rowBg = row.gameObject.AddComponent<Image>();
-            rowBg.color = new Color(0.12f, 0.12f, 0.18f, 1f);
+            ApplySprite(rowBg, listItemSprite, listItemBgColor);
 
             var btn = row.gameObject.AddComponent<Button>();
             var btnColors = btn.colors;
-            btnColors.highlightedColor = new Color(0.18f, 0.18f, 0.28f, 1f);
+            btnColors.highlightedColor = listItemHoverColor;
             btnColors.pressedColor = new Color(0.1f, 0.1f, 0.15f, 1f);
             btn.colors = btnColors;
 
@@ -1221,10 +1328,19 @@ namespace TheBunkerGames
             t.text = text;
             t.fontSize = size;
             t.alignment = align;
-            t.color = Color.white;
+            t.color = textColor;
             t.enableWordWrapping = true;
             t.overflowMode = TextOverflowModes.Ellipsis;
+            if (bodyFont != null) t.font = bodyFont;
             return t;
+        }
+
+        private void ApplySprite(Image img, Sprite sprite, Color fallback)
+        {
+            if (sprite != null)
+            { img.sprite = sprite; img.type = Image.Type.Sliced; img.color = Color.white; }
+            else
+            { img.color = fallback; }
         }
 
         private RectTransform MakeButton(string n, RectTransform p, string label)
@@ -1233,13 +1349,14 @@ namespace TheBunkerGames
             go.transform.SetParent(p, false);
             var rt = go.AddComponent<RectTransform>();
             var img = go.AddComponent<Image>();
-            img.color = new Color(0.2f, 0.5f, 0.2f, 1f);
+            ApplySprite(img, buttonSprite, new Color(0.2f, 0.5f, 0.2f, 1f));
             var btn = go.AddComponent<Button>();
             var c = btn.colors;
             c.highlightedColor = new Color(0.3f, 0.65f, 0.3f, 1f);
             c.pressedColor = new Color(0.15f, 0.4f, 0.15f, 1f);
             btn.colors = c;
-            MakeTMP("Text", rt, label, 16, TextAlignmentOptions.Center);
+            var tmp = MakeTMP("Text", rt, label, 16, TextAlignmentOptions.Center);
+            if (titleFont != null) tmp.font = titleFont;
             Stretch(go.transform.GetChild(0).GetComponent<RectTransform>());
             return rt;
         }

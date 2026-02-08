@@ -620,6 +620,273 @@ MonoBehaviour:
         \"AddSanity\",\n          \"intensity\": 10,\n          \"target\": \"Mother\"\n       
         },\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
         10,\n          \"target\": \"Son\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Eat
+      Title: Ignored Signal
+      Description: Morty decides to eat instead of investigating the radio signal.
+        The family misses a potential opportunity for contact but avoids possible
+        danger. The radio continues to crackle faintly in the background.
+      EffectCount: 2
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 13:58:21
+      FullEventJson: "{\n  \"title\": \"Ignored Signal\",\n  \"description\": \"Morty
+        decides to eat instead of investigating the radio signal. The family misses
+        a potential opportunity for contact but avoids possible danger. The radio
+        continues to crackle faintly in the background.\",\n  \"effects\": [\n   
+        {\n      \"effectType\": \"ReduceFood\",\n      \"intensity\": 2,\n     
+        \"target\": \"\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 1,\n      \"target\": \"Morty Sanchex\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Try to tune the radio again\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
+        1,\n          \"target\": \"Morty Sanchex\"\n        },\n        {\n         
+        \"effectType\": \"ReduceSupplies\",\n          \"intensity\": 1,\n         
+        \"target\": \"\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Ignore
+        the radio and rest\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddHP\",\n          \"intensity\": 2,\n          \"target\": \"Morty Sanchex\"\n       
+        },\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        1,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Search for more food\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"AddFood\",\n          \"intensity\": 3,\n         
+        \"target\": \"\"\n        },\n        {\n          \"effectType\": \"ReduceHP\",\n         
+        \"intensity\": 1,\n          \"target\": \"Morty Sanchex\"\n        }\n     
+        ]\n    }\n  ]\n}"
+    - PlayerAction: check here
+      Title: Initial Inspection
+      Description: You decide to inspect the drain area more closely. The blockage
+        seems to be caused by a buildup of debris and waste. It's a messy job, but
+        you might be able to clear it with some effort.
+      EffectCount: 2
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 16:02:33
+      FullEventJson: "{\n  \"title\": \"Initial Inspection\",\n  \"description\":
+        \"You decide to inspect the drain area more closely. The blockage seems to
+        be caused by a buildup of debris and waste. It's a messy job, but you might
+        be able to clear it with some effort.\",\n  \"effects\": [\n    {\n     
+        \"effectType\": \"ReduceSanity\",\n      \"intensity\": 2,\n      \"target\":
+        \"Morty Sanchex\"\n    },\n    {\n      \"effectType\": \"ReduceThirst\",\n     
+        \"intensity\": 3,\n      \"target\": \"Morty Sanchex\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Use a tool to clear the blockage\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceSupplies\",\n          \"intensity\":
+        2,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 3,\n          \"target\": \"Morty
+        Sanchex\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Attempt to
+        flush the drain with water\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"ReduceWater\",\n          \"intensity\": 5,\n         
+        \"target\": \"\"\n        },\n        {\n          \"effectType\": \"ReduceSanity\",\n         
+        \"intensity\": 1,\n          \"target\": \"Morty Sanchex\"\n        }\n     
+        ]\n    },\n    {\n      \"text\": \"Ignore it for now and focus on something
+        else\",\n      \"effects\": [\n        {\n          \"effectType\": \"InfectCharacter\",\n         
+        \"intensity\": 2,\n          \"target\": \"Morty Sanchex\"\n        }\n     
+        ]\n    }\n  ]\n}"
+    - PlayerAction: drink coffee
+      Title: Caffeine Boost
+      Description: Morty Sanchex drinks some coffee, feeling a bit more alert but
+        also more jittery. The solar panel challenge remains unsolved, but at least
+        he's more awake to think about it.
+      EffectCount: 2
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 16:09:25
+      FullEventJson: "{\n  \"title\": \"Caffeine Boost\",\n  \"description\": \"Morty
+        Sanchex drinks some coffee, feeling a bit more alert but also more jittery.
+        The solar panel challenge remains unsolved, but at least he's more awake
+        to think about it.\",\n  \"effects\": [\n    {\n      \"effectType\": \"AddSanity\",\n     
+        \"intensity\": 5,\n      \"target\": \"Morty Sanchex\"\n    },\n    {\n     
+        \"effectType\": \"ReduceThirst\",\n      \"intensity\": 10,\n      \"target\":
+        \"Morty Sanchex\"\n    }\n  ],\n  \"choices\": [\n    {\n      \"text\":
+        \"Try to connect the solar panels using a long extension cord from inside
+        the bunker.\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddSupplies\",\n          \"intensity\": 3,\n          \"target\": \"\"\n       
+        },\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        2,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Venturing outside quickly to manually connect the panels,
+        risking exposure.\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddSupplies\",\n          \"intensity\": 8,\n          \"target\": \"\"\n       
+        },\n        {\n          \"effectType\": \"ReduceHP\",\n          \"intensity\":
+        5,\n          \"target\": \"Morty Sanchex\"\n        },\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 5,\n         
+        \"target\": \"Morty Sanchex\"\n        }\n      ]\n    },\n    {\n      \"text\":
+        \"Forget about the solar panels for now and focus on rationing the current
+        power supply.\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 3,\n          \"target\": \"Morty
+        Sanchex\"\n        },\n        {\n          \"effectType\": \"ReduceSupplies\",\n         
+        \"intensity\": 2,\n          \"target\": \"\"\n        }\n      ]\n    }\n 
+        ]\n}"
+    - PlayerAction: test
+      Title: Failed Attempt
+      Description: The player's response was not clear enough to solve the problem.
+        The sewage continues to back up, creating a foul odor and unsanitary conditions
+        in the bunker.
+      EffectCount: 2
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 16:13:36
+      FullEventJson: "{\n  \"title\": \"Failed Attempt\",\n  \"description\": \"The
+        player's response was not clear enough to solve the problem. The sewage continues
+        to back up, creating a foul odor and unsanitary conditions in the bunker.\",\n 
+        \"effects\": [\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\":
+        5,\n      \"target\": \"Morty Sanchex\"\n    },\n    {\n      \"effectType\":
+        \"InfectCharacter\",\n      \"intensity\": 2,\n      \"target\": \"Morty
+        Sanchex\"\n    }\n  ],\n  \"choices\": [\n    {\n      \"text\": \"Try using
+        a plunger to unclog the drain.\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"AddSupplies\",\n          \"intensity\": -1,\n         
+        \"target\": \"\"\n        },\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 3,\n          \"target\": \"Morty Sanchex\"\n        }\n     
+        ]\n    },\n    {\n      \"text\": \"Use chemical drain cleaner to dissolve
+        the blockage.\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceSupplies\",\n          \"intensity\": 2,\n          \"target\": \"\"\n       
+        },\n        {\n          \"effectType\": \"ReduceHP\",\n          \"intensity\":
+        2,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Ignore the problem for now and focus on other tasks.\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"ReduceSanity\",\n         
+        \"intensity\": 4,\n          \"target\": \"Morty Sanchex\"\n        },\n       
+        {\n          \"effectType\": \"InfectCharacter\",\n          \"intensity\":
+        3,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n 
+        ]\n}"
+    - PlayerAction: eat and drink
+      Title: Ignored Problem
+      Description: Morty decides to ignore the blocked drain and focuses on eating
+        and drinking instead. The sewage continues to back up, creating a foul odor
+        and unsanitary conditions in the bunker.
+      EffectCount: 2
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 16:16:34
+      FullEventJson: "{\n  \"title\": \"Ignored Problem\",\n  \"description\": \"Morty
+        decides to ignore the blocked drain and focuses on eating and drinking instead.
+        The sewage continues to back up, creating a foul odor and unsanitary conditions
+        in the bunker.\",\n  \"effects\": [\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 5,\n      \"target\": \"Morty Sanchex\"\n    },\n    {\n     
+        \"effectType\": \"InfectCharacter\",\n      \"intensity\": 2,\n      \"target\":
+        \"Morty Sanchex\"\n    }\n  ],\n  \"choices\": [\n    {\n      \"text\":
+        \"Attempt to unclog the drain using a tool\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"ReduceSupplies\",\n          \"intensity\":
+        3,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 5,\n          \"target\": \"Morty
+        Sanchex\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Use water
+        to flush the drain\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceWater\",\n          \"intensity\": 10,\n          \"target\": \"\"\n       
+        },\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        2,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Leave the drain for now and focus on something else\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"ReduceSanity\",\n         
+        \"intensity\": 3,\n          \"target\": \"Morty Sanchex\"\n        },\n       
+        {\n          \"effectType\": \"InfectCharacter\",\n          \"intensity\":
+        3,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n 
+        ]\n}"
+    - PlayerAction: Drink
+      Title: Ignoring the Problem
+      Description: Morty decides to ignore the flickering lights and drinks some
+        water instead. The electrical issue remains unresolved, posing a continued
+        risk. The lack of action increases stress levels.
+      EffectCount: 2
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 16:17:01
+      FullEventJson: "{\n  \"title\": \"Ignoring the Problem\",\n  \"description\":
+        \"Morty decides to ignore the flickering lights and drinks some water instead.
+        The electrical issue remains unresolved, posing a continued risk. The lack
+        of action increases stress levels.\",\n  \"effects\": [\n    {\n      \"effectType\":
+        \"ReduceSanity\",\n      \"intensity\": 5,\n      \"target\": \"Morty Sanchex\"\n   
+        },\n    {\n      \"effectType\": \"ReduceWater\",\n      \"intensity\": 2,\n     
+        \"target\": \"\"\n    }\n  ],\n  \"choices\": [\n    {\n      \"text\": \"Attempt
+        to fix the wiring with available tools\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 3,\n         
+        \"target\": \"Morty Sanchex\"\n        },\n        {\n          \"effectType\":
+        \"ReduceSupplies\",\n          \"intensity\": 2,\n          \"target\": \"\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Search for a manual on electrical
+        repairs\",\n      \"effects\": [\n        {\n          \"effectType\": \"ReduceSanity\",\n         
+        \"intensity\": 2,\n          \"target\": \"Morty Sanchex\"\n        },\n       
+        {\n          \"effectType\": \"AddSupplies\",\n          \"intensity\": 1,\n         
+        \"target\": \"\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Leave
+        it for now and focus on something else\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        3,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n 
+        ]\n}"
+    - PlayerAction: Drink
+      Title: Unquenched Thirst
+      Description: Drinking water doesn't help with the combination lock. Morty becomes
+        more thirsty and frustrated by the futile attempt.
+      EffectCount: 2
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 16:17:15
+      FullEventJson: "{\n  \"title\": \"Unquenched Thirst\",\n  \"description\":
+        \"Drinking water doesn't help with the combination lock. Morty becomes more
+        thirsty and frustrated by the futile attempt.\",\n  \"effects\": [\n    {\n     
+        \"effectType\": \"ReduceSanity\",\n      \"intensity\": 5,\n      \"target\":
+        \"Morty Sanchex\"\n    },\n    {\n      \"effectType\": \"AddThirst\",\n     
+        \"intensity\": 10,\n      \"target\": \"Morty Sanchex\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Search for the combination\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        2,\n          \"target\": \"Morty Sanchex\"\n        },\n        {\n         
+        \"effectType\": \"AddSupplies\",\n          \"intensity\": 5,\n         
+        \"target\": \"\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Break
+        the lock\",\n      \"effects\": [\n        {\n          \"effectType\": \"ReduceHP\",\n         
+        \"intensity\": 5,\n          \"target\": \"Morty Sanchex\"\n        },\n       
+        {\n          \"effectType\": \"AddSupplies\",\n          \"intensity\": 8,\n         
+        \"target\": \"\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Ignore
+        it for now\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 3,\n          \"target\": \"Morty
+        Sanchex\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Clean the floor
+      Title: Cleaning Up
+      Description: You decide to clean the floor first, ensuring a hygienic environment.
+        However, the stranger's condition worsens as they are left unattended. Morty
+        Sanchex feels a sense of responsibility but is relieved to see the bunker
+        clean.
+      EffectCount: 2
+      ChoiceCount: 3
+      Category: Dilemma
+      Timestamp: 16:17:16
+      FullEventJson: "{\n  \"title\": \"Cleaning Up\",\n  \"description\": \"You
+        decide to clean the floor first, ensuring a hygienic environment. However,
+        the stranger's condition worsens as they are left unattended. Morty Sanchex
+        feels a sense of responsibility but is relieved to see the bunker clean.\",\n 
+        \"effects\": [\n    {\n      \"effectType\": \"AddSanity\",\n      \"intensity\":
+        5,\n      \"target\": \"Morty Sanchex\"\n    },\n    {\n      \"effectType\":
+        \"ReduceSupplies\",\n      \"intensity\": 3,\n      \"target\": \"\"\n   
+        }\n  ],\n  \"choices\": [\n    {\n      \"text\": \"Administer medicine to
+        the stranger\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceSupplies\",\n          \"intensity\": 5,\n          \"target\": \"\"\n       
+        },\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
+        3,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Ask the stranger to leave\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        4,\n          \"target\": \"Morty Sanchex\"\n        },\n        {\n         
+        \"effectType\": \"AddSupplies\",\n          \"intensity\": 2,\n         
+        \"target\": \"\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Ignore
+        the stranger and focus on your family\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"AddSanity\",\n          \"intensity\": 2,\n          \"target\":
+        \"Morty Sanchex\"\n        },\n        {\n          \"effectType\": \"ReduceHP\",\n         
+        \"intensity\": 3,\n          \"target\": \"Morty Sanchex\"\n        }\n     
+        ]\n    }\n  ]\n}"
+    - PlayerAction: Drink
+      Title: Hydration Break
+      Description: Morty takes a moment to drink some water, but the locked door
+        remains unopened. The sound of water being consumed echoes through the empty
+        bunker, reminding him of the task at hand.
+      EffectCount: 2
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 16:23:39
+      FullEventJson: "{\n  \"title\": \"Hydration Break\",\n  \"description\": \"Morty
+        takes a moment to drink some water, but the locked door remains unopened.
+        The sound of water being consumed echoes through the empty bunker, reminding
+        him of the task at hand.\",\n  \"effects\": [\n    {\n      \"effectType\":
+        \"ReduceThirst\",\n      \"intensity\": 10,\n      \"target\": \"Morty Sanchex\"\n   
+        },\n    {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\":
+        5,\n      \"target\": \"Morty Sanchex\"\n    }\n  ],\n  \"choices\": [\n   
+        {\n      \"text\": \"Search for a key\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 3,\n         
+        \"target\": \"Morty Sanchex\"\n        }\n      ]\n    },\n    {\n      \"text\":
+        \"Try to force the door open\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"ReduceHP\",\n          \"intensity\": 5,\n          \"target\":
+        \"Morty Sanchex\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Look
+        for another way around\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddHunger\",\n          \"intensity\": 7,\n          \"target\": \"Morty
+        Sanchex\"\n        }\n      ]\n    }\n  ]\n}"
   - DayNumber: 2
     Events:
     - PlayerAction: Search the storage room for supplies
@@ -700,5 +967,5 @@ MonoBehaviour:
         \"intensity\": 3,\n          \"target\": \"Father\"\n        },\n       
         {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 3,\n         
         \"target\": \"Mother\"\n        }\n      ]\n    }\n  ]\n}"
-  totalEvents: 17
-  lastUpdated: 2026-02-07 19:57:52
+  totalEvents: 26
+  lastUpdated: 2026-02-08 16:23:39

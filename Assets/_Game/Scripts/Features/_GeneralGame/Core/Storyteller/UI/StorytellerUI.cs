@@ -1,6 +1,10 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System.Collections.Generic;
+#if ODIN_INSPECTOR
+using Sirenix.OdinInspector;
+#endif
 
 namespace TheBunkerGames
 {
@@ -10,22 +14,89 @@ namespace TheBunkerGames
     /// </summary>
     public class StorytellerUI : MonoBehaviour
     {
+        // -------------------------------------------------------------------------
+        // Visual Assets (drag & drop in Inspector)
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("Visual Assets – Fonts")]
+        #endif
+        [Header("Fonts")]
+        [SerializeField] private TMP_FontAsset titleFont;
+        [SerializeField] private TMP_FontAsset bodyFont;
+
+        #if ODIN_INSPECTOR
+        [Title("Visual Assets – Sprites")]
+        #endif
+        [Header("Sprites – Backgrounds & Frames")]
+        [SerializeField] private Sprite panelBackgroundSprite;    // main overlay bg
+        [SerializeField] private Sprite titleBackgroundSprite;    // title area bg
+        [SerializeField] private Sprite descriptionFrameSprite;   // description area frame
+        [SerializeField] private Sprite inputFieldSprite;         // text input bg
+        [SerializeField] private Sprite effectsContainerSprite;   // effects area bg
+
+        [Header("Sprites – Buttons")]
+        [SerializeField] private Sprite buttonSprite;             // general button bg
+        [SerializeField] private Sprite continueButtonSprite;     // continue button bg
+        [SerializeField] private Sprite closeButtonSprite;        // close (X) button bg
+
+        [Header("Sprites – Icons")]
+        [SerializeField] private Sprite iconClose;                // X icon
+        [SerializeField] private Sprite iconContinue;             // continue/arrow icon
+
+        #if ODIN_INSPECTOR
+        [Title("Visual Assets – Colors")]
+        #endif
+        [Header("Colors")]
+        [SerializeField] private Color panelBgColor          = new Color(0f, 0f, 0f, 0.9f);
+        [SerializeField] private Color titleColor            = Color.white;
+        [SerializeField] private Color descriptionColor      = Color.white;
+        [SerializeField] private Color inputBgColor          = new Color(0.2f, 0.2f, 0.2f, 1f);
+        [SerializeField] private Color textColor             = Color.white;
+        [SerializeField] private Color placeholderColor      = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+        [SerializeField] private Color continueButtonColor   = Color.green;
+        [SerializeField] private Color closeButtonColor      = Color.red;
+        [SerializeField] private Color buttonTextColor       = Color.black;
+
+        // -------------------------------------------------------------------------
+        // UI References
+        // -------------------------------------------------------------------------
+        #if ODIN_INSPECTOR
+        [Title("UI References")]
+        #endif
         [Header("UI References")]
         [SerializeField] private TextMeshProUGUI titleText;
         [SerializeField] private TextMeshProUGUI descriptionText;
         [SerializeField] private GameObject contentParent;
 
+        #if ODIN_INSPECTOR
+        [Title("Interaction")]
+        #endif
         [Header("Interaction")]
         [SerializeField] private Button closeButton;
         [SerializeField] private Button continueButton;
         [SerializeField] private TMP_InputField inputField;
 
+        [Header("Navigation")]
+        [SerializeField] private Button previousButton;
+        [SerializeField] private Button nextButton;
+        [SerializeField] private TextMeshProUGUI pageIndicator;
+
+        #if ODIN_INSPECTOR
+        [Title("Effect Display")]
+        #endif
         [Header("Effect Display")]
         [SerializeField] private Transform effectsContainer;
         [SerializeField] private EffectDisplayEntry effectEntryPrefab;
         [SerializeField] private EffectIconDatabaseSO effectIconDatabase;
 
+        [Header("Settings")]
         [SerializeField] private bool autoToggleVisibility = true;
+
+        // -------------------------------------------------------------------------
+        // State
+        // -------------------------------------------------------------------------
+        private List<LLMStoryEventData> eventQueue = new List<LLMStoryEventData>();
+        private int currentEventIndex = 0;
 
         private void Awake()
         {
@@ -33,8 +104,10 @@ namespace TheBunkerGames
             if (contentParent != null) contentParent.SetActive(false);
             ClearText();
             
-            // Setup default listeners if needed (optional, logic might be handled by controller)
+            // Setup default listeners
             if (closeButton != null) closeButton.onClick.AddListener(Hide);
+            if (previousButton != null) previousButton.onClick.AddListener(ShowPreviousEvent);
+            if (nextButton != null) nextButton.onClick.AddListener(ShowNextEvent);
         }
 
         private void OnEnable()
@@ -57,27 +130,108 @@ namespace TheBunkerGames
         /// </summary>
         public void ShowEvent(LLMStoryEventData storyEvent)
         {
-            if (storyEvent != null)
+            if (storyEvent == null)
             {
-                // Clear previous effect entries when a new event arrives
-                ClearEffectEntries();
+                Hide();
+                return;
+            }
 
-                if (titleText != null)
-                    titleText.text = storyEvent.Title;
-                else
-                    Debug.LogWarning("[StorytellerUI] TitleText is missing!");
-
-                if (descriptionText != null)
-                    descriptionText.text = storyEvent.Description;
-                else
-                    Debug.LogWarning("[StorytellerUI] DescriptionText is missing!");
-
+            // Add to queue
+            eventQueue.Add(storyEvent);
+            
+            // Only auto-display if this is the first event
+            if (eventQueue.Count == 1)
+            {
+                currentEventIndex = 0;
+                DisplayCurrentEvent();
+                
                 if (contentParent != null && autoToggleVisibility)
                     contentParent.SetActive(true);
             }
             else
             {
-                Hide();
+                // Just update navigation to show there are more events
+                UpdateNavigationUI();
+            }
+        }
+
+        /// <summary>
+        /// Clear the event queue (call at start of new day).
+        /// </summary>
+        public void ClearEventQueue()
+        {
+            eventQueue.Clear();
+            currentEventIndex = 0;
+            ClearEffectEntries();
+            UpdateNavigationUI();
+        }
+
+        /// <summary>
+        /// Navigate to previous event.
+        /// </summary>
+        public void ShowPreviousEvent()
+        {
+            if (currentEventIndex > 0)
+            {
+                currentEventIndex--;
+                DisplayCurrentEvent();
+            }
+        }
+
+        /// <summary>
+        /// Navigate to next event.
+        /// </summary>
+        public void ShowNextEvent()
+        {
+            if (currentEventIndex < eventQueue.Count - 1)
+            {
+                currentEventIndex++;
+                DisplayCurrentEvent();
+            }
+        }
+
+        private void DisplayCurrentEvent()
+        {
+            if (eventQueue.Count == 0) return;
+
+            var storyEvent = eventQueue[currentEventIndex];
+            ClearEffectEntries();
+
+            if (titleText != null)
+                titleText.text = storyEvent.Title;
+            else
+                Debug.LogWarning("[StorytellerUI] TitleText is missing!");
+
+            if (descriptionText != null)
+                descriptionText.text = storyEvent.Description;
+            else
+                Debug.LogWarning("[StorytellerUI] DescriptionText is missing!");
+
+            UpdateNavigationUI();
+        }
+
+        private void UpdateNavigationUI()
+        {
+            bool hasMultiple = eventQueue.Count > 1;
+            bool canGoPrev = currentEventIndex > 0;
+            bool canGoNext = currentEventIndex < eventQueue.Count - 1;
+
+            // Hide Previous if only 1 event OR if we're on the first event
+            if (previousButton != null)
+            {
+                previousButton.gameObject.SetActive(hasMultiple && canGoPrev);
+            }
+
+            // Hide Next if only 1 event OR if we're on the last event
+            if (nextButton != null)
+            {
+                nextButton.gameObject.SetActive(hasMultiple && canGoNext);
+            }
+
+            if (pageIndicator != null)
+            {
+                pageIndicator.gameObject.SetActive(hasMultiple);
+                pageIndicator.text = $"{currentEventIndex + 1} / {eventQueue.Count}";
             }
         }
 
@@ -169,7 +323,7 @@ namespace TheBunkerGames
                     rect.offsetMax = Vector2.zero;
                     
                     var img = panelGO.AddComponent<UnityEngine.UI.Image>();
-                    img.color = new Color(0, 0, 0, 0.9f);
+                    ApplySprite(img, panelBackgroundSprite, panelBgColor);
                 }
                 contentParent = panelTransform.gameObject;
             }
@@ -187,7 +341,8 @@ namespace TheBunkerGames
                     txt.fontSize = 24;
                     txt.alignment = TextAlignmentOptions.Center;
                     txt.fontStyle = FontStyles.Bold;
-                    txt.color = Color.white;
+                    txt.color = titleColor;
+                    if (titleFont != null) txt.font = titleFont;
                     
                     var r = txt.rectTransform;
                     r.anchorMin = new Vector2(0, 0.85f);
@@ -215,7 +370,8 @@ namespace TheBunkerGames
                     txt.text = "Event Description...";
                     txt.fontSize = 18;
                     txt.alignment = TextAlignmentOptions.TopLeft;
-                    txt.color = Color.white;
+                    txt.color = descriptionColor;
+                    if (bodyFont != null) txt.font = bodyFont;
                     
                     var r = txt.rectTransform;
                     r.anchorMin = new Vector2(0.05f, 0.2f); // Adjusted for buttons
@@ -243,8 +399,8 @@ namespace TheBunkerGames
                     var go = new GameObject("Input_Field");
                     go.transform.SetParent(contentParent.transform, false);
                     var img = go.AddComponent<Image>();
-                    img.color = new Color(0.2f, 0.2f, 0.2f, 1f);
-                    
+                    ApplySprite(img, inputFieldSprite, inputBgColor);
+
                     var input = go.AddComponent<TMP_InputField>();
                     var r = go.GetComponent<RectTransform>();
                     r.anchorMin = new Vector2(0.1f, 0.1f);
@@ -267,16 +423,18 @@ namespace TheBunkerGames
                     var text = textGO.AddComponent<TextMeshProUGUI>();
                     text.text = "";
                     text.fontSize = 14;
-                    text.color = Color.white;
-                    
+                    text.color = textColor;
+                    if (bodyFont != null) text.font = bodyFont;
+
                     // Placeholder
                     var placeholderGO = new GameObject("Placeholder");
                     placeholderGO.transform.SetParent(textArea.transform, false);
                     var placeholder = placeholderGO.AddComponent<TextMeshProUGUI>();
                     placeholder.text = "Enter response...";
                     placeholder.fontSize = 14;
-                    placeholder.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
+                    placeholder.color = placeholderColor;
                     placeholder.fontStyle = FontStyles.Italic;
+                    if (bodyFont != null) placeholder.font = bodyFont;
 
                     input.textViewport = textAreaRect;
                     input.textComponent = text;
@@ -299,23 +457,24 @@ namespace TheBunkerGames
                     var go = new GameObject("Continue_Button");
                     go.transform.SetParent(contentParent.transform, false);
                     var img = go.AddComponent<Image>();
-                    img.color = Color.green;
-                    
+                    ApplySprite(img, continueButtonSprite, continueButtonColor);
+
                     var btn = go.AddComponent<Button>();
-                    
+
                     var r = go.GetComponent<RectTransform>();
                     r.anchorMin = new Vector2(0.75f, 0.1f);
                     r.anchorMax = new Vector2(0.9f, 0.18f);
                     r.offsetMin = Vector2.zero;
                     r.offsetMax = Vector2.zero;
-                    
+
                     // Text
                     var textGO = new GameObject("Text");
                     textGO.transform.SetParent(go.transform, false);
                     var text = textGO.AddComponent<TextMeshProUGUI>();
                     text.text = "Continue";
                     text.fontSize = 14;
-                    text.color = Color.black;
+                    text.color = buttonTextColor;
+                    if (titleFont != null) text.font = titleFont;
                     text.alignment = TextAlignmentOptions.Center;
                     text.rectTransform.anchorMin = Vector2.zero;
                     text.rectTransform.anchorMax = Vector2.one;
@@ -339,7 +498,7 @@ namespace TheBunkerGames
                     var go = new GameObject("Close_Button");
                     go.transform.SetParent(contentParent.transform, false);
                     var img = go.AddComponent<Image>();
-                    img.color = Color.red;
+                    ApplySprite(img, closeButtonSprite, closeButtonColor);
                     
                     var btn = go.AddComponent<Button>();
                     
@@ -355,7 +514,8 @@ namespace TheBunkerGames
                     var text = textGO.AddComponent<TextMeshProUGUI>();
                     text.text = "X";
                     text.fontSize = 14;
-                    text.color = Color.white;
+                    text.color = textColor;
+                    if (titleFont != null) text.font = titleFont;
                     text.alignment = TextAlignmentOptions.Center;
                     text.rectTransform.anchorMin = Vector2.zero;
                     text.rectTransform.anchorMax = Vector2.one;
@@ -411,9 +571,134 @@ namespace TheBunkerGames
                     Debug.Log("[StorytellerUI] Auto-loaded EffectIconDatabaseSO from Resources.");
             }
 
+            // 9. Ensure Previous Button
+            if (previousButton == null)
+            {
+                var btnTransform = contentParent.transform.Find("Previous_Button");
+                if (btnTransform == null)
+                {
+                    var go = new GameObject("Previous_Button");
+                    go.transform.SetParent(contentParent.transform, false);
+                    var img = go.AddComponent<Image>();
+                    img.color = new Color(0.3f, 0.3f, 0.3f, 1f);
+                    
+                    var btn = go.AddComponent<Button>();
+                    
+                    var r = go.GetComponent<RectTransform>();
+                    r.anchorMin = new Vector2(0.02f, 0.02f);
+                    r.anchorMax = new Vector2(0.12f, 0.08f);
+                    r.offsetMin = Vector2.zero;
+                    r.offsetMax = Vector2.zero;
+                    
+                    // Text
+                    var textGO = new GameObject("Text");
+                    textGO.transform.SetParent(go.transform, false);
+                    var text = textGO.AddComponent<TextMeshProUGUI>();
+                    text.text = "< Prev";
+                    text.fontSize = 12;
+                    text.color = Color.white;
+                    if (titleFont != null) text.font = titleFont;
+                    text.alignment = TextAlignmentOptions.Center;
+                    text.rectTransform.anchorMin = Vector2.zero;
+                    text.rectTransform.anchorMax = Vector2.one;
+                    text.rectTransform.offsetMin = Vector2.zero;
+                    text.rectTransform.offsetMax = Vector2.zero;
+
+                    previousButton = btn;
+                    go.SetActive(false); // Start hidden
+                }
+                else
+                {
+                    previousButton = btnTransform.GetComponent<Button>();
+                }
+            }
+
+            // 10. Ensure Next Button
+            if (nextButton == null)
+            {
+                var btnTransform = contentParent.transform.Find("Next_Button");
+                if (btnTransform == null)
+                {
+                    var go = new GameObject("Next_Button");
+                    go.transform.SetParent(contentParent.transform, false);
+                    var img = go.AddComponent<Image>();
+                    img.color = new Color(0.3f, 0.3f, 0.3f, 1f);
+                    
+                    var btn = go.AddComponent<Button>();
+                    
+                    var r = go.GetComponent<RectTransform>();
+                    r.anchorMin = new Vector2(0.88f, 0.02f);
+                    r.anchorMax = new Vector2(0.98f, 0.08f);
+                    r.offsetMin = Vector2.zero;
+                    r.offsetMax = Vector2.zero;
+                    
+                    // Text
+                    var textGO = new GameObject("Text");
+                    textGO.transform.SetParent(go.transform, false);
+                    var text = textGO.AddComponent<TextMeshProUGUI>();
+                    text.text = "Next >";
+                    text.fontSize = 12;
+                    text.color = Color.white;
+                    if (titleFont != null) text.font = titleFont;
+                    text.alignment = TextAlignmentOptions.Center;
+                    text.rectTransform.anchorMin = Vector2.zero;
+                    text.rectTransform.anchorMax = Vector2.one;
+                    text.rectTransform.offsetMin = Vector2.zero;
+                    text.rectTransform.offsetMax = Vector2.zero;
+
+                    nextButton = btn;
+                    go.SetActive(false); // Start hidden
+                }
+                else
+                {
+                    nextButton = btnTransform.GetComponent<Button>();
+                }
+            }
+
+            // 11. Ensure Page Indicator
+            if (pageIndicator == null)
+            {
+                var indicatorTransform = contentParent.transform.Find("Page_Indicator");
+                if (indicatorTransform == null)
+                {
+                    var go = new GameObject("Page_Indicator");
+                    go.transform.SetParent(contentParent.transform, false);
+                    var txt = go.AddComponent<TextMeshProUGUI>();
+                    txt.text = "1 / 1";
+                    txt.fontSize = 14;
+                    txt.alignment = TextAlignmentOptions.Center;
+                    txt.color = Color.white;
+                    if (bodyFont != null) txt.font = bodyFont;
+                    
+                    var r = txt.rectTransform;
+                    r.anchorMin = new Vector2(0.4f, 0.02f);
+                    r.anchorMax = new Vector2(0.6f, 0.08f);
+                    r.offsetMin = Vector2.zero;
+                    r.offsetMax = Vector2.zero;
+                    
+                    pageIndicator = txt;
+                    go.SetActive(false); // Start hidden
+                }
+                else
+                {
+                    pageIndicator = indicatorTransform.GetComponent<TextMeshProUGUI>();
+                }
+            }
+
             Debug.Log("[StorytellerUI] Auto-Setup Complete.");
         }
 #endif
+
+        // -------------------------------------------------------------------------
+        // Helpers
+        // -------------------------------------------------------------------------
+        private void ApplySprite(Image img, Sprite sprite, Color fallback)
+        {
+            if (sprite != null)
+            { img.sprite = sprite; img.type = Image.Type.Sliced; img.color = Color.white; }
+            else
+            { img.color = fallback; }
+        }
     }
 }
 

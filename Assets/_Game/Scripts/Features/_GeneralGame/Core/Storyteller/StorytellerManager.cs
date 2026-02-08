@@ -88,6 +88,10 @@ namespace TheBunkerGames
             // Update UI
             if (ui != null)
             {
+                // Ensure the UI GameObject is enabled
+                if (!ui.gameObject.activeInHierarchy)
+                    ui.gameObject.SetActive(true);
+                    
                 ui.ShowEvent(storyEvent);
             }
 
