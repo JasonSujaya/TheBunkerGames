@@ -147,11 +147,21 @@ namespace TheBunkerGames
         #if ODIN_INSPECTOR
         [Title("Resource Counts")]
         #endif
-        public TextMeshProUGUI foodCountText;
-        public TextMeshProUGUI waterCountText;
-        public TextMeshProUGUI medsCountText;
-        public TextMeshProUGUI toolsCountText;
-        public TextMeshProUGUI junkCountText;
+        [System.Serializable]
+        public class ResourceRow
+        {
+            public RectTransform root;
+            public Button button;
+            public Image icon;
+            public TextMeshProUGUI countText;
+            public ItemType type;
+        }
+
+        public ResourceRow foodRow;
+        public ResourceRow waterRow;
+        public ResourceRow medsRow;
+        public ResourceRow toolsRow;
+        public ResourceRow junkRow;
 
         // selection state
         private CharacterData selectedCharacter;
@@ -726,16 +736,21 @@ namespace TheBunkerGames
             vlg.childControlWidth = true;  vlg.childControlHeight = false;
             vlg.childForceExpandWidth = true; vlg.childForceExpandHeight = false;
 
-            foodCountText  = MakeResRow(col, "Food",  iconFood);
-            waterCountText = MakeResRow(col, "Water", iconWater);
-            medsCountText  = MakeResRow(col, "Meds",  iconMeds);
-            toolsCountText = MakeResRow(col, "Tools", iconTools);
-            junkCountText  = MakeResRow(col, "Junk",  iconJunk);
+            foodRow  = MakeResRow(col, "Food",  iconFood,  ItemType.Food);
+            waterRow = MakeResRow(col, "Water", iconWater, ItemType.Water);
+            medsRow  = MakeResRow(col, "Meds",  iconMeds,  ItemType.Meds);
+            toolsRow = MakeResRow(col, "Tools", iconTools, ItemType.Tools);
+            junkRow  = MakeResRow(col, "Junk",  iconJunk,  ItemType.Junk);
         }
 
-        private TextMeshProUGUI MakeResRow(RectTransform parent, string name, Sprite icon)
+        private ResourceRow MakeResRow(RectTransform parent, string name,
+            Sprite icon, ItemType type)
         {
+            var rowObj = new ResourceRow();
+            rowObj.type = type;
+
             var row = new GameObject(name, typeof(RectTransform));
+            rowObj.root = row.GetComponent<RectTransform>();
             row.transform.SetParent(parent, false);
             row.AddComponent<LayoutElement>().preferredHeight = 44;
 
@@ -745,14 +760,21 @@ namespace TheBunkerGames
             hlg.childControlWidth = false; hlg.childControlHeight = true;
             hlg.childForceExpandWidth = false; hlg.childForceExpandHeight = true;
 
-            // icon
-            var iGo = new GameObject("Icon", typeof(RectTransform));
+            // icon (Button)
+            var iGo = new GameObject("IconBtn", typeof(RectTransform));
             iGo.transform.SetParent(row.transform, false);
             iGo.GetComponent<RectTransform>().sizeDelta = new Vector2(40, 40);
             iGo.AddComponent<LayoutElement>().preferredWidth = 40;
+            
             var iImg = iGo.AddComponent<Image>();
             if (icon != null) { iImg.sprite = icon; iImg.preserveAspect = true; iImg.color = Color.white; }
             else iImg.color = new Color(0.6f, 0.6f, 0.6f, 0.5f);
+            rowObj.icon = iImg;
+
+            var btn = iGo.AddComponent<Button>();
+            btn.targetGraphic = iImg;
+            btn.onClick.AddListener(() => OnUseItem(rowObj));
+            rowObj.button = btn;
 
             // count
             var tGo = new GameObject("Count", typeof(RectTransform));
@@ -767,7 +789,79 @@ namespace TheBunkerGames
             tmp.color     = Color.white;
             tmp.enableAutoSizing = true; tmp.fontSizeMin = 14; tmp.fontSizeMax = 26;
             if (titleFont != null) tmp.font = titleFont;
-            return tmp;
+            rowObj.countText = tmp;
+
+            return rowObj;
+        }
+
+        private void OnUseItem(ResourceRow row)
+        {
+            if (selectedCharacter == null) return;
+            ItemType type = row.type;
+
+            if (InventoryManager.Instance == null || ItemManager.Instance == null) return;
+
+            // Find an item of this type in inventory
+            string foundItemId = null;
+            foreach (var slot in InventoryManager.Instance.Items)
+            {
+                var data = ItemManager.Instance.GetItem(slot.ItemId);
+                if (data != null && data.Type == type)
+                {
+                    foundItemId = slot.ItemId;
+                    break;
+                }
+            }
+
+            if (string.IsNullOrEmpty(foundItemId)) return;
+            
+            // Consume 1
+            if (InventoryManager.Instance.RemoveItem(foundItemId, 1))
+            {
+                // Animation punch on icon
+                StartCoroutine(PunchAnimate(row.icon.rectTransform));
+
+                // Effect & Animation punch on bar
+                switch (type)
+                {
+                    case ItemType.Food:
+                        selectedCharacter.ModifyHunger(2f); // +2 Food
+                        if (detailHungerFill != null) StartCoroutine(PunchAnimate(detailHungerFill.rectTransform.parent as RectTransform));
+                        break;
+                    case ItemType.Water:
+                        selectedCharacter.ModifyThirst(2f); // +2 Water
+                        if (detailThirstFill != null) StartCoroutine(PunchAnimate(detailThirstFill.rectTransform.parent as RectTransform));
+                        break;
+                    case ItemType.Meds:
+                        selectedCharacter.ModifyHealth(2f); // +2 Health
+                        if (detailHealthFill != null) StartCoroutine(PunchAnimate(detailHealthFill.rectTransform.parent as RectTransform));
+                        break;
+                }
+
+                RefreshLiveData(); // Update UI immediately
+            }
+        }
+
+        private System.Collections.IEnumerator PunchAnimate(RectTransform target)
+        {
+            if (target == null) yield break;
+            Vector3 originalScale = Vector3.one; 
+            // force reset first
+            target.localScale = originalScale;
+
+            float duration = 0.15f;
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                // simple curve: up to 1.2 then back to 1
+                float scale = 1f + Mathf.Sin(t * Mathf.PI) * 0.2f; 
+                target.localScale = originalScale * scale;
+                yield return null;
+            }
+            target.localScale = originalScale;
         }
 
         // =====================================================================
@@ -1233,11 +1327,11 @@ namespace TheBunkerGames
         {
             switch (type)
             {
-                case ItemType.Food:  if (foodCountText  != null) foodCountText.text  = count.ToString(); break;
-                case ItemType.Water: if (waterCountText != null) waterCountText.text = count.ToString(); break;
-                case ItemType.Meds:  if (medsCountText  != null) medsCountText.text  = count.ToString(); break;
-                case ItemType.Tools: if (toolsCountText != null) toolsCountText.text = count.ToString(); break;
-                case ItemType.Junk:  if (junkCountText  != null) junkCountText.text  = count.ToString(); break;
+                case ItemType.Food:  UpdateRow(foodRow, count); break;
+                case ItemType.Water: UpdateRow(waterRow, count); break;
+                case ItemType.Meds:  UpdateRow(medsRow, count); break;
+                case ItemType.Tools: UpdateRow(toolsRow, count); break;
+                case ItemType.Junk:  UpdateRow(junkRow, count); break;
             }
         }
 
@@ -1324,21 +1418,43 @@ namespace TheBunkerGames
         private void UpdateResourceDisplay()
         {
             if (InventoryManager.Instance == null) return;
-            SetResCount(foodCountText,  ItemType.Food);
-            SetResCount(waterCountText, ItemType.Water);
-            SetResCount(medsCountText,  ItemType.Meds);
-            SetResCount(toolsCountText, ItemType.Tools);
-            SetResCount(junkCountText,  ItemType.Junk);
+            if (ItemManager.Instance == null) return; // safety
+
+            int food = 0, water = 0, meds = 0, tools = 0, junk = 0;
+
+            foreach (var slot in InventoryManager.Instance.Items)
+            {
+                var data = ItemManager.Instance.GetItem(slot.ItemId);
+                if (data == null) continue;
+
+                switch (data.Type)
+                {
+                    case ItemType.Food:  food += slot.Quantity; break;
+                    case ItemType.Water: water += slot.Quantity; break;
+                    case ItemType.Meds:  meds += slot.Quantity; break;
+                    case ItemType.Tools: tools += slot.Quantity; break;
+                    case ItemType.Junk:  junk += slot.Quantity; break;
+                }
+            }
+
+            UpdateRow(foodRow, food);
+            UpdateRow(waterRow, water);
+            UpdateRow(medsRow, meds);
+            UpdateRow(toolsRow, tools);
+            UpdateRow(junkRow, junk);
         }
 
-        private void SetResCount(TextMeshProUGUI txt, ItemType type)
+        private void UpdateRow(ResourceRow row, int count)
         {
-            if (txt == null) return;
-            int n = 0;
-            if (InventoryManager.Instance != null && ItemManager.Instance != null)
-                foreach (var s in InventoryManager.Instance.Items)
-                { var d = ItemManager.Instance.GetItem(s.ItemId); if (d != null && d.Type == type) n += s.Quantity; }
-            txt.text = n.ToString();
+            if (row == null) return;
+            if (row.countText != null) row.countText.text = count.ToString();
+            
+            bool hasItems = count > 0;
+            if (row.button != null) row.button.interactable = hasItems;
+            if (row.icon != null)
+            {
+                 row.icon.color = hasItems ? Color.white : new Color(1f, 1f, 1f, 0.4f);
+            }
         }
 
         // =====================================================================
