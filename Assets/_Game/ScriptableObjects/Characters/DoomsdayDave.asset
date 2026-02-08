@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2ee0084deb024f438cd173e2f07dbf8, type: 3}
+  m_Name: DoomsdayDave
+  m_EditorClassIdentifier: Assembly-CSharp::TheBunkerGames.CharacterDefinitionSO
+  characterName: Doomsday Dave
+  role: 4
+  subtype: 0
+  description: He's been preparing for this his entire life. Bunker blueprints, canned
+    beans by the pallet, and a tin foil hat collection to rival a museum. Paranoid?
+    Maybe. Ready? Absolutely.
+  portrait: {fileID: 0}
+  maxHealth: 95
+  maxHunger: 95
+  maxThirst: 90
+  maxSanity: 60
+  startingTraits:
+  - Prepper
+  - Paranoid
+  - Survivalist
