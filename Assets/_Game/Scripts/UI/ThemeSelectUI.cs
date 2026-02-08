@@ -132,6 +132,9 @@ namespace TheBunkerGames
                 Destroy(videoPlayer);
                 videoPlayer = null;
             }
+            cardRenderTextures.Clear();
+            cardVideoPlayers.Clear();
+            cardVideoImages.Clear();
         }
 
         // -------------------------------------------------------------------------
@@ -241,7 +244,7 @@ namespace TheBunkerGames
             if (titleFont != null) text.font = titleFont;
         }
 
-        private void BuildThemeCard(Transform parent)
+        private void BuildCardGrid(Transform parent)
         {
             // The card sits on the left ~60% of the screen
             // Reference layout: card takes roughly left 62% of width, ~10%-85% height
@@ -314,9 +317,10 @@ namespace TheBunkerGames
             RectTransform ttRect = titleTextObj.AddComponent<RectTransform>();
             ttRect.anchorMin = Vector2.zero;
             ttRect.anchorMax = Vector2.one;
-            ttRect.offsetMin = new Vector2(10, 0);
-            ttRect.offsetMax = new Vector2(-10, 0);
+            ttRect.offsetMin = new Vector2(5, 0);
+            ttRect.offsetMax = new Vector2(-5, 0);
 
+            string themeName = theme != null ? theme.ThemeName.ToUpper() : "UNKNOWN";
             var cardTitle = titleTextObj.AddComponent<TextMeshProUGUI>();
             cardTitle.text = "SCENARIO NAME";
             cardTitle.fontSize = 44;
@@ -563,7 +567,7 @@ namespace TheBunkerGames
 
         public void Hide()
         {
-            StopVideo();
+            StopAllVideos();
             if (canvasRoot != null) canvasRoot.SetActive(false);
         }
 
@@ -616,25 +620,15 @@ namespace TheBunkerGames
                 videoImage.texture = renderTexture;
         }
 
-        private void PlayVideo(VideoClip clip)
+        private void StopAllVideos()
         {
             if (videoPlayer == null || clip == null) return;
 
-            videoPlayer.clip = clip;
-            videoPlayer.isLooping = true;
-            videoPlayer.Play();
-
-            if (videoImage != null)
-                videoImage.enabled = true;
-        }
-
-        private void StopVideo()
-        {
-            if (videoPlayer != null && videoPlayer.isPlaying)
-                videoPlayer.Stop();
-
-            if (videoImage != null)
-                videoImage.enabled = false;
+            foreach (var img in cardVideoImages)
+            {
+                if (img != null)
+                    img.enabled = false;
+            }
         }
 
         // -------------------------------------------------------------------------
@@ -722,7 +716,7 @@ namespace TheBunkerGames
         // -------------------------------------------------------------------------
         // Button Wiring
         // -------------------------------------------------------------------------
-        private void WireButtons()
+        private void WireCardButtons()
         {
             if (panel == null) return;
 
