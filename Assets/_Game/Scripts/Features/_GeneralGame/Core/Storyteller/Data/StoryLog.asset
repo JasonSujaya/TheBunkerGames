@@ -1790,6 +1790,215 @@ MonoBehaviour:
         \"target\": \"Doomsday Dave\"\n        },\n        {\n          \"effectType\":
         \"ReduceHunger\",\n          \"intensity\": 5,\n          \"target\": \"Doomsday
         Dave\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Yeah we are gong to ask gordon ramsey to cook for him
+      Title: High-Stakes Hospitality
+      Description: Chef Ramsay prepares a gourmet meal from your limited supplies,
+        impressing the stranger. He shares valuable information about safe water
+        sources in exchange. However, the display of your food stockpile attracts
+        unwanted attention from others nearby.
+      EffectCount: 3
+      ChoiceCount: 3
+      Category: Dilemma
+      Timestamp: 20:46:33
+      FullEventJson: "{\n  \"title\": \"High-Stakes Hospitality\",\n  \"description\":
+        \"Chef Ramsay prepares a gourmet meal from your limited supplies, impressing
+        the stranger. He shares valuable information about safe water sources in
+        exchange. However, the display of your food stockpile attracts unwanted attention
+        from others nearby.\",\n  \"effects\": [\n    {\n      \"effectType\": \"ReduceFood\",\n     
+        \"intensity\": 7,\n      \"target\": \"\"\n    },\n    {\n      \"effectType\":
+        \"AddSanity\",\n      \"intensity\": 5,\n      \"target\": \"Chef Ramsay\"\n   
+        },\n    {\n      \"effectType\": \"AddWater\",\n      \"intensity\": 10,\n     
+        \"target\": \"\"\n    }\n  ],\n  \"choices\": [\n    {\n      \"text\": \"Ask
+        the stranger to stay and share more information\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 3,\n         
+        \"target\": \"Morty Sanchex\"\n        },\n        {\n          \"effectType\":
+        \"ReduceSupplies\",\n          \"intensity\": 4,\n          \"target\": \"\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Politely decline further interaction
+        and secure the bunker\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceSanity\",\n          \"intensity\": 2,\n          \"target\": \"Rick
+        Sanchex\"\n        },\n        {\n          \"effectType\": \"AddSupplies\",\n         
+        \"intensity\": 3,\n          \"target\": \"\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Send Rick to gather more information using his portal
+        device\",\n      \"effects\": [\n        {\n          \"effectType\": \"ReduceHP\",\n         
+        \"intensity\": 5,\n          \"target\": \"Rick Sanchex\"\n        },\n       
+        {\n          \"effectType\": \"AddSupplies\",\n          \"intensity\": 6,\n         
+        \"target\": \"\"\n        },\n        {\n          \"effectType\": \"ReduceSanity\",\n         
+        \"intensity\": 3,\n          \"target\": \"Morty Sanchex\"\n        }\n     
+        ]\n    }\n  ]\n}"
+    - PlayerAction: I think we are going to ask Mr m6 box to solve this problem for
+        us
+      Title: Rick's Stubbornness
+      Description: Rick Sanchex scoffs at the idea of a box solving his problems.
+        'Oh, great, another idiot box. Like I'd listen to a toaster with delusions
+        of grandeur,' he mutters, taking a swig from his flask. His hunger grows,
+        but he refuses to eat.
+      EffectCount: 3
+      ChoiceCount: 3
+      Category: FamilyRequest
+      Timestamp: 20:46:34
+      FullEventJson: "{\n  \"title\": \"Rick's Stubbornness\",\n  \"description\":
+        \"Rick Sanchex scoffs at the idea of a box solving his problems. 'Oh, great,
+        another idiot box. Like I'd listen to a toaster with delusions of grandeur,'
+        he mutters, taking a swig from his flask. His hunger grows, but he refuses
+        to eat.\",\n  \"effects\": [\n    {\n      \"effectType\": \"ReduceHP\",\n     
+        \"intensity\": 5,\n      \"target\": \"Rick Sanchex\"\n    },\n    {\n     
+        \"effectType\": \"AddHunger\",\n      \"intensity\": 10,\n      \"target\":
+        \"Rick Sanchex\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 5,\n      \"target\": \"Rick Sanchex\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Insist that Rick eats, threatening to take away
+        his flask\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddHP\",\n          \"intensity\": 5,\n          \"target\": \"Rick Sanchex\"\n       
+        },\n        {\n          \"effectType\": \"ReduceHunger\",\n          \"intensity\":
+        10,\n          \"target\": \"Rick Sanchex\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Ask Morty to talk some sense into Rick\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
+        5,\n          \"target\": \"Rick Sanchex\"\n        },\n        {\n         
+        \"effectType\": \"ReduceHunger\",\n          \"intensity\": 5,\n         
+        \"target\": \"Rick Sanchex\"\n        }\n      ]\n    },\n    {\n      \"text\":
+        \"Let Rick be and hope he comes around\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"ReduceHP\",\n          \"intensity\": 5,\n         
+        \"target\": \"Rick Sanchex\"\n        },\n        {\n          \"effectType\":
+        \"AddHunger\",\n          \"intensity\": 5,\n          \"target\": \"Rick
+        Sanchex\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: Rick to open a portal and connect it
+      Title: Portal Power Play
+      Description: Rick Sanchex, muttering about 'idiots who can't see the multiverse,'
+        fires up his jury-rigged portal gun. A shimmering green rift opens to the
+        surface, revealing the solar panels. With a few quick adjustments, he connects
+        the panels to the bunker's power grid. The lights flicker and then stabilize,
+        but the portal's energy surge causes a minor explosion, singeing Rick's eyebrows
+        and rattling everyone's nerves.
+      EffectCount: 4
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 20:46:34
+      FullEventJson: "{\n  \"title\": \"Portal Power Play\",\n  \"description\":
+        \"Rick Sanchex, muttering about 'idiots who can't see the multiverse,' fires
+        up his jury-rigged portal gun. A shimmering green rift opens to the surface,
+        revealing the solar panels. With a few quick adjustments, he connects the
+        panels to the bunker's power grid. The lights flicker and then stabilize,
+        but the portal's energy surge causes a minor explosion, singeing Rick's eyebrows
+        and rattling everyone's nerves.\",\n  \"effects\": [\n    {\n      \"effectType\":
+        \"AddSupplies\",\n      \"intensity\": 8,\n      \"target\": \"\"\n    },\n   
+        {\n      \"effectType\": \"ReduceHP\",\n      \"intensity\": 5,\n      \"target\":
+        \"Rick Sanchex\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 10,\n      \"target\": \"Morty Sanchex\"\n    },\n    {\n     
+        \"effectType\": \"ReduceSanity\",\n      \"intensity\": 5,\n      \"target\":
+        \"Chef Ramsay\"\n    }\n  ],\n  \"choices\": [\n    {\n      \"text\": \"Rick
+        drinks to calm his nerves\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"AddSanity\",\n          \"intensity\": 10,\n          \"target\":
+        \"Rick Sanchex\"\n        },\n        {\n          \"effectType\": \"ReduceHP\",\n         
+        \"intensity\": 5,\n          \"target\": \"Rick Sanchex\"\n        }\n     
+        ]\n    },\n    {\n      \"text\": \"Chef Ramsay cooks a meal to lift spirits\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 15,\n          \"target\": \"Morty Sanchex\"\n        },\n       
+        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 10,\n         
+        \"target\": \"Chef Ramsay\"\n        },\n        {\n          \"effectType\":
+        \"ReduceFood\",\n          \"intensity\": 5,\n          \"target\": \"\"\n       
+        }\n      ]\n    },\n    {\n      \"text\": \"Morty tries to fix the portal
+        gun\",\n      \"effects\": [\n        {\n          \"effectType\": \"AddSupplies\",\n         
+        \"intensity\": 3,\n          \"target\": \"\"\n        },\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 5,\n         
+        \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: I am going to morty to basically fix it
+      Title: Morty's Mold Mishap
+      Description: Morty attempts to clean the mold with a rag and some bleach, but
+        his nervousness causes him to slip and spread the spores further. The area
+        is now more contaminated, and Morty is coughing from the exposure.
+      EffectCount: 3
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 20:57:58
+      FullEventJson: "{\n  \"title\": \"Morty's Mold Mishap\",\n  \"description\":
+        \"Morty attempts to clean the mold with a rag and some bleach, but his nervousness
+        causes him to slip and spread the spores further. The area is now more contaminated,
+        and Morty is coughing from the exposure.\",\n  \"effects\": [\n    {\n     
+        \"effectType\": \"ReduceSanity\",\n      \"intensity\": 5,\n      \"target\":
+        \"Morty Sanchex\"\n    },\n    {\n      \"effectType\": \"InfectCharacter\",\n     
+        \"intensity\": 2,\n      \"target\": \"Morty Sanchex\"\n    },\n    {\n     
+        \"effectType\": \"ReduceSupplies\",\n      \"intensity\": 3,\n      \"target\":
+        \"\"\n    }\n  ],\n  \"choices\": [\n    {\n      \"text\": \"Rick uses his
+        portal gun to safely remove the mold\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"AddSupplies\",\n          \"intensity\": 5,\n         
+        \"target\": \"\"\n        },\n        {\n          \"effectType\": \"ReduceSanity\",\n         
+        \"intensity\": 3,\n          \"target\": \"Rick Sanchex\"\n        }\n     
+        ]\n    },\n    {\n      \"text\": \"Chef Ramsay prepares a strong herbal
+        remedy to help Morty\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 5,\n          \"target\": \"Morty
+        Sanchex\"\n        },\n        {\n          \"effectType\": \"ReduceFood\",\n         
+        \"intensity\": 4,\n          \"target\": \"\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Ignore the mold and focus on other tasks\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceHP\",\n          \"intensity\":
+        2,\n          \"target\": \"Morty Sanchex\"\n        },\n        {\n         
+        \"effectType\": \"ReduceSanity\",\n          \"intensity\": 3,\n         
+        \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n  ]\n}"
+    - PlayerAction: I'm going to ask morty to figure it out
+      Title: Morty's Lucky Guess
+      Description: Morty, despite his nervousness, manages to guess the combination
+        on his third try. The medicine cabinet opens, revealing a stash of medical
+        supplies and some painkillers. However, the sudden success startles him,
+        causing him to drop and break a few bottles of medicine.
+      EffectCount: 3
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 21:08:28
+      FullEventJson: "{\n  \"title\": \"Morty's Lucky Guess\",\n  \"description\":
+        \"Morty, despite his nervousness, manages to guess the combination on his
+        third try. The medicine cabinet opens, revealing a stash of medical supplies
+        and some painkillers. However, the sudden success startles him, causing him
+        to drop and break a few bottles of medicine.\",\n  \"effects\": [\n    {\n     
+        \"effectType\": \"AddSupplies\",\n      \"intensity\": 7,\n      \"target\":
+        \"\"\n    },\n    {\n      \"effectType\": \"ReduceSupplies\",\n      \"intensity\":
+        3,\n      \"target\": \"\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 5,\n      \"target\": \"Morty Sanchex\"\n    }\n  ],\n  \"choices\":
+        [\n    {\n      \"text\": \"Have Rick examine the supplies for useful items\",\n     
+        \"effects\": [\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 5,\n          \"target\": \"Rick Sanchex\"\n        },\n       
+        {\n          \"effectType\": \"AddSupplies\",\n          \"intensity\": 2,\n         
+        \"target\": \"\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Ask
+        Chef Ramsay to organize the remaining medicines\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"ReduceHunger\",\n          \"intensity\":
+        5,\n          \"target\": \"Chef Ramsay\"\n        },\n        {\n         
+        \"effectType\": \"AddSanity\",\n          \"intensity\": 3,\n          \"target\":
+        \"Chef Ramsay\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Leave
+        the medicines for now and focus on something else\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
+        3,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n 
+        ]\n}"
+    - PlayerAction: Rick fixes it
+      Title: Generator Fixed
+      Description: Doomsday Dave manages to fix the generator using his prepper knowledge
+        and some spare parts he had stored. The bunker now has power again, but the
+        effort was exhausting and used up some valuable supplies.
+      EffectCount: 4
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 21:22:18
+      FullEventJson: "{\n  \"title\": \"Generator Fixed\",\n  \"description\": \"Doomsday
+        Dave manages to fix the generator using his prepper knowledge and some spare
+        parts he had stored. The bunker now has power again, but the effort was exhausting
+        and used up some valuable supplies.\",\n  \"effects\": [\n    {\n      \"effectType\":
+        \"ReduceSupplies\",\n      \"intensity\": 3,\n      \"target\": \"\"\n   
+        },\n    {\n      \"effectType\": \"ReduceHP\",\n      \"intensity\": 5,\n     
+        \"target\": \"Doomsday Dave\"\n    },\n    {\n      \"effectType\": \"ReduceHunger\",\n     
+        \"intensity\": 10,\n      \"target\": \"Doomsday Dave\"\n    },\n    {\n     
+        \"effectType\": \"ReduceThirst\",\n      \"intensity\": 10,\n      \"target\":
+        \"Doomsday Dave\"\n    }\n  ],\n  \"choices\": [\n    {\n      \"text\":
+        \"Take a break and rest\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddHP\",\n          \"intensity\": 5,\n          \"target\": \"Doomsday
+        Dave\"\n        },\n        {\n          \"effectType\": \"ReduceSanity\",\n         
+        \"intensity\": 5,\n          \"target\": \"Doomsday Dave\"\n        }\n     
+        ]\n    },\n    {\n      \"text\": \"Search for more supplies\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"AddSupplies\",\n          \"intensity\":
+        5,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"ReduceHP\",\n          \"intensity\": 5,\n          \"target\": \"Doomsday
+        Dave\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Celebrate with
+        a small meal\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceFood\",\n          \"intensity\": 5,\n          \"target\": \"\"\n       
+        },\n        {\n          \"effectType\": \"AddSanity\",\n          \"intensity\":
+        10,\n          \"target\": \"Doomsday Dave\"\n        },\n        {\n         
+        \"effectType\": \"AddSanity\",\n          \"intensity\": 5,\n          \"target\":
+        \"Morty Sanchex\"\n        }\n      ]\n    }\n  ]\n}"
   - DayNumber: 3
     Events:
     - PlayerAction: Search the city
@@ -1869,5 +2078,5 @@ MonoBehaviour:
         {\n          \"effectType\": \"ReduceSanity\",\n          \"intensity\":
         4,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n 
         ]\n}"
-  totalEvents: 54
-  lastUpdated: 2026-02-08 20:14:48
+  totalEvents: 60
+  lastUpdated: 2026-02-08 21:22:18

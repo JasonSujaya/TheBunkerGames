@@ -157,9 +157,11 @@ namespace TheBunkerGames
             {
                 Day = day,
                 ExplorationActive = true,
-                // Force all categories active on Day 1 for a busy start
-                DilemmaActive = (day == 1) || (UnityEngine.Random.value <= dilemmaChance),
-                FamilyRequestActive = (day == 1) || ShouldActivateFamilyRequest()
+                // Day 1: Only Exploration (1 challenge)
+                // Day 2: Force all active (3 challenges)
+                // Day 3+: Random chance
+                DilemmaActive = (day == 2) || (day > 2 && UnityEngine.Random.value <= dilemmaChance),
+                FamilyRequestActive = (day == 2) || (day > 2 && ShouldActivateFamilyRequest())
             };
 
             // Draw challenges

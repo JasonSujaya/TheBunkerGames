@@ -88,6 +88,106 @@ MonoBehaviour:
     description: There's a solar panel array on the surface that could supplement
       power, but going outside is dangerous. How do you attempt to connect it?
     targetCharacter: 
+  - category: 0
+    title: Clogged Air Filter
+    description: The primary air filter is clogged with dust and won't last much longer.
+      Breathing is becoming difficult. How do you clean or replace it?
+    targetCharacter: 
+  - category: 0
+    title: Hydroponics Failure
+    description: The UV lights in the hydroponics garden have shorted out. The plants
+      will die without light. How do you fix the lighting system?
+    targetCharacter: 
+  - category: 0
+    title: Mysterious Leak
+    description: A steady drip of unknown liquid is coming from the ceiling in the
+      living quarters. It smells chemical. How do you investigate and stop it?
+    targetCharacter: 
+  - category: 0
+    title: Radio Static
+    description: The radio is stuck on a loop of static that sounds almost like a
+      voice. It's driving everyone crazy. How do you tune it or fix the receiver?
+    targetCharacter: 
+  - category: 0
+    title: Mold Growth
+    description: Black mold is spreading rapidly in the shower corner. It could be
+      toxic. How do you remove it without spreading spores?
+    targetCharacter: 
+  - category: 0
+    title: Computer Glitch
+    description: The main terminal is frozen on a boot screen. You need it to check
+      external radiation levels. How do you reboot the system manually?
+    targetCharacter: 
+  - category: 0
+    title: Rusty Pipes
+    description: A water pipe has burst, spraying water everywhere. You're losing
+      precious water reserves. How do you patch the leak?
+    targetCharacter: 
+  - category: 0
+    title: Strange Smell
+    description: A foul smell is coming from the waste recycler. It might be blocked
+      or malfunctioning. How do you fix the sanitation system?
+    targetCharacter: 
+  - category: 0
+    title: Vibration
+    description: The entire bunker is vibrating slightly. It could be an earthquake
+      or something digging nearby. How do you determine the cause?
+    targetCharacter: 
+  - category: 0
+    title: Locked Safe
+    description: You found a small, locked wall safe behind a loose panel. It might
+      contain old codes or supplies. How do you crack it?
+    targetCharacter: 
+  - category: 0
+    title: Broken Thermostat
+    description: The temperature controls are broken, and the bunker is getting freezing
+      cold. How do you bypass the thermostat to heat the place up?
+    targetCharacter: 
+  - category: 0
+    title: Overgrown Roots
+    description: Roots from a surface tree have broken through the concrete wall in
+      storage. They are damaging the structure. How do you remove them?
+    targetCharacter: 
+  - category: 0
+    title: Flickering Screen
+    description: The surveillance monitor for the front door is flickering and going
+      dark. You need to see outside. How do you repair the display?
+    targetCharacter: 
+  - category: 0
+    title: Interpreting Old Maps
+    description: You found some old blueprints of the bunker that show a hidden room.
+      The entrance is concealed. How do you find the secret door?
+    targetCharacter: 
+  - category: 0
+    title: Battery Leak
+    description: One of the backup batteries is leaking acid. It's corroding the floor
+      and releasing fumes. How do you safely neutralize and remove it?
+    targetCharacter: 
+  - category: 0
+    title: Echoes in the Vents
+    description: You hear voices echoing through the ventilation request. Is it the
+      wind, or people on the surface? How do you listen in without being heard?
+    targetCharacter: 
+  - category: 0
+    title: Stuck Hatch Wheel
+    description: The wheel to seal the airlock is jammed. If there's a breach, you
+      won't be able to close it. How do you grease or force the mechanism?
+    targetCharacter: 
+  - category: 0
+    title: Unidentified Object
+    description: You found a strange metallic object embedded in the bunker wall.
+      It's warm to the touch. How do you analyze what it is?
+    targetCharacter: 
+  - category: 0
+    title: Short Circuit
+    description: Sparks are flying from a junction box. The smell of ozone is strong.
+      Power is fluctuating. How do you rewire the circuit safely?
+    targetCharacter: 
+  - category: 0
+    title: Data Drive
+    description: You found an old data drive labeled "Project A.N.G.E.L. Backup".
+      It allows you to access old logs. How do you try to read the encrypted data?
+    targetCharacter: 
   dilemmaChallenges:
   - category: 1
     title: Water Rationing
@@ -143,9 +243,106 @@ MonoBehaviour:
       trying to find help. How do you respond?
     targetCharacter: 
   - category: 1
-    title: Contaminated Food
-    description: Half of your remaining food supply may have been exposed to contamination.
-      Eating it risks sickness. Throwing it away means going hungry. What's the plan?
+    title: The Lost Scout
+    description: A scout from a nearby settlement asks for shelter. They have valuable
+      intel but might lead enemies to you. Do you let them in?
+    targetCharacter: 
+  - category: 1
+    title: Fuel vs Medicine
+    description: You find a stash with both fuel and medicine, but can only carry one
+      container back before a storm hits. Which do you take?
+    targetCharacter: 
+  - category: 1
+    title: Broken Radio
+    description: To fix the long-range transmitter, you need parts from the life support
+      system. It will reduce air quality slightly but let you call for help. Do you take the parts?
+    targetCharacter: 
+  - category: 1
+    title: The Zealot
+    description: A religious zealot offers food if you let him preach to your family.
+      His ideas are radical and disturbing. Do you accept the trade?
+    targetCharacter: 
+  - category: 1
+    title: Pest Control
+    description: You can use a strong chemical to kill the rats, but it will release
+      toxic fumes for a day. Or you can hunt them manually, which is slow and ineffective.
+      What do you choose?
+    targetCharacter: 
+  - category: 1
+    title: The Gamble
+    description: A stranger challenges you to a game of chance for supplies. If you
+      win, you get food. If you lose, you give up ammo. Do you play?
+    targetCharacter: 
+  - category: 1
+    title: Old Friends
+    description: You recognize a raider leader as an old friend. You can try to negotiate
+      (risky) or attack while you have the element of surprise. What do you do?
+    targetCharacter: 
+  - category: 1
+    title: Rotten Meat
+    description: You found meat that is slightly turned. Cooking it thoroughly *might*
+      make it safe, or it could poison everyone. Eating it saves other rations. Do you risk it?
+    targetCharacter: 
+  - category: 1
+    title: The Thief
+    description: You caught a child from the surface stealing water. You can punish
+      them (deterrent) or let them go (mercy). What is your justice?
+    targetCharacter: 
+  - category: 1
+    title: Overclocking
+    description: You can overclock the generator to get more power for a few days,
+      but it risks permanent damage. Do you push the machine?
+    targetCharacter: 
+  - category: 1
+    title: The Map
+    description: A dying traveler offers his map in exchange for a proper burial. Digging
+      the grave takes time and energy. Do you help him?
+    targetCharacter: 
+  - category: 1
+    title: Trapped Animal
+    description: A mutated deer is trapped in a pit nearby. It's suffering. Do you
+      kill it for meat (risky meat) or set it free (mercy but no food)?
+    targetCharacter: 
+  - category: 1
+    title: False Alarm
+    description: The radiation alarm is going off, but the sensors might be faulty.
+      Sealing the bunker wastes air. Ignoring it risks exposure. What do you do?
+    targetCharacter: 
+  - category: 1
+    title: The Deserter
+    description: A soldier fleeing the army offers weapons in exchange for hiding him.
+      The army will come looking. Is the firepower worth the risk?
+    targetCharacter: 
+  - category: 1
+    title: Moldy Books
+    description: You found a library of damp books. You can burn them for heat (immediate
+      survival) or try to dry them to preserve knowledge (sanity). What do you choose?
+    targetCharacter: 
+  - category: 1
+    title: Signal Flare
+    description: You found a flare gun. Firing it might attract rescuers, but it will
+      definitely attract raiders. Do you use it?
+    targetCharacter: 
+  - category: 1
+    title: The Experiment
+    description: You found unidentified chemical boosters. They could increase strength
+      or cause sickness. Do you test one on a family member?
+    targetCharacter: 
+  - category: 1
+    title: Cryptic Warning
+    description: A message scratched on the door says "Don't open for 3 days." It
+      could be a warning about radiation or a trick to keep you inside. Do you obey?
+    targetCharacter: 
+  - category: 1
+    title: Hydroponics Choice
+    description: The plants have a fungus. You can use a harsh fungicide (kills some
+      crops but saves the rest) or try manual removal (saves crops but might fail).
+      What do you do?
+    targetCharacter: 
+  - category: 1
+    title: Abandoned Dog
+    description: A stray dog is scratching at the door. It could be a companion (sanity)
+      but it will eat your food (resource drain). Do you let it in?
     targetCharacter: 
   familyRequestChallenges:
   - category: 2
@@ -202,4 +399,105 @@ MonoBehaviour:
     title: Wants to Leave
     description: '{target} wants to leave the bunker alone to search for help. It''s
       dangerous outside, but they''re determined. How do you respond to their plan?'
+    targetCharacter: 
+  - category: 2
+    title: Cabin Fever
+    description: '{target} is pacing back and forth, muttering aggressively. They
+      feel trapped and are about to snap. How do you help them cope with confinement?'
+    targetCharacter: 
+  - category: 2
+    title: Lost Memento
+    description: '{target} has lost a small item that reminds them of the old world.
+      They are tearing the room apart in a panic. How do you help them find it or
+      calm down?'
+    targetCharacter: 
+  - category: 2
+    title: Strange Rash
+    description: '{target} has developed a weird, itchy rash on their arm. They are
+      scared it''s contamination. How do you treat or soothe them?'
+    targetCharacter: 
+  - category: 2
+    title: Existential Dread
+    description: '{target} is staring at a blank wall, asking "What''s the point?"
+      They are refusing to do their chores. How do you motivate them?'
+    targetCharacter: 
+  - category: 2
+    title: Hiding Food
+    description: You found {target} hiding a small stash of food under their mattress.
+      They look guilty but scared. How do you confront them?'
+    targetCharacter: 
+  - category: 2
+    title: Toothache
+    description: '{target} has a severe toothache and can barely speak. You don''t
+      have a dentist, but you have tools. How do you help them?'
+    targetCharacter: 
+  - category: 2
+    title: Hearing Voices
+    description: '{target} claims they can hear people scratching on the other side
+      of the wall. No one else hears it. They are terrified. How do you handle this?'
+    targetCharacter: 
+  - category: 2
+    title: Boredom
+    description: '{target} is visibly bored and starting to annoy everyone else with
+      constant noise. They need a distraction. What do you suggest?'
+    targetCharacter: 
+  - category: 2
+    title: Secret Diary
+    description: '{target} is furiously writing in a notebook and hiding it whenever
+      you come near. They seem paranoid. do you respect their privacy or investigate?'
+    targetCharacter: 
+  - category: 2
+    title: Cold Symptoms
+    description: '{target} is coughing and sneezing constanty. It might just be a
+      cold, or something worse. How do you care for them?'
+    targetCharacter: 
+  - category: 2
+    title: Birthday Blues
+    description: It's {target}'s birthday, but there's no cake or presents. They
+      are sitting alone, looking miserable. How do you celebrate in the apocalypse?'
+    targetCharacter: 
+  - category: 2
+    title: Fear of the Dark
+    description: The backup lights flickered, and {target} is now refusing to go
+      into the back rooms alone. They are paralyzed by fear. How do you help?'
+    targetCharacter: 
+  - category: 2
+    title: Anger Issues
+    description: '{target} just punched a wall in frustration, hurting their hand.
+      Their temper is getting dangerous. How do you de-escalate?'
+    targetCharacter: 
+  - category: 2
+    title: Obsessive Cleaning
+    description: '{target} is scrubbing the floor until their hands bleed, terrified
+      of germs. It''s becoming a compulsion. How do you intervene?'
+    targetCharacter: 
+  - category: 2
+    title: Guilt Trip
+    description: '{target} won''t stop talking about someone you had to leave behind.
+      They blame you. It''s hurting morale. How do you address this?'
+    targetCharacter: 
+  - category: 2
+    title: Insomia
+    description: '{target} has been awake for three days straight. They are hallucinating
+      from exhaustion. How do you get them to sleep?'
+    targetCharacter: 
+  - category: 2
+    title: Shadow Puppets
+    description: '{target} is trying to entertain the group with shadow puppets but
+      the story they are telling is incredibly dark and disturbing. How do you react?'
+    targetCharacter: 
+  - category: 2
+    title: Broken Glasses
+    description: '{target} broke their glasses (or reading light) and can''t see well.
+      They feel useless. How do you fix the situation?'
+    targetCharacter: 
+  - category: 2
+    title: Prayer
+    description: '{target} has started praying loudly at all hours, disturbing others''
+      sleep. They say it''s the only thing saving them. How do you handle it?'
+    targetCharacter: 
+  - category: 2
+    title: New Hobby
+    description: '{target} wants to start a "garden" using moldy food scraps. It''s
+      gross, but they seem excited. Do you encourage this?'
     targetCharacter: 
