@@ -235,22 +235,22 @@ namespace TheBunkerGames
             gridObj.transform.SetParent(parent, false);
 
             RectTransform gridRect = gridObj.AddComponent<RectTransform>();
-            gridRect.anchorMin = new Vector2(0.03f, 0.04f);
-            gridRect.anchorMax = new Vector2(0.97f, 0.87f);
+            gridRect.anchorMin = new Vector2(0.03f, 0.08f);
+            gridRect.anchorMax = new Vector2(0.97f, 0.86f);
             gridRect.offsetMin = Vector2.zero;
             gridRect.offsetMax = Vector2.zero;
 
-            // Use GridLayoutGroup for automatic 2-column layout
+            // GridLayoutGroup with calculated cell sizes
+            // Reference canvas: 1920x1080. Grid area ~94% x 78% = ~1804 x 842
+            // 2 cols: (1804 - 40 padding - 30 spacing) / 2 = ~867 per cell width
+            // 2 rows: (842 - 20 padding - 30 spacing) / 2 = ~396 per cell height
             GridLayoutGroup grid = gridObj.AddComponent<GridLayoutGroup>();
             grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             grid.constraintCount = 2;
-            grid.spacing = new Vector2(20, 20);
+            grid.cellSize = new Vector2(860, 390);
+            grid.spacing = new Vector2(30, 30);
             grid.padding = new RectOffset(20, 20, 10, 10);
-            grid.childAlignment = TextAnchor.UpperCenter;
-
-            // ContentSizeFitter is not needed — grid fills the container
-            // We need to calculate cell size based on available space
-            // For now, use flexible cells via LayoutElement on each card
+            grid.childAlignment = TextAnchor.MiddleCenter;
 
             // Build individual cards for each theme
             for (int i = 0; i < availableThemes.Count; i++)
@@ -261,7 +261,7 @@ namespace TheBunkerGames
 
         private void BuildThemeCardInGrid(Transform gridParent, GameThemeSO theme, int index)
         {
-            // Card wrapper — the clickable card
+            // Card wrapper — the clickable card (sized by GridLayoutGroup)
             GameObject cardObj = new GameObject($"ThemeCard_{index}");
             cardObj.transform.SetParent(gridParent, false);
 
@@ -286,12 +286,6 @@ namespace TheBunkerGames
             btnColors.highlightedColor = new Color(0.9f, 0.9f, 0.85f, 1f);
             btnColors.pressedColor = new Color(0.7f, 0.7f, 0.65f, 1f);
             cardButton.colors = btnColors;
-
-            // LayoutElement to control size in grid
-            LayoutElement layout = cardObj.AddComponent<LayoutElement>();
-            layout.flexibleWidth = 1;
-            layout.flexibleHeight = 1;
-            layout.minHeight = 200;
 
             // --- Media area (video/image inside card frame) ---
             GameObject mediaArea = new GameObject("MediaArea");
