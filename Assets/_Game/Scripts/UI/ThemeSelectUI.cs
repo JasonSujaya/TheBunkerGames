@@ -720,6 +720,88 @@ namespace TheBunkerGames
         }
 
         // -------------------------------------------------------------------------
+        // Display Current Theme
+        // -------------------------------------------------------------------------
+        private void DisplayCurrentTheme()
+        {
+            if (availableThemes.Count == 0) return;
+            if (currentIndex < 0 || currentIndex >= availableThemes.Count)
+                currentIndex = 0;
+
+            GameThemeSO theme = availableThemes[currentIndex];
+            if (theme == null) return;
+
+            // Update card title
+            if (scenarioNameText != null)
+                scenarioNameText.text = theme.ThemeName.ToUpper();
+
+            // Update card media (static image fallback)
+            if (cardMediaImage != null)
+            {
+                if (theme.ThemeIcon != null)
+                {
+                    cardMediaImage.sprite = theme.ThemeIcon;
+                    cardMediaImage.color = Color.white;
+                    cardMediaImage.preserveAspect = false;
+                }
+                else
+                {
+                    cardMediaImage.sprite = null;
+                    cardMediaImage.color = new Color(0.2f, 0.2f, 0.2f, 1f);
+                }
+            }
+
+            // Update detail panel
+            if (detailNameText != null)
+                detailNameText.text = theme.ThemeName.ToUpper();
+
+            if (detailTraitsText != null)
+            {
+                if (theme.Traits != null && theme.Traits.Length > 0)
+                    detailTraitsText.text = string.Join("\n", theme.Traits).ToUpper();
+                else
+                    detailTraitsText.text = "NONE";
+            }
+
+            if (detailBioText != null)
+                detailBioText.text = !string.IsNullOrEmpty(theme.Description)
+                    ? theme.Description
+                    : "No description available.";
+
+            // Play video
+            StopVideo();
+            if (theme.PreviewVideo != null)
+                PlayVideo(theme.PreviewVideo);
+
+            // Auto-select the displayed theme
+            selectedTheme = theme;
+            UIBuilderUtils.SetButtonInteractable(panel, "ConfirmButton", true);
+
+            if (enableDebugLogs) Debug.Log($"[ThemeSelectUI] Displaying: {theme.ThemeName} ({currentIndex + 1}/{availableThemes.Count})");
+        }
+
+        // -------------------------------------------------------------------------
+        // Navigation
+        // -------------------------------------------------------------------------
+        private void NavigateLeft()
+        {
+            if (availableThemes.Count == 0) return;
+            currentIndex--;
+            if (currentIndex < 0)
+                currentIndex = availableThemes.Count - 1;
+            DisplayCurrentTheme();
+        }
+
+        private void NavigateRight()
+        {
+            if (availableThemes.Count == 0) return;
+            currentIndex++;
+            if (currentIndex >= availableThemes.Count)
+                currentIndex = 0;
+            DisplayCurrentTheme();
+        }
+
+        // -------------------------------------------------------------------------
         // Button Wiring
         // -------------------------------------------------------------------------
         private void WireCardButtons()
