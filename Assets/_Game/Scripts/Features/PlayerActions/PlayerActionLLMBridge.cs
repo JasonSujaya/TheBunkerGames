@@ -159,11 +159,14 @@ namespace TheBunkerGames
                 sb.AppendLine($"- Days 28-{totalDays}: Endgame. Final push for survival, maximum stakes.");
             sb.AppendLine();
 
-            // Character names
+            // Character names and personalities
             sb.AppendLine("CHARACTERS:");
             string characterNames = GetCharacterNameList();
             sb.AppendLine($"- The family members are: {characterNames}");
             sb.AppendLine("- You MUST use these exact names as the \"target\" in effects. Do NOT invent names.");
+            
+            // Add character descriptions/bios for richer storytelling
+            AppendCharacterDescriptions(sb);
             sb.AppendLine();
 
             // Effect types
@@ -441,6 +444,39 @@ namespace TheBunkerGames
             var family = FamilyManager.Instance.FamilyMembers;
             if (family == null || family.Count == 0) return "Father";
             return family[0].Name;
+        }
+
+        private void AppendCharacterDescriptions(StringBuilder sb)
+        {
+            // Try to get character definitions from FamilyManager's profile
+            if (FamilyManager.Instance == null || FamilyManager.Instance.DefaultFamilyProfile == null)
+                return;
+
+            var definitions = FamilyManager.Instance.DefaultFamilyProfile.DefaultFamilyMembers;
+            if (definitions == null || definitions.Count == 0)
+                return;
+
+            sb.AppendLine();
+            sb.AppendLine("CHARACTER PERSONALITIES (use these for dialogue and story flavor):");
+            foreach (var def in definitions)
+            {
+                if (def == null) continue;
+                
+                sb.Append($"  - {def.CharacterName}");
+                
+                // Add role
+                sb.Append($" ({def.Role})");
+                
+                sb.AppendLine(":");
+                
+                // Add description/bio
+                if (!string.IsNullOrEmpty(def.Description))
+                    sb.AppendLine($"    Bio: {def.Description}");
+                
+                // Add traits
+                if (def.StartingTraits != null && def.StartingTraits.Length > 0)
+                    sb.AppendLine($"    Traits: {string.Join(", ", def.StartingTraits)}");
+            }
         }
 
         // -------------------------------------------------------------------------
