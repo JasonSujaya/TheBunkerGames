@@ -178,6 +178,11 @@ namespace TheBunkerGames
             var flow = FindFirstObjectByType<GameFlowController>();
             if (flow != null)
             {
+                // Ensure other screens are hidden
+                if (familyUI != null) familyUI.Hide();
+                if (themeUI != null)  themeUI.Hide();
+                if (homeUI != null)   homeUI.Hide();
+
                 flow.StartNewGame();
                 if (enableDebugLogs) Debug.Log("[MainMenuController] GameFlowController.StartNewGame() called.");
             }
@@ -242,6 +247,9 @@ namespace TheBunkerGames
                       $"Family={(familyUI==null?"MISSING":"OK")}, " +
                       $"HUD={(gameplayHUD==null?"MISSING":"OK")}, " +
                       $"Fader={(fader==null?"MISSING":"OK")}");
+            
+            if (homeUI != null) Debug.Log($"[MainMenuController] HomeUI: {homeUI.name} (Scene: {homeUI.gameObject.scene.name})");
+            if (familyUI != null) Debug.Log($"[MainMenuController] FamilyUI: {familyUI.name} (Scene: {familyUI.gameObject.scene.name})");
             
             #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(this);

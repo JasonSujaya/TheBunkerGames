@@ -82,6 +82,21 @@ namespace TheBunkerGames
         }
 
         // -------------------------------------------------------------------------
+        //  Show / Hide
+        // -------------------------------------------------------------------------
+        public void Show()
+        {
+            gameObject.SetActive(true);
+            if (enableDebugLogs) Debug.Log("[HomeUI] Shown");
+        }
+
+        public void Hide()
+        {
+            gameObject.SetActive(false);
+            if (enableDebugLogs) Debug.Log("[HomeUI] Hidden");
+        }
+
+        // -------------------------------------------------------------------------
         // Auto Setup / Editor Tools
         // -------------------------------------------------------------------------
         #if UNITY_EDITOR
