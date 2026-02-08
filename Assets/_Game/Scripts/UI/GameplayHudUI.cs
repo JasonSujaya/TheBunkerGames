@@ -1084,6 +1084,30 @@ namespace TheBunkerGames
             if (playerActionUI == null)
                 playerActionUI = FindFirstObjectByType<PlayerActionUI>(FindObjectsInactive.Include);
 
+            // Auto-find button references if not assigned (critical for disabled GameObjects)
+            if (panel == null)
+            {
+                var childPanel = transform.Find("GameplayHudCanvas/HudPanel");
+                if (childPanel != null) panel = childPanel.gameObject;
+            }
+            
+            if (panel != null)
+            {
+                if (diaryButton == null)
+                    diaryButton = UIBuilderUtils.FindButton(panel, "DiaryBtn");
+                if (endDayButton == null)
+                    endDayButton = UIBuilderUtils.FindButton(panel, "EndDayBtn");
+                if (ourThingsButton == null)
+                    ourThingsButton = UIBuilderUtils.FindButton(panel, "OurThingsBtn");
+                    
+                if (enableDebugLogs && diaryButton != null)
+                    Debug.Log("[GameplayHudUI] DiaryButton found and ready to wire.");
+            }
+            else if (enableDebugLogs)
+            {
+                Debug.LogWarning("[GameplayHudUI] Panel is null - cannot find buttons!");
+            }
+
             // Wire character navigation arrows on detail card
             if (prevCharButton != null)
             {

@@ -952,6 +952,77 @@ MonoBehaviour:
         {\n          \"effectType\": \"ReduceThirst\",\n          \"intensity\":
         5,\n          \"target\": \"Morty Sanchex\"\n        }\n      ]\n    }\n 
         ]\n}"
+    - PlayerAction: I ask Rick to shoot a portal gone outside....
+      Title: Portal Mishap
+      Description: Rick attempts to shoot a portal to access the solar panels but
+        miscalculates, creating a chaotic and unstable connection. The portal flickers
+        dangerously, causing minor injuries and draining some of the bunker's power
+        reserves.
+      EffectCount: 3
+      ChoiceCount: 3
+      Category: Exploration
+      Timestamp: 19:45:37
+      FullEventJson: "{\n  \"title\": \"Portal Mishap\",\n  \"description\": \"Rick
+        attempts to shoot a portal to access the solar panels but miscalculates,
+        creating a chaotic and unstable connection. The portal flickers dangerously,
+        causing minor injuries and draining some of the bunker's power reserves.\",\n 
+        \"effects\": [\n    {\n      \"effectType\": \"ReduceHP\",\n      \"intensity\":
+        10,\n      \"target\": \"Rick Sanchex\"\n    },\n    {\n      \"effectType\":
+        \"ReduceSanity\",\n      \"intensity\": 15,\n      \"target\": \"Rick Sanchex\"\n   
+        },\n    {\n      \"effectType\": \"ReduceSupplies\",\n      \"intensity\":
+        20,\n      \"target\": \"\"\n    }\n  ],\n  \"choices\": [\n    {\n     
+        \"text\": \"Attempt to stabilize the portal\",\n      \"effects\": [\n       
+        {\n          \"effectType\": \"ReduceHP\",\n          \"intensity\": 5,\n         
+        \"target\": \"Doomsday Dave\"\n        },\n        {\n          \"effectType\":
+        \"ReduceSupplies\",\n          \"intensity\": 10,\n          \"target\":
+        \"\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Close the portal
+        and abandon the plan\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddSanity\",\n          \"intensity\": 5,\n          \"target\": \"Morty
+        Sanchex\"\n        },\n        {\n          \"effectType\": \"ReduceHunger\",\n         
+        \"intensity\": 5,\n          \"target\": \"\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Send someone through the unstable portal to manually
+        connect the solar panels\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"ReduceHP\",\n          \"intensity\": 15,\n          \"target\": \"Morty
+        Sanchex\"\n        },\n        {\n          \"effectType\": \"AddSupplies\",\n         
+        \"intensity\": 30,\n          \"target\": \"\"\n        }\n      ]\n    }\n 
+        ]\n}"
+    - PlayerAction: I put some water in it
+      Title: Water Over Everything
+      Description: You decide to prioritize the water pump, ensuring everyone stays
+        hydrated. However, the lack of lights and radio starts to affect the family's
+        morale and information access. Morty Sanchex is relieved to have water but
+        worried about being in the dark.
+      EffectCount: 4
+      ChoiceCount: 3
+      Category: Dilemma
+      Timestamp: 19:45:38
+      FullEventJson: "{\n  \"title\": \"Water Over Everything\",\n  \"description\":
+        \"You decide to prioritize the water pump, ensuring everyone stays hydrated.
+        However, the lack of lights and radio starts to affect the family's morale
+        and information access. Morty Sanchex is relieved to have water but worried
+        about being in the dark.\",\n  \"effects\": [\n    {\n      \"effectType\":
+        \"AddWater\",\n      \"intensity\": 10,\n      \"target\": \"\"\n    },\n   
+        {\n      \"effectType\": \"ReduceSanity\",\n      \"intensity\": 5,\n     
+        \"target\": \"Morty Sanchex\"\n    },\n    {\n      \"effectType\": \"ReduceSanity\",\n     
+        \"intensity\": 3,\n      \"target\": \"Rick Sanchex\"\n    },\n    {\n     
+        \"effectType\": \"ReduceSanity\",\n      \"intensity\": 2,\n      \"target\":
+        \"Doomsday Dave\"\n    }\n  ],\n  \"choices\": [\n    {\n      \"text\":
+        \"Tell stories to boost morale\",\n      \"effects\": [\n        {\n         
+        \"effectType\": \"AddSanity\",\n          \"intensity\": 4,\n          \"target\":
+        \"Morty Sanchex\"\n        },\n        {\n          \"effectType\": \"AddSanity\",\n         
+        \"intensity\": 3,\n          \"target\": \"Rick Sanchex\"\n        },\n       
+        {\n          \"effectType\": \"ReduceHunger\",\n          \"intensity\":
+        2,\n          \"target\": \"Doomsday Dave\"\n        }\n      ]\n    },\n   
+        {\n      \"text\": \"Ration food to conserve supplies\",\n      \"effects\":
+        [\n        {\n          \"effectType\": \"ReduceHunger\",\n          \"intensity\":
+        5,\n          \"target\": \"\"\n        },\n        {\n          \"effectType\":
+        \"ReduceSanity\",\n          \"intensity\": 3,\n          \"target\": \"Rick
+        Sanchex\"\n        }\n      ]\n    },\n    {\n      \"text\": \"Search for
+        more fuel in the dark\",\n      \"effects\": [\n        {\n          \"effectType\":
+        \"AddSupplies\",\n          \"intensity\": 3,\n          \"target\": \"\"\n       
+        },\n        {\n          \"effectType\": \"InjureCharacter\",\n         
+        \"intensity\": 2,\n          \"target\": \"Doomsday Dave\"\n        }\n     
+        ]\n    }\n  ]\n}"
   - DayNumber: 2
     Events:
     - PlayerAction: Search the storage room for supplies
@@ -1560,5 +1631,5 @@ MonoBehaviour:
         \"intensity\": 3,\n          \"target\": \"Father\"\n        },\n       
         {\n          \"effectType\": \"AddSanity\",\n          \"intensity\": 3,\n         
         \"target\": \"Mother\"\n        }\n      ]\n    }\n  ]\n}"
-  totalEvents: 45
-  lastUpdated: 2026-02-08 18:37:05
+  totalEvents: 47
+  lastUpdated: 2026-02-08 19:45:38

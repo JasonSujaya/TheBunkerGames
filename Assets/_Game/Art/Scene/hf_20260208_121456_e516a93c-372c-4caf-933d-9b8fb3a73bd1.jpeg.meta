@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 934e2e6419ff34c7ba2c3d5a382cf530
+guid: dae791e5bb678428db4df033417c277a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1685163811429531668
-    second: SceneTest 1_0
+      213: 4244786247235170680
+    second: hf_20260208_121456_e516a93c-372c-4caf-933d-9b8fb3a73bd1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -139,7 +139,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: SceneTest 1_0
+      name: hf_20260208_121456_e516a93c-372c-4caf-933d-9b8fb3a73bd1_0
       rect:
         serializedVersion: 2
         x: 0
@@ -154,8 +154,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: cef366f11781d98e0800000000000000
-      internalID: -1685163811429531668
+      spriteID: 8717aed1a9288ea30800000000000000
+      internalID: 4244786247235170680
       vertices: []
       indices: 
       edges: []
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      SceneTest 1_0: -1685163811429531668
+      hf_20260208_121456_e516a93c-372c-4caf-933d-9b8fb3a73bd1_0: 4244786247235170680
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

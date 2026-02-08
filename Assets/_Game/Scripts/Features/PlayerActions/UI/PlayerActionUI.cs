@@ -653,29 +653,9 @@ namespace TheBunkerGames
 
         private void CheckAllSaved()
         {
-            if (currentState == null)
-            {
-                if (submitAllButton != null)
-                    submitAllButton.gameObject.SetActive(false);
-                return;
-            }
-
-            var active = currentState.GetActiveCategories();
-            bool allSaved = true;
-            foreach (var cat in active)
-            {
-                if (!savedCategories.ContainsKey(cat) || !savedCategories[cat])
-                {
-                    allSaved = false;
-                    break;
-                }
-            }
-
+            // Submit All button is disabled - actions are submitted automatically
             if (submitAllButton != null)
-                submitAllButton.gameObject.SetActive(allSaved && active.Count > 0);
-
-            if (allSaved && active.Count > 0 && enableDebugLogs)
-                Debug.Log("[PlayerActionUI] All categories saved! Submit All button shown.");
+                submitAllButton.gameObject.SetActive(false);
         }
 
         private void OnSubmitAllClicked()
