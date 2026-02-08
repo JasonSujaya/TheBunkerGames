@@ -726,7 +726,7 @@ namespace TheBunkerGames
             { img.color = fallback; }
         }
 
-        /// <summary>Small arrow button. Returns the Button component.</summary>
+        /// <summary>Small arrow button using sprite directly. Returns the Button component.</summary>
         private Button MakeArrowBtn(RectTransform parent, string name, Sprite arrowSprite,
             string fallbackChar, float size)
         {
@@ -735,30 +735,20 @@ namespace TheBunkerGames
             go.GetComponent<RectTransform>().sizeDelta = new Vector2(size, size);
             go.AddComponent<LayoutElement>().preferredWidth = size;
 
-            var bg = go.AddComponent<Image>();
-            bg.color = new Color(0f, 0f, 0f, 0.05f); // very subtle bg
-            bg.raycastTarget = true;
-
-            var btn = go.AddComponent<Button>();
-            btn.targetGraphic = bg;
-            var c = btn.colors;
-            c.highlightedColor = new Color(0.80f, 0.75f, 0.70f, 0.30f);
-            c.pressedColor     = new Color(0.60f, 0.55f, 0.50f, 0.40f);
-            btn.colors = c;
+            var img = go.AddComponent<Image>();
+            img.raycastTarget = true;
 
             if (arrowSprite != null)
             {
-                var inner = MakeRect(go.GetComponent<RectTransform>(), "Arrow",
-                    new Vector2(0.15f, 0.15f), new Vector2(0.85f, 0.85f));
-                var img = inner.gameObject.AddComponent<Image>();
-                img.sprite = arrowSprite; img.preserveAspect = true;
-                img.color = textColor;
-                img.raycastTarget = false;
+                img.sprite = arrowSprite;
+                img.preserveAspect = true;
+                img.color = Color.white;
             }
             else
             {
+                img.color = Color.clear; // invisible bg, use text fallback
                 var inner = MakeRect(go.GetComponent<RectTransform>(), "Arrow",
-                    new Vector2(0f, 0f), new Vector2(1f, 1f));
+                    Vector2.zero, Vector2.one);
                 var tmp = inner.gameObject.AddComponent<TextMeshProUGUI>();
                 tmp.text      = fallbackChar;
                 tmp.fontSize  = 22;
@@ -767,6 +757,14 @@ namespace TheBunkerGames
                 tmp.raycastTarget = false;
                 if (titleFont != null) tmp.font = titleFont;
             }
+
+            var btn = go.AddComponent<Button>();
+            btn.targetGraphic = img;
+            var c = btn.colors;
+            c.normalColor      = Color.white;
+            c.highlightedColor = new Color(0.85f, 0.80f, 0.70f, 1f);
+            c.pressedColor     = new Color(0.65f, 0.60f, 0.55f, 1f);
+            btn.colors = c;
 
             return btn;
         }
