@@ -1,17 +1,3 @@
-# Entropy's Watch
-
-> **A narrative-driven survival game where players must manage resources and family members inside an underground bunker while dealing with a decaying AI custodian.**
-
----
-
-## 📖 Overview
-
-**Entropy's Watch** (formerly "AI Survival Bunker") drops players into a post-apocalyptic underground bunker managed by **A.N.G.E.L.** (Autonomous Neural Guard & Emergency Logistics). As the outside world collapses, A.N.G.E.L.'s logic filters decay, forcing players to argue for resources, explore the void, and make impossible choices to keep their family alive.
-
-### Core Features
-Bringing an AI-native twist to the classic survival RPG. Face off against a dynamic AI storyteller with unique characters in unpredictable scenarios.
-
----
 
 ## 🎮 How to Play
 
